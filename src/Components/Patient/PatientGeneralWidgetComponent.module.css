@@ -1,0 +1,100 @@
+.ellipse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background-color: #fff;
+  width: 48px;
+  height: 48px;
+}
+.contacts-icon {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+}
+.icon {
+  width: 48px;
+  height: 48px;
+}
+.icon,
+.text,
+.title1 {
+  position: relative;
+}
+.title1 {
+  flex: 1;
+  line-height: 24px;
+}
+.text {
+  font-size: 14px;
+  line-height: 22px;
+}
+.title {
+  align-self: stretch;
+  border-radius: 10px 10px 0 0;
+  background-color: #1b2455;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 16px;
+  gap: 10px;
+}
+.text1,
+.text2 {
+  position: relative;
+  line-height: 22px;
+  font-weight: 500;
+}
+.text2 {
+  color: #000;
+}
+.item,
+.text-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.item {
+  justify-content: flex-start;
+  gap: 8px;
+}
+.text-wrapper {
+  margin: 0;
+  flex: 1;
+  background-color: #e4e9f2;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+.generalwidget,
+.table {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.table {
+  align-self: stretch;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 1px 0#f0f0f0 inset;
+  flex-direction: row;
+  padding: 0 25px;
+  font-size: 20px;
+  color: rgba(11, 24, 40, 0.45);
+}
+.generalwidget {
+  position: relative;
+  border-radius: 10px;
+  background-color: #e4e9f2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid #fff;
+  box-sizing: border-box;
+  width: 100%;
+  flex-direction: column;
+  text-align: left;
+  font-size: 30px;
+  color: #fff;
+  font-family: Manrope;
+}

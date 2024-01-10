@@ -1,0 +1,108 @@
+.ellipse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    background-color: #fff;
+    width: 48px;
+    height: 48px;
+  }
+  .contacts-icon {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+  }
+  .icon {
+    width: 48px;
+    height: 48px;
+  }
+  .icon,
+  .text,
+  .title1 {
+    position: relative;
+  }
+  .title1 {
+    flex: 1;
+    line-height: 24px;
+  }
+  .text {
+    font-size: 14px;
+    line-height: 22px;
+  }
+  .title {
+    align-self: stretch;
+    border-radius: 10px 10px 0 0;
+    background-color: #1b2455;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  .text1,
+  .text2 {
+    flex: 1;
+    position: relative;
+    line-height: 22px;
+    font-weight: 500;
+  }
+  .text2 {
+    color: #000;
+  }
+  .item {
+    align-self: stretch;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+  .infolist,
+  .table,
+  .text-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+  .text-wrapper {
+    margin: 0;
+    gap: 10px;
+    align-self: stretch;
+    flex: 1;
+    background-color: #e4e9f2;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+  }
+  .infolist,
+  .table {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  .table {
+    align-self: stretch;
+    flex: 1;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 1px 0#f0f0f0 inset;
+    padding: 0 25px;
+    font-size: 14px;
+    color: rgba(11, 24, 40, 0.45);
+  }
+  .infolist {
+    position: relative;
+    border-radius: 10px;
+    background-color: #e4e9f2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid #fff;
+    box-sizing: border-box;
+    width: 350px;
+    height: 100%;
+    text-align: left;
+    font-size: 16px;
+    color: #fff;
+    font-family: Manrope;
+  }
+  

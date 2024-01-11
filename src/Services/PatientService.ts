@@ -1,5 +1,5 @@
 import Client from "fhir-kit-client";
-import { Patient, Bundle } from "fhir/r4";
+import { Patient, Bundle, FhirResource } from "fhir/r4";
 
 export default class PatientService {
   public apiUrl: string;
@@ -38,6 +38,14 @@ export default class PatientService {
       id: id,
     })) as Patient;
   }
+
+  public async postPatient(newPatient: Patient) 
+  {
+    console.log("paciente a postear", newPatient);
+    this.fhirClient.create({resourceType: "Patient", body: newPatient}).then(res => console.log("respuesta paciente posteado", res));
+
+  }
+
   public async getPatients(count?: number): Promise<Patient[]> {
     const searchParams: { _count: number } = { _count: count || 5 };
     const response = (await this.fhirClient.search({

@@ -10,7 +10,7 @@ import {
 import PatientListPage from "./Pages/PatientListPage.tsx";
 import PatientPage from "./Pages/PatientPage.tsx";
 import QuestionnaireListComponent from "./Components/Questionnaire/QuestionnaireListComponent.tsx";
-
+import PatientCreateComponent from "./Components/Patient/PatientCreateComponent.tsx";
 
 const router = createBrowserRouter([
   {
@@ -26,8 +26,8 @@ const router = createBrowserRouter([
     element: <PatientPage></PatientPage>
   },
   {
-    path: "/ques",
-    element: <QuestionnaireListComponent></QuestionnaireListComponent>
+    path: "/add",
+    element: <PatientCreateComponent></PatientCreateComponent>
   }
 ]);
 

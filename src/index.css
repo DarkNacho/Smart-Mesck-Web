@@ -3,7 +3,7 @@ body {
   line-height: normal;
 
   background-color: #7e94ff;
-  background-image: url("/public/backgroud-smart-mesck.png");
+  background-image: url("/backgroud-smart-mesck.png");
   background-repeat: no-repeat;
   background-size: 100% 50%; /* La imagen ocupará el 100% del ancho y el 50% de la altura del contenedor */
   background-position: bottom; /* La imagen estará posicionada en la parte inferior del contenedor */

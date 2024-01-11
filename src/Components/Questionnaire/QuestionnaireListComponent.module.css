@@ -5,11 +5,6 @@
     background-color: #1B2455;
     color: white;
   }
-  
-  .closeButton {
-    margin-left: 8px;
-    color: white;
-  }
 
   .listItem {
     cursor: pointer;

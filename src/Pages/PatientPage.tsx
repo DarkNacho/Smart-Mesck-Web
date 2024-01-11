@@ -4,8 +4,6 @@ import { Observation, Patient, Bundle, Questionnaire } from "fhir/r4";
 import PatientGeneralWidgetComponent from "../Components/Patient/PatientGeneralWidgetComponent";
 import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent";
 import Pair from "../Interfaces/Pair";
-import QuestionnaireListComponent from "../Components/Questionnaire/QuestionnaireListComponent";
-import QuestionnaireComponent from "../Components/Questionnaire/QuestionnaireComponent";
 
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 import PatientService from "../Services/PatientService";
@@ -80,19 +78,9 @@ export default function PatientPage() {
       break;
     case "Formularios":
       componentToRender = (
-        <div>
-        <QuestionnaireListComponent
-          onQuestionnaireSelect={handleQuesSelect}
-        ></QuestionnaireListComponent>
-        <QuestionnaireComponent formDef={selecteQues}></QuestionnaireComponent>
-        </div>
-      );
-      break;
-    case "Encounters":
-      componentToRender = (
-        <div>
-          <PatientQuestionnaireComponent patientID={patientID || ''}></PatientQuestionnaireComponent>
-        </div>
+        <PatientQuestionnaireComponent
+          patientID={patientID!}
+        ></PatientQuestionnaireComponent>
       );
       break;
     default:

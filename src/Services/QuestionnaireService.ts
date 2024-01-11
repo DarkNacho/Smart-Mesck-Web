@@ -95,4 +95,17 @@ export default class QuestionnaireService {
       []
     );
   }
+  public async postResponse(quesResponse: QuestionnaireResponse) {
+    if (!quesResponse.id)
+      this.fhirClient.create({
+        resourceType: "QuestionnaireResponse",
+        body: quesResponse,
+      });
+    else
+      this.fhirClient.update({
+        resourceType: "QuestionnaireResponse",
+        id: quesResponse.id,
+        body: quesResponse,
+      });
+  }
 }

@@ -11,6 +11,7 @@ import PatientListPage from "./Pages/PatientListPage.tsx";
 import PatientPage from "./Pages/PatientPage.tsx";
 import QuestionnaireListComponent from "./Components/Questionnaire/QuestionnaireListComponent.tsx";
 import PatientCreateComponent from "./Components/Patient/PatientCreateComponent.tsx";
+import HeaderComponent from "./Components/HeaderComponent.tsx";
 
 const router = createBrowserRouter([
   {
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <h1>Header aqui</h1>
+    <HeaderComponent></HeaderComponent>
     <RouterProvider router={router}></RouterProvider>
   </React.StrictMode>
 );

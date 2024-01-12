@@ -12,7 +12,9 @@ export default class QuestionnaireService {
   public hasPrevPage: boolean = false;
 
   private constructor() {
-    this.apiUrl = "https://hapi.fhir.org/baseR4";
+    //this.apiUrl = "https://hapi.fhir.org/baseR4";
+    //this.apiUrl = "https://castudillo-hapi.darknacho.xyz/fhir/"
+    this.apiUrl = import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
     this.fhirClient = new Client({ baseUrl: this.apiUrl });
     this._questionnaireBundle = {} as Bundle;
   }

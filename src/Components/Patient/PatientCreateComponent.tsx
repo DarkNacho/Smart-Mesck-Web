@@ -12,7 +12,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useState } from "react";
-import { Close } from "@mui/icons-material";
+import { Close, Add  } from "@mui/icons-material";
 
 import styles from "./PatientCreateComponent.module.css";
 import { Patient } from "fhir/r4";
@@ -58,6 +58,7 @@ interface FormData {
   genero: string;
   rut: string;
   numeroTelefonico: string;
+  photo: string;
 }
 
 export default function PatientCreateComponent() {
@@ -76,40 +77,41 @@ export default function PatientCreateComponent() {
   const handleClose = () => {
     setOpen(false);
   };
-  
 
   // Función que se ejecuta al enviar el formulario
   const onSubmit: SubmitHandler<FormData> = (data) => {
     const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
     var newPatient: Patient = {
-      resourceType: "Patient", 
-      identifier: [ {system: "RUT", value: data.rut}],
+      resourceType: "Patient",
+      identifier: [{ system: "RUT", value: rut }],
       name: [
         {
           family: data.apellidoPaterno,
           given: [data.nombre, data.segundoNombre],
           suffix: [data.apellidoMaterno],
-          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno})`
+          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno})`,
         },
       ],
       birthDate: data.fechaNacimiento,
       gender: data.genero as "male" | "female" | "other" | "unknown",
-      telecom: [{system: "phone", value: data.numeroTelefonico}] 
+      telecom: [{ system: "phone", value: data.numeroTelefonico }],
+      photo: [{ url: data.photo }],
     };
     PatientService.getInstance().postPatient(newPatient);
-;
   };
 
   return (
     <div>
-      <Button onClick={handleOpen}>Abrir Dialog</Button>
+      <IconButton onClick={handleOpen} color="primary" aria-label="add"   sx={{backgroundColor: "white", "&:hover": { backgroundColor: "#1b2455"}}}>
+        <Add/>
+      </IconButton>
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
           Formularios Disponibles
           <IconButton
             aria-label="close"
             onClick={handleClose}
-            sx={{ color: "white", "&:hover": { backgroundColor: "red" } }}
+            sx={{ color: "white", backgroundColor: "#7e94ff", "&:hover": { backgroundColor: "red" } }}
           >
             <Close />
           </IconButton>
@@ -175,7 +177,7 @@ export default function PatientCreateComponent() {
                   <TextField
                     select
                     label="Género"
-                    defaultValue="undefined"
+                    defaultValue="unknown"
                     {...register("genero", {
                       required: "El Género es necesario",
                     })}
@@ -209,12 +211,15 @@ export default function PatientCreateComponent() {
                     fullWidth
                   />
                 </Grid>
+                <Grid item xs={12} sm={12}>
+                  <TextField label="Foto" {...register("photo")} fullWidth />
+                </Grid>
               </Grid>
             </form>
           </Container>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={handleClose} variant="contained" color="error">
             Cancelar
           </Button>
           <Button

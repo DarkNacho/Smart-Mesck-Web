@@ -59,7 +59,7 @@ export default function QuestionnaireListComponent({
       >
         Mostrar Cuestionarios
       </Button>
-      <Dialog open={showModal} onClose={closeModal} maxWidth="md" fullWidth>
+      <Dialog open={showModal} onClose={closeModal} maxWidth="md" fullWidth >
         <DialogTitle className={styles.dialogTitle}>
           Formularios Disponibles
           <IconButton
@@ -70,32 +70,42 @@ export default function QuestionnaireListComponent({
             <Close />
           </IconButton>
         </DialogTitle>
-        <DialogContent>
-          <div className={styles.searchContainer}>
-            <TextField label="Buscar Por título" />
-            <Button variant="contained" color="primary">
-              Buscar
-            </Button>
+        <DialogContent className={styles.dialog}>
+          <div className={styles.dialogContent}>
+            <div className={styles.searchContainer}>
+              <TextField label="Buscar Por título" />
+              <Button variant="contained" color="primary">
+                Buscar
+              </Button>
+            </div>
+            <List className={styles.listContent}>
+              {questionnaires.map((ques) => (
+                <ListItem
+                  className={styles.listItem}
+                  key={ques.id}
+                  onClick={() => {
+                    onQuestionnaireSelect(ques);
+                    closeModal();
+                  }}
+                >
+                  <ListItemText
+                    primary={`${ques.title}`}
+                    secondary={`${ques.description}`}
+                  />
+                </ListItem>
+              ))}
+            </List>
           </div>
-          <List>
-            {questionnaires.map((ques) => (
-              <ListItem
-                className={styles.listItem}
-                key={ques.id}
-                onClick={() => {
-                  onQuestionnaireSelect(ques);
-                  closeModal();
-                }}
-              >
-                <ListItemText
-                  primary={`${ques.title}`}
-                  secondary={`${ques.description}`}
-                />
-              </ListItem>
-            ))}
-          </List>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>
+        <Button
+            style={{ marginRight: 'auto'}}
+            variant="contained"
+            color="error"
+            onClick={closeModal}
+          >
+            Cancelar
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -114,6 +124,6 @@ export default function QuestionnaireListComponent({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+      </div>
   );
 }

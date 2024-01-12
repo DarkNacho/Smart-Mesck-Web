@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { Patient } from "fhir/r4";
 
 import { List, ListItem, ListItemText, Button } from "@mui/material";
+import { useNavigate } from 'react-router-dom';
+import PatientCreateComponent from "../Components/Patient/PatientCreateComponent";
+import styles from "./PatientListPage.module.css";
+
 
 import PatientService from "../Services/PatientService";
 
@@ -9,6 +13,8 @@ const patienteService = PatientService.getInstance();
 
 export default function PatientListPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
+
+  const navigate = useNavigate();
 
   const handleNextPage = async () => {
     patienteService.getNextPage().then((res) => setPatients(res));
@@ -30,10 +36,13 @@ export default function PatientListPage() {
 
   return (
     <div>
-      <h1>Patient List</h1>
+      <div style={{ display: 'flex', gap: "10px", alignItems: "center" }}>
+      <h1>Lista de Pacientes</h1>
+      <PatientCreateComponent></PatientCreateComponent>
+      </div>
       <List>
         {patients.map((patient) => (
-          <ListItem key={patient.id}>
+          <ListItem className={styles.listItem} key={patient.id} onClick={() => navigate(`/Patient/${patient.id}`)}>
             <ListItemText
               primary={`ID: ${patient.id}`}
               secondary={`Name: ${patienteService.parsePatientName(

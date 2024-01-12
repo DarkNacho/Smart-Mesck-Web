@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Questionnaire, QuestionnaireResponse } from "fhir/r4";
 import QuestionnaireService from "../../Services/QuestionnaireService";
 import QuestionnaireComponent from "../Questionnaire/QuestionnaireComponent";
-import QuestionnaireListComponent from "../Questionnaire/QuestionnaireListComponent";
+import QuestionnaireListComponent from "../Questionnaire/QuestionnaireListDialogComponent";
 
 const questionnaireService = QuestionnaireService.getInstance();
 

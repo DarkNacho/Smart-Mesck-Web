@@ -11,8 +11,8 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { useState } from "react";
-import { Close, Add  } from "@mui/icons-material";
+import { useEffect } from "react";
+import { Close} from "@mui/icons-material";
 
 import styles from "./PatientCreateComponent.module.css";
 import { Patient } from "fhir/r4";
@@ -61,22 +61,25 @@ interface FormData {
   photo: string;
 }
 
-export default function PatientCreateComponent() {
+export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (isOpen: boolean) => void , isOpen: boolean}) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
 
-  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    onOpen(isOpen);
+  }, [isOpen]);
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
+
+
 
   const handleClose = () => {
-    setOpen(false);
+
+    onOpen(false);
   };
+
 
   // Función que se ejecuta al enviar el formulario
   const onSubmit: SubmitHandler<FormData> = (data) => {
@@ -89,7 +92,7 @@ export default function PatientCreateComponent() {
           family: data.apellidoPaterno,
           given: [data.nombre, data.segundoNombre],
           suffix: [data.apellidoMaterno],
-          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno})`,
+          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`,
         },
       ],
       birthDate: data.fechaNacimiento,
@@ -102,10 +105,8 @@ export default function PatientCreateComponent() {
 
   return (
     <div>
-      <IconButton onClick={handleOpen} color="primary" aria-label="add"   sx={{backgroundColor: "white", "&:hover": { backgroundColor: "#1b2455"}}}>
-        <Add/>
-      </IconButton>
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+      
+      <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
           Formularios Disponibles
           <IconButton

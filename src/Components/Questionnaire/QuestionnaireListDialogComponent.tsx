@@ -13,12 +13,12 @@ import {
   TextField,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import styles from "./QuestionnaireListComponent.module.css";
+import styles from "./QuestionnaireListDialogComponent.module.css";
 import QuestionnaireService from "../../Services/QuestionnaireService";
 
 const questionnaireService = QuestionnaireService.getInstance();
 
-export default function QuestionnaireListComponent({
+export default function QuestionnaireListDialogComponent({
   onQuestionnaireSelect,
 }: {
   onQuestionnaireSelect: (ques: Questionnaire) => void;

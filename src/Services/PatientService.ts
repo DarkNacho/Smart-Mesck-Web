@@ -48,8 +48,12 @@ export default class PatientService {
 
   }
 
-  public async getPatients(count?: number): Promise<Patient[]> {
-    const searchParams: { _count: number } = { _count: count || 5 };
+  public async getPatients(count?: number, content?: string): Promise<Patient[]> {
+    let searchParams: Record<string, any> = {};
+
+    searchParams["_count"] = count || 5;
+    if(content) searchParams["_content"] = content;
+    
     const response = (await this.fhirClient.search({
       resourceType: "Patient",
       searchParams: searchParams,

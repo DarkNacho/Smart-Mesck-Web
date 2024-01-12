@@ -5,7 +5,7 @@ body {
   background-color: #7e94ff;
   background-image: url("/backgroud-smart-mesck.png");
   background-repeat: no-repeat;
-  background-size: 100% 50%; /* La imagen ocupará el 100% del ancho y el 50% de la altura del contenedor */
+  background-size: 100% 40%; /* La imagen ocupará el 100% del ancho y el 50% de la altura del contenedor */
   background-position: bottom; /* La imagen estará posicionada en la parte inferior del contenedor */
-  min-height: 100vh;
+  background-attachment: fixed;
 }

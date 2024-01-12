@@ -44,7 +44,11 @@ export default function QuestionnaireComponent({
   }, [formDef]);
 
   const showQR = () => {
-    const formContainer = formContainerRef.current;
+    const formContainer = formContainerRef.current;    
+        
+    const val = window.LForms.Util.checkValidity(formContainer);
+    if(val) return
+
     const qr = window.LForms.Util.getFormFHIRData(
       "QuestionnaireResponse",
       "R4",
@@ -63,7 +67,7 @@ export default function QuestionnaireComponent({
     const nuevaRespuesta = { ...quesResponse, ...qr };
     console.log("res actualizado", nuevaRespuesta);
 
-    questionnaireService.postResponse(nuevaRespuesta);
+    questionnaireService.postResponse(nuevaRespuesta).then(res => console.log("responsed post form", res));
   };
 
   return (

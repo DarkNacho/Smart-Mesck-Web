@@ -102,7 +102,7 @@ export default class QuestionnaireService {
       this.fhirClient.create({
         resourceType: "QuestionnaireResponse",
         body: quesResponse,
-      });
+      }).then(res => console.log("res post", res));
     else
       this.fhirClient.update({
         resourceType: "QuestionnaireResponse",

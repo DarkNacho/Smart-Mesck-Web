@@ -13,8 +13,8 @@ export default class PatientService {
 
   private constructor() {
     this.apiUrl =
-    //import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
-    this.apiUrl = "https://hapi.fhir.org/baseR4";
+    import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
+    //this.apiUrl = "https://hapi.fhir.org/baseR4";
     //this.apiUrl = "https://castudillo-hapi.darknacho.xyz/fhir/"
     this.fhirClient = new Client({ baseUrl: this.apiUrl });
     this._patientBundle = {} as Bundle;

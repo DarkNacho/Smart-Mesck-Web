@@ -49,8 +49,10 @@ const handleSelectedTab = (tab: string) =>
 }
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  <div>
     <HeaderComponent></HeaderComponent>
     <RouterProvider router={router}></RouterProvider>
-  </React.StrictMode>
+  </div>
 );
+
+//<React.StrictMode>

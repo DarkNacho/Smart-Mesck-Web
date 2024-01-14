@@ -12,7 +12,8 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useEffect } from "react";
-import { Close} from "@mui/icons-material";
+import toast, { Toaster } from "react-hot-toast";
+import { Close } from "@mui/icons-material";
 
 import styles from "./PatientCreateComponent.module.css";
 import { Patient } from "fhir/r4";
@@ -61,9 +62,16 @@ interface FormData {
   photo: string;
 }
 
-export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (isOpen: boolean) => void , isOpen: boolean}) {
+export default function PatientCreateComponent({
+  onOpen,
+  isOpen,
+}: {
+  onOpen: (isOpen: boolean) => void;
+  isOpen: boolean;
+}) {
   const {
     register,
+    trigger,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
@@ -72,14 +80,32 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
     onOpen(isOpen);
   }, [isOpen]);
 
-
-
-
   const handleClose = () => {
-
     onOpen(false);
   };
 
+  const postPatient = async (newPatient: Patient) => {
+    const response = await toast.promise(
+      PatientService.getInstance().postPatient(newPatient),
+      {
+        loading: "Enviado Paciente",
+        success: (result) => {
+          if (result.success) {
+            return "Paciente enviado de forma exitosa";
+          } else {
+            throw Error(result.error);
+          }
+        },
+        error: (result) => result.toString(),
+      }
+    );
+
+    if (response.success) {
+      console.log(response.data);
+    } else {
+      console.error(response.error);
+    }
+  };
 
   // Función que se ejecuta al enviar el formulario
   const onSubmit: SubmitHandler<FormData> = (data) => {
@@ -100,19 +126,23 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
       telecom: [{ system: "phone", value: data.numeroTelefonico }],
       photo: [{ url: data.photo }],
     };
-    PatientService.getInstance().postPatient(newPatient);
+    postPatient(newPatient);
   };
 
   return (
     <div>
-      
+      <Toaster position="bottom-right" reverseOrder={false} />
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
           Formularios Disponibles
           <IconButton
             aria-label="close"
             onClick={handleClose}
-            sx={{ color: "white", backgroundColor: "#7e94ff", "&:hover": { backgroundColor: "red" } }}
+            sx={{
+              color: "white",
+              backgroundColor: "#7e94ff",
+              "&:hover": { backgroundColor: "red" },
+            }}
           >
             <Close />
           </IconButton>
@@ -130,6 +160,7 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
                     fullWidth
                     error={Boolean(errors.nombre)}
                     helperText={errors.nombre && errors.nombre.message}
+                    onBlur={() => trigger("nombre")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -137,6 +168,7 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
                     label="Segundo Nombre"
                     {...register("segundoNombre")}
                     fullWidth
+                    onBlur={() => trigger("segundoNombre")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -150,6 +182,7 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
                     helperText={
                       errors.apellidoPaterno && errors.apellidoPaterno.message
                     }
+                    onBlur={() => trigger("apellidoPaterno")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -157,6 +190,7 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
                     label="Apellido Materno"
                     {...register("apellidoMaterno")}
                     fullWidth
+                    onBlur={() => trigger("apellidoMaterno")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -172,6 +206,7 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
                     helperText={
                       errors.fechaNacimiento && errors.fechaNacimiento.message
                     }
+                    onBlur={() => trigger("fechaNacimiento")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -185,6 +220,7 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
                     fullWidth
                     error={Boolean(errors.genero)}
                     helperText={errors.genero && errors.genero.message}
+                    onBlur={() => trigger("genero")}
                   >
                     {generoOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -203,6 +239,7 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
                     fullWidth
                     error={Boolean(errors.rut)}
                     helperText={errors.rut && errors.rut.message}
+                    onBlur={() => trigger("rut")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -210,6 +247,7 @@ export default function PatientCreateComponent({onOpen, isOpen } : { onOpen: (is
                     label="Número Telefónico"
                     {...register("numeroTelefonico")}
                     fullWidth
+                    onBlur={() => trigger("numeroTelefonico")}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>

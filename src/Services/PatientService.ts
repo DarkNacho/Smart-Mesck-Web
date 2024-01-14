@@ -1,5 +1,5 @@
 import Client from "fhir-kit-client";
-import { Patient, Bundle, FhirResource } from "fhir/r4";
+import { Patient, Bundle} from "fhir/r4";
 
 export default class PatientService {
   public apiUrl: string;
@@ -12,8 +12,9 @@ export default class PatientService {
   public hasPrevPage: boolean = false;
 
   private constructor() {
-    this.apiUrl = import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
-    //this.apiUrl = "https://hapi.fhir.org/baseR4";
+    this.apiUrl =
+    //import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
+    this.apiUrl = "https://hapi.fhir.org/baseR4";
     //this.apiUrl = "https://castudillo-hapi.darknacho.xyz/fhir/"
     this.fhirClient = new Client({ baseUrl: this.apiUrl });
     this._patientBundle = {} as Bundle;
@@ -26,6 +27,19 @@ export default class PatientService {
     return PatientService.instance;
   }
 
+  private handleResult<T>(result: Promise<T>): Promise<Result<T>> {
+    return result
+      .then((data: T) => {
+        return { success: true, data } as Result<T>;
+      })
+      .catch((error: any) => {
+        return {
+          success: false,
+          error: error.message || "Unknown error",
+        } as Result<T>;
+      });
+  }
+
   private setNewPages(response: Bundle) {
     this.hasNextPage = !!response.link?.find((link) => link.relation === "next")
       ?.url;
@@ -34,51 +48,96 @@ export default class PatientService {
     )?.url;
   }
 
-  public async getById(id: string): Promise<Patient> {
-    return (await this.fhirClient.read({
-      resourceType: "Patient",
-      id: id,
-    })) as Patient;
+  public async getById(id: string): Promise<Result<Patient>> {
+    return this.handleResult<Patient>(
+      this.fhirClient.read({
+        resourceType: "Patient",
+        id: id,
+      }) as Promise<Patient>
+    );
   }
 
-  public async postPatient(newPatient: Patient) 
+  public async postPatient(newPatient: Patient): Promise<Result<Patient>> {
+    return this.handleResult<Patient>(
+      this.fhirClient.create({
+        resourceType: "Patient",
+        body: newPatient,
+      }) as Promise<Patient>
+    );
+  }
+
+  public async getPatients(
+    count?: number,
+    content?: string
+  ): Promise<Result<Patient[]>> {
+    const result = await this.handleResult<Bundle>(
+      this.fhirClient.search({
+        resourceType: "Patient",
+        searchParams: {
+          _count: count || 5,
+          ...(content && { _content: content }),
+        },
+      }) as Promise<Bundle>
+    );
+
+    if (result.success) {
+      const response = result.data;
+      this._patientBundle = response;
+      this.setNewPages(response);
+      const patients =
+        response.entry?.map((entry) => entry.resource as Patient) || [];
+      return { success: true, data: patients };
+    } else {
+      return { success: false, error: result.error };
+    }
+  }
+
+  public async getNewPatients(direction: "next" | "prev"): Promise<Result<Patient[]>>
   {
-    console.log("paciente a postear", newPatient);
-    this.fhirClient.create({resourceType: "Patient", body: newPatient}).then(res => console.log("respuesta paciente posteado", res));
+    const response = await this.handleResult<Bundle>(
+      direction === "next"
+        ? this.fhirClient.nextPage({ bundle: this._patientBundle }) as Promise<Bundle>
+        : this.fhirClient.prevPage({ bundle: this._patientBundle }) as Promise<Bundle>
+    );
+    if(!response.success) return response
 
+    this._patientBundle = response.data;
+    this.setNewPages(response.data);
+
+    const patients = response.data.entry?.map( entry => entry.resource as Patient) || [];
+    return { success: true, data: patients };
   }
 
-  public async getPatients(count?: number, content?: string): Promise<Patient[]> {
-    let searchParams: Record<string, any> = {};
+  public async getNextPage(): Promise<Result<Patient[]>>
+  {
+    const response = await this.handleResult<Bundle>(
+      this.fhirClient.nextPage({
+        bundle: this._patientBundle
+      }) as Promise<Bundle>
+    );
+    if(!response.success) return response
 
-    searchParams["_count"] = count || 5;
-    if(content) searchParams["_content"] = content;
-    
-    const response = (await this.fhirClient.search({
-      resourceType: "Patient",
-      searchParams: searchParams,
-    })) as Bundle;
-    this._patientBundle = response;
-    this.setNewPages(response);
-    return response.entry?.map((entry) => entry.resource as Patient) || [];
+    this._patientBundle = response.data;
+    this.setNewPages(response.data);
+
+    const patients = response.data.entry?.map( entry => entry.resource as Patient) || [];
+    return { success: true, data: patients };
   }
 
-  public async getNextPage(): Promise<Patient[]> {
-    const response = (await this.fhirClient.nextPage({
-      bundle: this._patientBundle,
-    })) as Bundle;
-    this._patientBundle = response;
-    this.setNewPages(response);
-    return response.entry?.map((entry) => entry.resource as Patient) || [];
-  }
+  public async getPrevPage(): Promise<Result<Patient[]>>
+  {
+    const response = await this.handleResult<Bundle>(
+      this.fhirClient.prevPage({
+        bundle: this._patientBundle
+      }) as Promise<Bundle>
+    );
+    if(!response.success) return response
 
-  public async getPrevPage(): Promise<Patient[]> {
-    const response = (await this.fhirClient.prevPage({
-      bundle: this._patientBundle,
-    })) as Bundle;
-    this._patientBundle = response;
-    this.setNewPages(response);
-    return response.entry?.map((entry) => entry.resource as Patient) || [];
+    this._patientBundle = response.data;
+    this.setNewPages(response.data);
+
+    const patients = response.data.entry?.map( entry => entry.resource as Patient) || [];
+    return { success: true, data: patients };
   }
 
   public parsePatientName(patient: Patient) {

@@ -9,8 +9,6 @@ import {
   TextField,
   IconButton,
   InputAdornment,
-  Alert,
-  Snackbar,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PatientCreateComponent from "../Components/Patient/PatientCreateComponent";
@@ -18,19 +16,14 @@ import styles from "./PatientListPage.module.css";
 
 import PatientService from "../Services/PatientService";
 import { Add, Search } from "@mui/icons-material";
+import toast, { Toaster } from "react-hot-toast";
 
-const patienteService = PatientService.getInstance();
-
-type AlertType = "success" | "info" | "warning" | "error";
+const patientService = PatientService.getInstance();
 
 export default function PatientListPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState<AlertType>("success");
 
   const navigate = useNavigate();
 
@@ -38,104 +31,58 @@ export default function PatientListPage() {
     setOpenDialog(isOpen);
   };
 
-  const handleApiResponse = (
-    res: Patient[],
-    successMessage: string,
-    infoMessage: string
+  const handleOperation = async (
+    operation: () => Promise<Result<Patient[]>>,
+    successMessage: string
   ) => {
-    setPatients(res);
-    console.log("fetched patients: ", res);
-
-    if (res.length > 0) showAlert(successMessage, "success");
-    else showAlert(infoMessage, "info");
+    const response = await toast.promise(operation(), {
+      loading: "Obteniendo Pacientes",
+      success: (result) => {
+        if (result.success) {
+          return successMessage;
+        } else {
+          throw Error(result.error);
+        }
+      },
+      error: (result) => result.toString(),
+    });
+  
+    if (response.success) {
+      setPatients(response.data);
+      console.log(response.data);
+    } else {
+      console.error(response.error);
+    }
   };
 
-  const handleApiError = (error: any, errorMessage: string) => {
-    console.error("Error fetching patients:", error);
-    showAlert(errorMessage, "error");
+  const handleNewPatients = async (direction: "next" | "prev") => {
+    handleOperation(
+      () => patientService.getNewPatients(direction),
+      "Pacientes Obtenidos exitosamente"
+    );
   };
-
-  const handleNextPage = async () => {
-    patienteService
-      .getNextPage()
-      .then((res) =>
-        handleApiResponse(
-          res,
-          "Pacientes cargados exitosamente",
-          "No se encontraron pacientes"
-        )
-      )
-      .catch((error) => handleApiError(error, "Error al cargar los pacientes"));
-  };
-  const handlePrevPage = async () => {
-    patienteService
-      .getPrevPage()
-      .then((res) =>
-        handleApiResponse(
-          res,
-          "Pacientes cargados exitosamente",
-          "No se encontraron pacientes"
-        )
-      )
-      .catch((error) => handleApiError(error, "Error al cargar los pacientes"));
-  };
+  
   const fetchPatients = async () => {
-    patienteService
-      .getPatients(7)
-      .then((res) =>
-        handleApiResponse(
-          res,
-          "Pacientes cargados exitosamente",
-          "No se encontraron pacientes"
-        )
-      )
-      .catch((error) => handleApiError(error, "Error al cargar los pacientes"));
+    handleOperation(
+      () => patientService.getPatients(7),
+      "Pacientes Obtenidos exitosamente"
+    );
   };
-
-  const handleSearch = () => {
-    patienteService
-      .getPatients(7, searchTerm)
-      .then((res) =>
-        handleApiResponse(
-          res,
-          "Resultado de búsqueda de pacientes exitosa",
-          "No se encontraron pacientes en la búsqueda, intente con otros parámetros"
-        )
-      )
-      .catch((error) => handleApiError(error, "Error al cargar los pacientes"));
+  
+  const handleSearch = async () => {
+    handleOperation(
+      () => patientService.getPatients(7, searchTerm),
+      "Pacientes buscados obtenidos exitosamente"
+    );
   };
 
   useEffect(() => {
     fetchPatients();
   }, []);
 
-  useEffect(() => {}, [patients]);
-
-  const showAlert = (message: string, severity: AlertType) => {
-    setAlertMessage(message);
-    setAlertSeverity(severity);
-    setAlertOpen(true);
-  };
-
   return (
     <div>
-      {alertOpen && (
-        <Snackbar
-          open={alertOpen}
-          autoHideDuration={6000}
-          onClose={() => setAlertOpen(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Alert
-            onClose={() => setAlertOpen(false)}
-            variant="filled"
-            severity={alertSeverity}
-          >
-            {alertMessage}
-          </Alert>
-        </Snackbar>
-      )}
-
+      <Toaster position="bottom-right" reverseOrder={false} />
       <div className={styles.content}>
         <div
           style={{
@@ -194,7 +141,7 @@ export default function PatientListPage() {
             >
               <ListItemText
                 primary={`ID: ${patient.id}`}
-                secondary={`Name: ${patienteService.parsePatientName(
+                secondary={`Name: ${patientService.parsePatientName(
                   patient
                 )}, Gender: ${patient.gender || "N/A"}`}
               />
@@ -205,16 +152,16 @@ export default function PatientListPage() {
           <Button
             variant="contained"
             color="primary"
-            onClick={handlePrevPage}
-            disabled={!patienteService.hasPrevPage}
+            onClick={() => handleNewPatients("prev")}
+            disabled={!patientService.hasPrevPage}
           >
             Previous Page
           </Button>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleNextPage}
-            disabled={!patienteService.hasNextPage}
+            onClick={() => handleNewPatients("next")}
+            disabled={!patientService.hasNextPage}
           >
             Next Page
           </Button>

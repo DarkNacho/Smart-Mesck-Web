@@ -1,69 +1,48 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Observation, Patient, Bundle, Questionnaire } from "fhir/r4";
+import { Patient, Questionnaire } from "fhir/r4";
+import toast, { Toaster } from "react-hot-toast";
 import PatientGeneralWidgetComponent from "../Components/Patient/PatientGeneralWidgetComponent";
 import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent";
-import Pair from "../Interfaces/Pair";
 
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 import PatientService from "../Services/PatientService";
 
 const patientService = PatientService.getInstance();
 
-function bundleToObservationArray(bundle: Bundle): Observation[] {
-  return bundle.entry?.map((entry) => entry.resource as Observation) || [];
-}
-
-function observationArrayToPair(
-  observations: Observation[]
-): Pair<string, string>[] {
-  const ObservationValueParse = (observation: Observation) => {
-    if (observation.valueString) {
-      return observation.valueString;
-    } else if (observation.valueQuantity) {
-      const { value, unit } = observation.valueQuantity;
-      return `${value} ${unit || ""}`;
-    }
-    return "";
-  };
-  const someArray: Pair<string, string>[] = [
-    { first: "hola", second: "mundo" },
-    { first: "nuvo", second: "valor" },
-  ];
-
-  var mapped = observations?.map((obs) => {
-    const name = obs.code?.text! || "No texto";
-    const value = ObservationValueParse(obs);
-    return { first: name, second: value } as Pair<string, string>;
-  });
-
-  console.log(mapped);
-  return mapped;
-}
-
 export default function PatientPage() {
   const { patientID } = useParams();
   const [patient, setPatient] = useState<Patient>({} as Patient);
-  const [observations, setObservations] = useState<Observation[]>([]);
+
   const [selectedOption, setSelectedOption] = useState<String>("Overview");
-  const [selecteQues, setQues] = useState<Questionnaire>({} as Questionnaire);
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
   };
 
-  const handleQuesSelect = (ques: Questionnaire) => {
-    setQues(ques);
-    console.log("Questionario", ques);
-  };
-
   const fetchPatient = async () => {
-    patientService.getById(patientID!).then((res) => setPatient(res));
+    const response = await toast.promise(patientService.getById(patientID!), {
+      loading: "Cargando Paciente",
+      success: (result) => {
+        if (result.success) {
+          return "Paciente cargado exitosamente";
+        } else {
+          throw Error(result.error);
+        }
+      },
+      error: (result) => result.toString(),
+    });
+
+    if (response.success) {
+      setPatient(response.data);
+      console.log(response.data);
+    } else {
+      console.error(response.error);
+    }
   };
 
   useEffect(() => {
     fetchPatient();
-    console.log("paciente:", patient);
   }, [patientID]);
 
   let componentToRender;
@@ -88,6 +67,7 @@ export default function PatientPage() {
 
   return (
     <div>
+      <Toaster position="bottom-right" reverseOrder={false} />
       <PatientHeaderComponent
         patient={patient}
         onOptionSelect={handleOptionSelect}

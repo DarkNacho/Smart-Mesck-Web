@@ -1,5 +1,5 @@
 import Client from "fhir-kit-client";
-import { Patient, Bundle} from "fhir/r4";
+import { Patient, Bundle, OperationOutcome} from "fhir/r4";
 
 export default class PatientService {
   public apiUrl: string;
@@ -13,8 +13,8 @@ export default class PatientService {
 
   private constructor() {
     this.apiUrl =
-    //import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
-    this.apiUrl = "https://hapi.fhir.org/baseR4";
+    import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
+    //this.apiUrl = "https://hapi.fhir.org/baseR4";
     //this.apiUrl = "https://castudillo-hapi.darknacho.xyz/fhir/"
     this.fhirClient = new Client({ baseUrl: this.apiUrl });
     this._patientBundle = {} as Bundle;
@@ -33,9 +33,10 @@ export default class PatientService {
         return { success: true, data } as Result<T>;
       })
       .catch((error: any) => {
+        console.log(error);
         return {
           success: false,
-          error: error.message || "Unknown error",
+          error: this.parseOperationOutcome(error.response.data) || error.message,
         } as Result<T>;
       });
   }
@@ -140,6 +141,10 @@ export default class PatientService {
     return { success: true, data: patients };
   }
 
+  private parseOperationOutcome(operation: OperationOutcome): string
+  {
+    return operation.issue[0]?.diagnostics || "Unknown error" 
+  }
   public parsePatientName(patient: Patient) {
     let name = "";
 

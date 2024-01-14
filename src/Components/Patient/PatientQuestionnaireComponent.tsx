@@ -3,6 +3,8 @@ import { Questionnaire, QuestionnaireResponse } from "fhir/r4";
 import QuestionnaireService from "../../Services/QuestionnaireService";
 import QuestionnaireComponent from "../Questionnaire/QuestionnaireComponent";
 import QuestionnaireListComponent from "../Questionnaire/QuestionnaireListDialogComponent";
+import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const questionnaireService = QuestionnaireService.getInstance();
 
@@ -47,7 +49,7 @@ export default function PatientQuestionnaireComponent({
     };
     fetchData();
   }, [patientID]);
-  
+
   return (
     <div>
       <div>
@@ -56,30 +58,58 @@ export default function PatientQuestionnaireComponent({
         ></QuestionnaireListComponent>
       </div>
       <h1>Lista de cuestionarios:</h1>
-      <h1>Nuevos formularios</h1>
-      {newQuestionnaires.map((newQues, index) => (
-        <div key={index}>
-          <QuestionnaireComponent formDef={newQues} subjectId={patientID}></QuestionnaireComponent>
-        </div>
-      ))}
-      <div></div>
-      {Object.keys(questionnaires).length > 0 && (
-        <div>
-          <h1>Formularios cargados del paciente</h1>
-          {questionnaireResponses.map(
-            (quesRes, index) =>
-              quesRes.questionnaire && (
+      <div>
+        {newQuestionnaires.length > 0 && (
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              Nuevos formularios
+            </AccordionSummary>
+            <AccordionDetails>
+              {newQuestionnaires.map((newQues, index) => (
                 <div key={index}>
                   <QuestionnaireComponent
-                    formDef={questionnaires[quesRes.questionnaire]}
-                    quesResponse={quesRes}
+                    formDef={newQues}
                     subjectId={patientID}
                   ></QuestionnaireComponent>
                 </div>
-              )
-          )}
-        </div>
-      )}
+              ))}
+            </AccordionDetails>
+          </Accordion>
+        )}
+      </div>
+      <div>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            Formularios cargados del paciente
+          </AccordionSummary>
+          <AccordionDetails>
+            {Object.keys(questionnaires).length > 0 && (
+              <div>
+                {questionnaireResponses.map(
+                  (quesRes, index) =>
+                    quesRes.questionnaire && (
+                      <div style={{paddingBottom: "50px"}} key={index}>
+                        <QuestionnaireComponent
+                          formDef={questionnaires[quesRes.questionnaire]}
+                          quesResponse={quesRes}
+                          subjectId={patientID}
+                        ></QuestionnaireComponent>
+                      </div>
+                    )
+                )}
+              </div>
+            )}
+          </AccordionDetails>
+        </Accordion>
+      </div>
     </div>
   );
 }

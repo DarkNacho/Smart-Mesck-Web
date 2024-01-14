@@ -46,7 +46,6 @@
 .searchContainer {
  
   padding: 16px;
-  gap: 10px; /* Espacio (gap) entre los componentes */
   border-radius: 10px;
   border: 1px solid #fff;
   background: #b7c3ff;
@@ -54,8 +53,6 @@
   /* drop-shadow / 0.15 */
   box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.15);
 
-  padding-top: 20px;
-  display: flex;
 
-  align-items: center;
+
 }

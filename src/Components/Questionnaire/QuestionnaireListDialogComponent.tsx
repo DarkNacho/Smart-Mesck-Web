@@ -11,8 +11,9 @@ import {
   ListItemText,
   IconButton,
   TextField,
+  InputAdornment,
 } from "@mui/material";
-import { Close } from "@mui/icons-material";
+import { Close, Search } from "@mui/icons-material";
 import styles from "./QuestionnaireListDialogComponent.module.css";
 import QuestionnaireService from "../../Services/QuestionnaireService";
 
@@ -25,6 +26,7 @@ export default function QuestionnaireListDialogComponent({
 }) {
   const [showModal, setShowModal] = useState(false);
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleNextPage = async () => {
     questionnaireService.getNextPage().then((res) => setQuestionnaires(res));
@@ -34,12 +36,16 @@ export default function QuestionnaireListDialogComponent({
   };
   const fetchQuestionnaires = async () => {
     questionnaireService
-      .getQuestionnaires(8)
+      .getQuestionnaires(7)
       .then((res) => setQuestionnaires(res));
   };
 
   const closeModal = () => {
     setShowModal(false);
+  };
+
+  const handleSearch = async () => {
+
   };
 
   useEffect(() => {
@@ -59,7 +65,7 @@ export default function QuestionnaireListDialogComponent({
       >
         Mostrar Cuestionarios
       </Button>
-      <Dialog open={showModal} onClose={closeModal} maxWidth="md" fullWidth >
+      <Dialog open={showModal} onClose={closeModal} maxWidth="md" fullWidth>
         <DialogTitle className={styles.dialogTitle}>
           Formularios Disponibles
           <IconButton
@@ -72,12 +78,29 @@ export default function QuestionnaireListDialogComponent({
         </DialogTitle>
         <DialogContent className={styles.dialog}>
           <div className={styles.dialogContent}>
-            <div className={styles.searchContainer}>
-              <TextField label="Buscar Por título" />
-              <Button variant="contained" color="primary">
-                Buscar
-              </Button>
-            </div>
+          <form
+          className={styles.searchContainer}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch();
+          }}
+        >
+          <TextField
+            style={{ width: "100%" }}
+            label="Buscar un paciente"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton type="submit">
+                    <Search />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </form>
             <List className={styles.listContent}>
               {questionnaires.map((ques) => (
                 <ListItem

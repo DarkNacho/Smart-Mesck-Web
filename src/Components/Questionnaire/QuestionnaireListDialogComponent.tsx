@@ -45,7 +45,9 @@ export default function QuestionnaireListDialogComponent({
   };
 
   const handleSearch = async () => {
-
+    questionnaireService
+      .getQuestionnaires(7, searchTerm)
+      .then((res) => setQuestionnaires(res));
   };
 
   useEffect(() => {

@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite  --host --mode development",
+    "dev": "vite --host --mode development",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "git-deploy": "tsc && vite build && gh-pages -d dist",
+    "git-deploy": "tsc && vite build --mode deploy && gh-pages -d dist",
     "preview": "vite preview"
   },
   "dependencies": {

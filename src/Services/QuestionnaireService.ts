@@ -40,8 +40,11 @@ export default class QuestionnaireService {
       id: id,
     })) as Questionnaire;
   }
-  public async getQuestionnaires(count?: number): Promise<Questionnaire[]> {
-    const searchParams: { _count: number } = { _count: count || 5 };
+
+  
+  public async getQuestionnaires(count?: number, contentSearch?: string): Promise<Questionnaire[]> {
+    var searchParams: { _count: number, _content: string } = { _count: count || 5, _content: contentSearch || ''};
+  
     const response = (await this.fhirClient.search({
       resourceType: "Questionnaire",
       searchParams: searchParams,

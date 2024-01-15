@@ -5,6 +5,7 @@ import Pair from "./Interfaces/Pair";
 function App() {
   const someArray: Pair<string, string>[] = [{first: "hola", second: "mundo"}, {first: "nuvo", second: "valor"}]
 
+  
   return (
     <>
       <div>

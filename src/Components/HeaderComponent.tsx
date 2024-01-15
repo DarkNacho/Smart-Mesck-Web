@@ -52,7 +52,7 @@ export default function HeaderComponent() {
       <img
         className={styles.smImage}
         alt=""
-        src="smart-mesck-blanco-6@2x.png"
+        src="/smart-mesck-blanco-6@2x.png"
       />
       <ul className={styles.items}>
       <ul className={styles.menulegacy}>
@@ -83,7 +83,7 @@ export default function HeaderComponent() {
               <img
                 className={styles.avatarimageIcon}
                 alt=""
-                src="avatarimage.svg"
+                src="/avatarimage.svg"
               />
               UsuarioNoRegistrado
             </div>

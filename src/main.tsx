@@ -17,7 +17,7 @@ import HeaderComponent from "./Components/HeaderComponent.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App></App>
+    element: <PatientListPage></PatientListPage>
   },
   {
     path: "/Patient",
@@ -36,16 +36,9 @@ const router = createBrowserRouter([
   {
     path: "/op4",
   }
-], {
-  
-  basename: '/Smart-Mesck-Web' // Reemplaza "tu-base-url" con tu URL base real
-});
+]);
 
 
-const handleSelectedTab = (tab: string) =>
-{
-  console.log(tab);
-}
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>

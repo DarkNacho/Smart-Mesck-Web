@@ -13,7 +13,6 @@ import PatientPage from "./Pages/PatientPage.tsx";
 import QuestionnaireListComponent from "./Components/Questionnaire/QuestionnaireListDialogComponent.tsx";
 import PatientCreateComponent from "./Components/Patient/PatientCreateComponent.tsx";
 import HeaderComponent from "./Components/HeaderComponent.tsx";
-import ResponsiveAppBar from "./Components/NavBar.tsx";
 
 const router = createBrowserRouter([
   {
@@ -29,10 +28,6 @@ const router = createBrowserRouter([
     element: <PatientPage></PatientPage>
   },
   {
-    path: "/add",
-    element: <PatientCreateComponent></PatientCreateComponent>
-  },
-  {
     path: "/op2",
   },
   {
@@ -41,7 +36,11 @@ const router = createBrowserRouter([
   {
     path: "/op4",
   }
-]);
+], {
+  
+  basename: '/Smart-Mesck-Web' // Reemplaza "tu-base-url" con tu URL base real
+});
+
 
 const handleSelectedTab = (tab: string) =>
 {
@@ -51,7 +50,7 @@ const handleSelectedTab = (tab: string) =>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
     <HeaderComponent></HeaderComponent>
-    <RouterProvider router={router}></RouterProvider>
+    <RouterProvider router={router} ></RouterProvider>
   </div>
 );
 

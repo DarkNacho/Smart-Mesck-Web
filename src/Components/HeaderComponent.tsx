@@ -63,7 +63,7 @@ export default function HeaderComponent() {
           color="error"
           onClick={() => handleSelectedTab(tabKey)}
           sx={selectedTab === tabKey ? sxStyleActive : sxStyle}
-          href={`${tabKey}`}
+          href={`/${tabKey}`}
         >
           {tabText}
         </Button>

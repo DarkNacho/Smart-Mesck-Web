@@ -17,7 +17,7 @@ import HeaderComponent from "./Components/HeaderComponent.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <PatientListPage></PatientListPage>
+    element: <App></App>
   },
   {
     path: "/Patient",

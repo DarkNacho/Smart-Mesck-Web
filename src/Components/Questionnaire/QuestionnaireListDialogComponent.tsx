@@ -67,14 +67,14 @@ export default function QuestionnaireListDialogComponent({
   
   const fetchQuestionnaires = async () => {
     handleOperation(
-      () => questionnaireService.getResources(7),
+      () => questionnaireService.getResources(),
       "Forumularios Obtenidos exitosamente"
     );
   };
   
   const handleSearch = async () => {
     handleOperation(
-      () => questionnaireService.getResources(7, searchTerm),
+      () => questionnaireService.getResources({content: searchTerm}),
       "Questionnaires buscados obtenidos exitosamente"
     );
   };

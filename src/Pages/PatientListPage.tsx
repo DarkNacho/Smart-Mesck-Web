@@ -98,14 +98,14 @@ export default function PatientListPage() {
   
   const fetchPatients = async () => {
     handleOperation(
-      () => patientService.getResources(7),
+      () => patientService.getResources(),
       "Pacientes Obtenidos exitosamente"
     );
   };
   
   const handleSearch = async () => {
     handleOperation(
-      () => patientService.getResources(7, searchTerm),
+      () => patientService.getResources( {content: searchTerm}),
       "Pacientes buscados obtenidos exitosamente"
     );
   };

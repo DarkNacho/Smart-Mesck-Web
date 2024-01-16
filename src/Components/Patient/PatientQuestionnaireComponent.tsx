@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Questionnaire, QuestionnaireResponse } from "fhir/r4";
-import QuestionnaireService from "../../Services/QuestionnaireService";
+import QuestionnaireResponseService from "../../Services/QuestionnaireResponseService";
 import QuestionnaireComponent from "../Questionnaire/QuestionnaireComponent";
 import QuestionnaireListComponent from "../Questionnaire/QuestionnaireListDialogComponent";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import QuestionnaireService from "../../Services/QuestionnaireService";
 
+const questionnaireResponseService = new QuestionnaireResponseService();
 const questionnaireService = new QuestionnaireService();
 
 export default function PatientQuestionnaireComponent({
@@ -28,16 +30,20 @@ export default function PatientQuestionnaireComponent({
     console.log("Questionario seleccionado", ques);
   };
 
-  const fetchQuestionnaireResponses = async () => {
-    const res = await questionnaireService.getResponseByPatientId(patientID);
-    setQuestionnaireResponses(res);
+  const fetchQuestionnaireResponses = async () => 
+  {
+    try
+    {
+    var responseBundle = await questionnaireResponseService.getResources({subject: patientID})
+    if(!responseBundle.success) throw Error(responseBundle.error); 
+    
+    console.log(responseBundle.data)
+    setQuestionnaireResponses(responseBundle.data);
     const updatedQuestionnaires: Record<string, Questionnaire> = {};
 
-    for (const quetionnaireResponse of res) {
+    for (const quetionnaireResponse of responseBundle.data) {
       const quesR_id = quetionnaireResponse.questionnaire;
       if (!quesR_id) continue;
-
-      await questionnaireService.getById(quesR_id);
       
       const res = await questionnaireService.getById(
         quesR_id
@@ -45,6 +51,11 @@ export default function PatientQuestionnaireComponent({
       if(res.success) updatedQuestionnaires[quesR_id] = res.data;
     }
     setQuestionnaires(updatedQuestionnaires);
+  }
+  catch
+  {
+    console.log("entro al catch");
+  }
   };
 
   useEffect(() => {
@@ -76,7 +87,7 @@ export default function PatientQuestionnaireComponent({
               {newQuestionnaires.map((newQues, index) => (
                 <div key={index}>
                   <QuestionnaireComponent
-                    formDef={newQues}
+                    questionnaire={newQues}
                     subjectId={patientID}
                   ></QuestionnaireComponent>
                 </div>
@@ -102,8 +113,8 @@ export default function PatientQuestionnaireComponent({
                     quesRes.questionnaire && (
                       <div style={{paddingBottom: "50px"}} key={index}>
                         <QuestionnaireComponent
-                          formDef={questionnaires[quesRes.questionnaire]}
-                          quesResponse={quesRes}
+                          questionnaire={questionnaires[quesRes.questionnaire]}
+                          questionnaireResponse={quesRes}
                           subjectId={patientID}
                         ></QuestionnaireComponent>
                       </div>

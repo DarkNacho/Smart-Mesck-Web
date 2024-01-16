@@ -4,7 +4,7 @@ import QuestionnaireService from "../../Services/QuestionnaireService";
 import Button from "@mui/material/Button";
 //import "./QuestionnaireComponent.css";
 
-const questionnaireService = QuestionnaireService.getInstance();
+const questionnaireService = new QuestionnaireService();
 
 export default function QuestionnaireComponent({
   formDef = {} as Questionnaire,

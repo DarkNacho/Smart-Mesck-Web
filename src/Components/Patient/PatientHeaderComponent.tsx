@@ -11,7 +11,7 @@ export default function PatientHeaderComponent({
   onOptionSelect: (nuevaOpcion: string) => void;
 }) {
   const [selectedOption, setSelectedOption] = useState<String>("Overview");
-  const name = PatientService.getInstance().parsePatientName(patient);
+  const name = new PatientService().parsePatientName(patient);
   const avatar = patient.photo?.[0]?.url || "/avatar.JPG";
 
   const handleOptionSelect = (option: string) => {

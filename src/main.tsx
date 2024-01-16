@@ -1,17 +1,14 @@
-import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import {
   createBrowserRouter,
   RouterProvider,
-  useNavigate,
 } from "react-router-dom";
 
+import { Toaster } from "react-hot-toast";
 import PatientListPage from "./Pages/PatientListPage.tsx";
 import PatientPage from "./Pages/PatientPage.tsx";
-import QuestionnaireListComponent from "./Components/Questionnaire/QuestionnaireListDialogComponent.tsx";
-import PatientCreateComponent from "./Components/Patient/PatientCreateComponent.tsx";
 import HeaderComponent from "./Components/HeaderComponent.tsx";
 
 const router = createBrowserRouter([
@@ -42,6 +39,7 @@ const router = createBrowserRouter([
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
+    <Toaster></Toaster>
     <HeaderComponent></HeaderComponent>
     <RouterProvider router={router} ></RouterProvider>
   </div>

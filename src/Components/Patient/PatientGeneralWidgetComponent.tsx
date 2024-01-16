@@ -2,7 +2,7 @@ import styles from "./PatientGeneralWidgetComponent.module.css";
 import PatientService from "../../Services/PatientService";
 import { Patient } from "fhir/r4";
 
-const patientService = PatientService.getInstance();
+const patientService = new PatientService();
 
 export default function PatientGeneralWidgetComponent({
   patient,

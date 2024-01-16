@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Patient, Questionnaire } from "fhir/r4";
-import toast, { Toaster } from "react-hot-toast";
+import { Patient } from "fhir/r4";
+import toast from "react-hot-toast";
 import PatientGeneralWidgetComponent from "../Components/Patient/PatientGeneralWidgetComponent";
 import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent";
 
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 import PatientService from "../Services/PatientService";
 
-const patientService = PatientService.getInstance();
+const patientService = new PatientService();
+
 
 export default function PatientPage() {
   const { patientID } = useParams();
@@ -19,6 +20,9 @@ export default function PatientPage() {
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
   };
+
+
+
 
   const fetchPatient = async () => {
     const response = await toast.promise(patientService.getById(patientID!), {
@@ -67,7 +71,6 @@ export default function PatientPage() {
 
   return (
     <div>
-      <Toaster position="bottom-right" reverseOrder={false} />
       <PatientHeaderComponent
         patient={patient}
         onOptionSelect={handleOptionSelect}

@@ -10,7 +10,7 @@ export default function HeaderComponent() {
     localStorage.setItem("selectedTab", tab);
   };
 
-  const pages = ["Products", "Pricing", "Blog"];
+
 
   const sxStyleActive = {
     fontSize: "18px",

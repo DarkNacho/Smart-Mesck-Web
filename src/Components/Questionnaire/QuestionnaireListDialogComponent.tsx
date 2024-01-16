@@ -13,11 +13,13 @@ import {
   TextField,
   InputAdornment,
 } from "@mui/material";
+import toast from "react-hot-toast";
 import { Close, Search } from "@mui/icons-material";
 import styles from "./QuestionnaireListDialogComponent.module.css";
 import QuestionnaireService from "../../Services/QuestionnaireService";
 
-const questionnaireService = QuestionnaireService.getInstance();
+
+const questionnaireService = new QuestionnaireService();
 
 export default function QuestionnaireListDialogComponent({
   onQuestionnaireSelect,
@@ -28,35 +30,62 @@ export default function QuestionnaireListDialogComponent({
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleNextPage = async () => {
-    questionnaireService.getNextPage().then((res) => setQuestionnaires(res));
-  };
-  const handlePrevPage = async () => {
-    questionnaireService.getPrevPage().then((res) => setQuestionnaires(res));
-  };
-  const fetchQuestionnaires = async () => {
-    questionnaireService
-      .getQuestionnaires(7)
-      .then((res) => setQuestionnaires(res));
-  };
-
   const closeModal = () => {
     setShowModal(false);
   };
 
-  const handleSearch = async () => {
-    questionnaireService
-      .getQuestionnaires(7, searchTerm)
-      .then((res) => setQuestionnaires(res));
+  const handleOperation = async (
+    operation: () => Promise<Result<Questionnaire[]>>,
+    successMessage: string
+  ) => {
+    const response = await toast.promise(operation(), {
+      loading: "Obteniendo Formularios",
+      success: (result) => {
+        if (result.success) {
+          return successMessage;
+        } else {
+          throw Error(result.error);
+        }
+      },
+      error: (result) => result.toString(),
+    });
+  
+    if (response.success) {
+      setQuestionnaires(response.data);
+      console.log(response.data);
+    } else {
+      console.error(response.error);
+    }
   };
 
-  useEffect(() => {
-    fetchQuestionnaires();
-  }, []);
+  const handleNewQuestionnaires = async (direction: "next" | "prev") => {
+    handleOperation(
+      () => questionnaireService.getNewResources(direction),
+      "Formularios Obtenidos exitosamente"
+    );
+  };
+  
+  const fetchQuestionnaires = async () => {
+    handleOperation(
+      () => questionnaireService.getResources(7),
+      "Forumularios Obtenidos exitosamente"
+    );
+  };
+  
+  const handleSearch = async () => {
+    handleOperation(
+      () => questionnaireService.getResources(7, searchTerm),
+      "Questionnaires buscados obtenidos exitosamente"
+    );
+  };
+
 
   useEffect(() => {
-    console.log("questionarios: ", questionnaires);
-  }, [questionnaires]);
+    if(showModal)
+      fetchQuestionnaires();
+  }, [showModal]);
+
+
 
   return (
     <div>
@@ -134,7 +163,7 @@ export default function QuestionnaireListDialogComponent({
           <Button
             variant="contained"
             color="primary"
-            onClick={handlePrevPage}
+            onClick={() => handleNewQuestionnaires("prev")}
             disabled={!questionnaireService.hasPrevPage}
           >
             Página anterior
@@ -142,7 +171,7 @@ export default function QuestionnaireListDialogComponent({
           <Button
             variant="contained"
             color="primary"
-            onClick={handleNextPage}
+            onClick={() => handleNewQuestionnaires("next")}
             disabled={!questionnaireService.hasNextPage}
           >
             Siguiente página

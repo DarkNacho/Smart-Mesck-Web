@@ -1,35 +1,29 @@
 import Client from "fhir-kit-client";
-import { Bundle, OperationOutcome, FhirResource } from "fhir/r4";
+import { Bundle, OperationOutcome, FhirResource} from "fhir/r4";
+
 
 export default class FhirResourceService<T extends FhirResource> {
+  
+  public resourceTypeName: string;
+  
   public apiUrl: string;
-  private static instance: FhirResourceService<any>;
-  private fhirClient: Client;
-  private static resourceType: string; // Atributo estático para almacenar el tipo de recurso
-
+  public fhirClient: Client;
+  
   private _resourceBundle: Bundle;
 
   public hasNextPage: boolean = false;
   public hasPrevPage: boolean = false;
 
-  private constructor() {
+
+  public constructor(type: string) {
     this.apiUrl =
       import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
     this.fhirClient = new Client({ baseUrl: this.apiUrl });
     this._resourceBundle = {} as Bundle;
+    this.resourceTypeName = type; 
   }
 
-  public static getInstance<T extends FhirResource>(
-    resourceType: string
-  ): FhirResourceService<T> {
-    if (!FhirResourceService.instance) {
-      FhirResourceService.instance = new FhirResourceService<T>();
-    }
-    FhirResourceService.resourceType = resourceType;
-    return FhirResourceService.instance as FhirResourceService<T>;
-  }
-
-  private handleResult<T>(result: Promise<T>): Promise<Result<T>> {
+   private handleResult<T>(result: Promise<T>): Promise<Result<T>> {
     return result
       .then((data: T) => {
         return { success: true, data } as Result<T>;
@@ -56,7 +50,7 @@ export default class FhirResourceService<T extends FhirResource> {
   public async getById(id: string): Promise<Result<T>> {
     return this.handleResult<T>(
       this.fhirClient.read({
-        resourceType: FhirResourceService.resourceType,
+        resourceType: this.resourceTypeName,
         id: id,
       }) as Promise<T>
     );
@@ -65,7 +59,7 @@ export default class FhirResourceService<T extends FhirResource> {
   public async postResource(newResource: T): Promise<Result<T>> {
     return this.handleResult<T>(
       this.fhirClient.create({
-        resourceType: FhirResourceService.resourceType,
+        resourceType: this.resourceTypeName,
         body: newResource,
       }) as Promise<T>
     );
@@ -77,7 +71,7 @@ export default class FhirResourceService<T extends FhirResource> {
   ): Promise<Result<T[]>> {
     const result = await this.handleResult<Bundle>(
       this.fhirClient.search({
-        resourceType: FhirResourceService.resourceType,
+        resourceType: this.resourceTypeName,
         searchParams: {
           _count: count || 5,
           ...(content && { _content: content }),

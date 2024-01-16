@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { FhirResource } from "fhir/r4";
+import { useEffect } from "react";
 import styles from "./InfoListComponent.module.css";
 import Pair from "../Interfaces/Pair";
 

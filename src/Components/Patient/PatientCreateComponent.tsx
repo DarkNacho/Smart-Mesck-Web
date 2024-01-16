@@ -12,7 +12,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { Close } from "@mui/icons-material";
 
 import styles from "./PatientCreateComponent.module.css";
@@ -86,7 +86,7 @@ export default function PatientCreateComponent({
 
   const postPatient = async (newPatient: Patient) => {
     const response = await toast.promise(
-      PatientService.getInstance().postPatient(newPatient),
+      new PatientService().postResource(newPatient),
       {
         loading: "Enviado Paciente",
         success: (result) => {
@@ -131,7 +131,6 @@ export default function PatientCreateComponent({
 
   return (
     <div>
-      <Toaster position="bottom-right" reverseOrder={false} />
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
           Formularios Disponibles

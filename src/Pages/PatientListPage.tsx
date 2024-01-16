@@ -16,11 +16,45 @@ import styles from "./PatientListPage.module.css";
 
 import PatientService from "../Services/PatientService";
 import { Add, Search } from "@mui/icons-material";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
-const patientService = PatientService.getInstance();
+const patientService = new PatientService();
+
 
 export default function PatientListPage() {
+
+  const parsePatientName = (patient: Patient) => {
+    let name = "";
+
+    // Intenta obtener el nombre usando patient.name[0].text
+    if (patient.name && patient.name[0] && patient.name[0].text) {
+      name = patient.name[0].text;
+    } else if (patient.name && patient.name[0]) {
+      // Intenta obtener el nombre usando patient.name[0].given y patient.name[0].family
+      const givenNames = patient.name[0].given
+        ? patient.name[0].given.join(" ")
+        : "";
+      const familyName = patient.name[0].family ? patient.name[0].family : "";
+      name = `${givenNames} ${familyName}`;
+    } else if (
+      patient.name &&
+      patient.name[0] &&
+      patient.name[0].use === "official"
+    ) {
+      // Intenta obtener el nombre usando patient.name[0].prefix, patient.name[0].given y patient.name[0].family
+      const prefix = patient.name[0].prefix
+        ? patient.name[0].prefix.join(" ")
+        : "";
+      const givenNames = patient.name[0].given
+        ? patient.name[0].given.join(" ")
+        : "";
+      const familyName = patient.name[0].family ? patient.name[0].family : "";
+      name = `${prefix} ${givenNames} ${familyName}`;
+    }
+
+    return name;
+  }
+
   const [patients, setPatients] = useState<Patient[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,21 +91,21 @@ export default function PatientListPage() {
 
   const handleNewPatients = async (direction: "next" | "prev") => {
     handleOperation(
-      () => patientService.getNewPatients(direction),
+      () => patientService.getNewResources(direction),
       "Pacientes Obtenidos exitosamente"
     );
   };
   
   const fetchPatients = async () => {
     handleOperation(
-      () => patientService.getPatients(7),
+      () => patientService.getResources(7),
       "Pacientes Obtenidos exitosamente"
     );
   };
   
   const handleSearch = async () => {
     handleOperation(
-      () => patientService.getPatients(7, searchTerm),
+      () => patientService.getResources(7, searchTerm),
       "Pacientes buscados obtenidos exitosamente"
     );
   };
@@ -82,7 +116,6 @@ export default function PatientListPage() {
 
   return (
     <div>
-      <Toaster position="bottom-right" reverseOrder={false} />
       <div className={styles.content}>
         <div
           style={{
@@ -141,7 +174,7 @@ export default function PatientListPage() {
             >
               <ListItemText
                 primary={`ID: ${patient.id}`}
-                secondary={`Name: ${patientService.parsePatientName(
+                secondary={`Name: ${parsePatientName(
                   patient
                 )}, Gender: ${patient.gender || "N/A"}`}
               />

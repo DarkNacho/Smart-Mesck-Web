@@ -6,7 +6,7 @@ import QuestionnaireListComponent from "../Questionnaire/QuestionnaireListDialog
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const questionnaireService = QuestionnaireService.getInstance();
+const questionnaireService = new QuestionnaireService();
 
 export default function PatientQuestionnaireComponent({
   patientID,
@@ -36,9 +36,13 @@ export default function PatientQuestionnaireComponent({
     for (const quetionnaireResponse of res) {
       const quesR_id = quetionnaireResponse.questionnaire;
       if (!quesR_id) continue;
-      updatedQuestionnaires[quesR_id] = await questionnaireService.getById(
+
+      await questionnaireService.getById(quesR_id);
+      
+      const res = await questionnaireService.getById(
         quesR_id
       );
+      if(res.success) updatedQuestionnaires[quesR_id] = res.data;
     }
     setQuestionnaires(updatedQuestionnaires);
   };

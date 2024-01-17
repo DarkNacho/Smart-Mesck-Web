@@ -10,7 +10,25 @@ export default class ObservationService extends FhirResourceService<Observation>
     QuestionnaireResponseId: string
   ): Promise<Result<Observation[]>> {
     return this.getResources({
-      __hasMember: `QuestionnaireResponse/${QuestionnaireResponseId}`,
+      'has-member': `QuestionnaireResponse/${QuestionnaireResponseId}`,
     });
   }
+
+  public extractObservationInfo(observations: Observation[]): { name: string; value: string }[] {
+    return observations.map(observation => {
+      const name =
+        observation.code?.coding?.[0]?.display ||
+        observation.code?.text ||
+        (observation.code?.coding?.[0]?.system && observation.code?.coding?.[0]?.code
+          ? `${observation.code.coding[0].system} - ${observation.code.coding[0].code}`
+          : "Unknown Name");
+  
+      const value = observation.valueQuantity
+        ? `${observation.valueQuantity.value}${observation.valueQuantity.unit ? ` ${observation.valueQuantity.unit}` : ""}`
+        : "Unknown Value";
+  
+      return { name, value };
+    });
+  }
+
 }

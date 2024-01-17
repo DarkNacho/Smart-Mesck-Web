@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import styles from "./InfoListComponent.module.css";
-import Pair from "../Interfaces/Pair";
-
 
 export default function InfoListComponent({
   data,
@@ -9,7 +7,7 @@ export default function InfoListComponent({
   icon,
   edit = false,
 }: {
-  data: Pair<String,String>[];
+  data: { name: string; value: string }[]
   title: string;
   icon: string;
   edit?: Boolean;
@@ -27,8 +25,8 @@ export default function InfoListComponent({
   } else {
     content = data.map((dato, index) => (
       <div className={styles.item} key={index}>
-        <div className={styles.text1}>{dato.first}</div>
-        <div className={styles.text2}>{dato.second}</div>
+        <div className={styles.text1}>{dato.name}</div>
+        <div className={styles.text2}>{dato.value}</div>
       </div>
     ));
   }

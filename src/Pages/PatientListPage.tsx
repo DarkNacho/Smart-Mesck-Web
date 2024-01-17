@@ -105,7 +105,7 @@ export default function PatientListPage() {
   
   const handleSearch = async () => {
     handleOperation(
-      () => patientService.getResources( {content: searchTerm}),
+      () => patientService.getResources( {_content: searchTerm}),
       "Pacientes buscados obtenidos exitosamente"
     );
   };

@@ -74,7 +74,7 @@ export default function QuestionnaireListDialogComponent({
   
   const handleSearch = async () => {
     handleOperation(
-      () => questionnaireService.getResources({content: searchTerm}),
+      () => questionnaireService.getResources({_content: searchTerm}),
       "Questionnaires buscados obtenidos exitosamente"
     );
   };

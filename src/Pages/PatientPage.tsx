@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Patient } from "fhir/r4";
 import toast from "react-hot-toast";
-import PatientGeneralWidgetComponent from "../Components/Patient/PatientGeneralWidgetComponent";
 import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent";
 
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 import PatientService from "../Services/PatientService";
+import PatientOverviewComponent from "../Components/Patient/PatientOverviewComponent";
 
 const patientService = new PatientService();
 
@@ -54,9 +54,7 @@ export default function PatientPage() {
   switch (selectedOption) {
     case "Overview":
       componentToRender = (
-        <PatientGeneralWidgetComponent
-          patient={patient}
-        ></PatientGeneralWidgetComponent>
+        patient.id && <PatientOverviewComponent patient={patient}></PatientOverviewComponent>
       );
       break;
     case "Formularios":

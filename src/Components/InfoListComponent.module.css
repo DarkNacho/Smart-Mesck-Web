@@ -63,11 +63,10 @@
   }
   .infolist,
   .table,
+
   .text-wrapper {
-    display: flex;
-    flex-direction: column;
-  }
-  .text-wrapper {
+    /*display: flex;
+    flex-direction: column;*/
     margin: 0;
     gap: 10px;
     align-self: stretch;

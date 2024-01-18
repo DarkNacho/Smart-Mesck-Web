@@ -97,6 +97,7 @@ export default function PatientQuestionnaireComponent({
         )}
       </div>
       <div>
+      { Object.keys(questionnaires).length > 0 && (
         <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -124,6 +125,7 @@ export default function PatientQuestionnaireComponent({
             )}
           </AccordionDetails>
         </Accordion>
+      )}
       </div>
     </div>
   );

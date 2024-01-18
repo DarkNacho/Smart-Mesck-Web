@@ -11,7 +11,11 @@ export default function PatientOverviewComponent({patient}:{patient: Patient})
   const fetchData = async () =>
   {
     const result = await observationService.getResources( {subject: patient.id!});
-    if(result.success) setData(observationService.extractObservationInfo(result.data));
+    if(result.success)
+    {
+      setData(observationService.extractObservationInfo(result.data));
+      console.log(result.data);
+    } 
   }
 
   useEffect(() => {

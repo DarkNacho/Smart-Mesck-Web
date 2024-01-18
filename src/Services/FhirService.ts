@@ -1,5 +1,5 @@
-import Client, {SearchParams} from "fhir-kit-client";
-import { Bundle, OperationOutcome, FhirResource} from "fhir/r4";
+import Client, { SearchParams } from "fhir-kit-client";
+import { Bundle, OperationOutcome, FhirResource } from "fhir/r4";
 
 type FhirType =
   | "Patient"
@@ -67,30 +67,59 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
-  public async postArray(newResources: T[]): Promise<Result<T>> {
-    
-
-    const result = await this.handleResult( this.fhirClient.transaction({
-      body: {
-        resourceType: "Bundle",
-        type: "transaction",
-        entry: newResources.map((resource) => ({
-          resource,
-          request: {
-            method: "POST",
-            url: resource.resourceType,
-          },
-        })),
-      },
-    }));
-
+  private bundleAction(objeto: any) : "POST" | "PUT" | "DELETE" | "GET" | "PATCH"
+  {
+    // Verificar que "id" y "resourceType" tengan valores
+    const idResourceTypeLlenos = objeto.id !== undefined && objeto.resourceType !== undefined;
+  
+    // Verificar que el resto de los atributos estén vacíos o indefinidos
+    const restoAtributosVaciosOIndefinidos = Object.keys(objeto).every(
+      key => key === 'id' || key === 'resourceType' || objeto[key] === null || objeto[key] === undefined || objeto[key] === ''
+    );
+  
+    // Devolver true si "id" y "resourceType" tienen valores y el resto está vacío o indefinido
+    if(idResourceTypeLlenos && restoAtributosVaciosOIndefinidos)
+      return "DELETE";
+    else if(objeto.id) return "PUT";
+    else return "POST";
+  }
+  private resourceUrl(resource: FhirResource, method: "POST" | "PUT" | "DELETE" | "GET" | "PATCH") : string
+  {
+    return method === "POST" ? resource.resourceType : `${resource.resourceType}/${resource.id}`
+  }
+  
+  /**
+   * 
+   * @param newResources Arreglo del recurso,
+   *  este se encarga de enviarlo como un bundle.
+   * 
+   * Condiciones:
+   * 
+   * sólo @id y @resourceType elimina el recurso,
+   * si tiene @id actualiza el recurso,
+   * en caso de que el @id no existe, lo añade.
+   * @returns 
+   */
+  public async sendArray(newResources: T[]): Promise<Result<T>> {
+    const result = await this.handleResult(
+      this.fhirClient.transaction({
+        body: {
+          resourceType: "Bundle",
+          type: "transaction",
+          entry: newResources.map((resource) => {
+            const method = this.bundleAction(resource);
+            const request = { method: method, url: this.resourceUrl(resource, method)}
+            return {resource, request}
+          }),
+        },
+      })
+    );
 
     if (result.success) {
       return { success: true, data: {} as T };
     } else {
       return { success: false, error: result.error };
     }
-  
   }
 
   public async updateResource(newResource: T): Promise<Result<T>> {
@@ -120,7 +149,7 @@ export default class FhirResourceService<T extends FhirResource> {
           _count: params?._count ?? 20,
         },
       }) as Promise<Bundle>
-    );         
+    );
 
     if (result.success) {
       const response = result.data;

@@ -30,7 +30,7 @@ export default class ObservationService extends FhirResourceService<Observation>
         let value;
 
         if (observation.valueQuantity) {
-          value = `${observation.valueQuantity.value}${observation.valueQuantity.unit ? ` ${observation.valueQuantity.unit}` : ""}`;
+          value = `${observation.valueQuantity.value}${observation.valueQuantity.code ? ` ${observation.valueQuantity.code}` : ""}`;
         } else if (observation.valueCodeableConcept) {
           value = observation.valueCodeableConcept.text || "Unknown Value CodeableConcept";
         } else if (typeof observation.valueString !== 'undefined') {

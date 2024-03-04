@@ -146,7 +146,7 @@ export default class FhirResourceService<T extends FhirResource> {
         searchParams: {
           ...params,
           _sort: "-_lastUpdated",
-          _count: params?._count ?? 20,
+          _count: params?._count ?? 10,
         },
       }) as Promise<Bundle>
     );

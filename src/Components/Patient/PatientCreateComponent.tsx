@@ -133,7 +133,7 @@ export default function PatientCreateComponent({
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Formularios Disponibles
+          Añadir Nuevo Paciente
           <IconButton
             aria-label="close"
             onClick={handleClose}

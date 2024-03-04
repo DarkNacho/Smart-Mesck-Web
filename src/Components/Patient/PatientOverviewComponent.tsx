@@ -26,9 +26,21 @@ export default function PatientOverviewComponent({patient}:{patient: Patient})
   
 
     return (
-        <div>
+        <div style={{padding: "50px"}}>
+            <div style={{paddingBottom: "30px"}}>
             <PatientGeneralWidgetComponent patient={patient}></PatientGeneralWidgetComponent>
-            <InfoListComponent data={data} title={"Observaciones"} icon={"/hearth.svg"}></InfoListComponent>
+            </div>
+            <div style={{display: "flex", flexWrap: "wrap", gap: "30px"}}>
+              <div style={{flex:1}}>
+              <InfoListComponent data={data} title={"Observaciones"} icon={"/hearth.svg"}></InfoListComponent>
+              </div>
+              <div style={{flex:1}}>
+              <InfoListComponent data={[]} title={"Condiciones"} icon={"/inercial.svg"}></InfoListComponent>
+              </div>
+              <div style={{flex:1}}>
+              <InfoListComponent data={[]} title={"Medicamentos"} icon={"/medication.svg"}></InfoListComponent>
+              </div>
+            </div>
         </div>
     )
 

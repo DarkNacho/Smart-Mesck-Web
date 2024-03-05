@@ -40,7 +40,7 @@ export default function HeaderComponent() {
 
   const tabs = {
     Patient: "Pacientes",
-    op2: "Opción2",
+    Encounter: "Encuentros",
     op3: "Opción3",
     op4: "Opción4",
   };

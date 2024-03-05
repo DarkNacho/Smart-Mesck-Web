@@ -5,7 +5,8 @@ type FhirType =
   | "Patient"
   | "Questionnaire"
   | "QuestionnaireResponse"
-  | "Observation";
+  | "Observation"
+  | "Encounter";
 
 export default class FhirResourceService<T extends FhirResource> {
   public resourceTypeName: string;

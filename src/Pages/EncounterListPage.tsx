@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Patient } from "fhir/r4";
+import { Encounter } from "fhir/r4";
 
 import {
   List,
@@ -12,20 +12,19 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PatientCreateComponent from "../Components/Patient/PatientCreateComponent";
-import styles from "./PatientListPage.module.css";
+import styles from "./EncounterListPage.module.css";
 
-import PatientService from "../Services/PatientService";
+import EncounterService from "../Services/EncounterService";
 import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
 
-const patientService = new PatientService();
+const encounterService = new EncounterService();
 
 
-export default function PatientListPage() {
+export default function EncounterListPage() {
 
 
-
-  const [patients, setPatients] = useState<Patient[]>([]);
+  const [encounters, setEncounters] = useState<Encounter[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -36,11 +35,11 @@ export default function PatientListPage() {
   };
 
   const handleOperation = async (
-    operation: () => Promise<Result<Patient[]>>,
+    operation: () => Promise<Result<Encounter[]>>,
     successMessage: string
   ) => {
     const response = await toast.promise(operation(), {
-      loading: "Obteniendo Pacientes",
+      loading: "Obteniendo Encuentros",
       success: (result) => {
         if (result.success) {
           return successMessage;
@@ -52,36 +51,36 @@ export default function PatientListPage() {
     });
   
     if (response.success) {
-      setPatients(response.data);
+      setEncounters(response.data);
       console.log(response.data);
     } else {
       console.error(response.error);
     }
   };
 
-  const handleNewPatients = async (direction: "next" | "prev") => {
+  const handleNewEncounters = async (direction: "next" | "prev") => {
     handleOperation(
-      () => patientService.getNewResources(direction),
-      "Pacientes Obtenidos exitosamente"
+      () => encounterService.getNewResources(direction),
+      "Encuentros Obtenidos exitosamente"
     );
   };
   
-  const fetchPatients = async () => {
+  const fetchEncounters = async () => {
     handleOperation(
-      () => patientService.getResources( {_count: 5}),
-      "Pacientes Obtenidos exitosamente"
+      () => encounterService.getResources( {_count: 5}),
+      "Encuentros Obtenidos exitosamente"
     );
   };
   
   const handleSearch = async () => {
     handleOperation(
-      () => patientService.getResources( {_content: searchTerm, _count: 5}),
-      "Pacientes buscados obtenidos exitosamente"
+      () => encounterService.getResources( {_content: searchTerm, _count: 5}),
+      "Encuentros buscados obtenidos exitosamente"
     );
   };
 
   useEffect(() => {
-    fetchPatients();
+    fetchEncounters();
   }, []);
 
   return (
@@ -136,17 +135,15 @@ export default function PatientListPage() {
           />
         </form>
         <List className={styles.listContent}>
-          {patients.map((patient) => (
+          {encounters.map((encounter) => (
             <ListItem
               className={styles.listItem}
-              key={patient.id}
-              onClick={() => navigate(`/Patient/${patient.id}`)}
+              key={encounter.id}
+              onClick={() => navigate(`/Patient/${encounterService.getSubjectID(encounter.subject!)}`)}
             >
               <ListItemText
-                primary={`ID: ${patient.id}`}
-                secondary={`Name: ${patientService.parsePatientName(
-                  patient
-                )}, Gender: ${patient.gender || "N/A"}`}
+                primary={`Paciente: ${encounterService.getSubjectDisplayOrID(encounter.subject!)}`}
+                secondary={`Period: ${encounterService.getFormatPeriod(encounter.period!)}`}
               />
             </ListItem>
           ))}
@@ -155,16 +152,16 @@ export default function PatientListPage() {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleNewPatients("prev")}
-            disabled={!patientService.hasPrevPage}
+            onClick={() => handleNewEncounters("prev")}
+            disabled={!encounterService.hasPrevPage}
           >
             Previous Page
           </Button>
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleNewPatients("next")}
-            disabled={!patientService.hasNextPage}
+            onClick={() => handleNewEncounters("next")}
+            disabled={!encounterService.hasNextPage}
           >
             Next Page
           </Button>

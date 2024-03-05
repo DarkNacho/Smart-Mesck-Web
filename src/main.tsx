@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast";
 import PatientListPage from "./Pages/PatientListPage.tsx";
 import PatientPage from "./Pages/PatientPage.tsx";
 import HeaderComponent from "./Components/HeaderComponent.tsx";
+import EncounterListPage from "./Pages/EncounterListPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +26,8 @@ const router = createBrowserRouter([
     element: <PatientPage></PatientPage>
   },
   {
-    path: "/op2",
+    path: "/Encounter",
+    element: <EncounterListPage></EncounterListPage>
   },
   {
     path: "/op3",

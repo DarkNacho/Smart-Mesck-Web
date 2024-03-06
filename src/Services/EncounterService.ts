@@ -1,4 +1,4 @@
-import { Encounter, Period, Reference} from "fhir/r4";
+import {Encounter, Period, Reference} from "fhir/r4";
 import FhirResourceService from "./FhirService";
 
 export default class EncounterService extends FhirResourceService<Encounter> {
@@ -45,6 +45,39 @@ export default class EncounterService extends FhirResourceService<Encounter> {
     }
   }
 
+  public getPrimaryPractitioner(encounter: Encounter) {
+    const participants = encounter.participant || [];
+  
+    // Buscar el practicante principal
+    const primaryPerformer = participants.find((participant) => {
+      return (
+        participant.type &&
+        participant.type.some(
+          (type) =>
+            type.coding &&
+            type.coding.some(
+              (coding) =>
+                coding.system === 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType' &&
+                coding.code === 'PPRF'
+            )
+        )
+      );
+    });
+  
+    // Si hay un practicante principal, devolverlo
+    if (primaryPerformer) {
+      return this.getSubjectDisplayOrID(primaryPerformer.individual!);
+    }
+  
+    // Si no hay practicante principal, devolver el primer participante de la lista
+    const firstParticipant = participants[0];
+    if (firstParticipant) {
+      return this.getSubjectDisplayOrID(firstParticipant.individual!); 
+    }
+  
+  }
+
+  
   /*
   public async getSubjectName(subject: Reference) {
     if (subject && subject.display) return subject.display;

@@ -7,6 +7,7 @@ import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 import PatientService from "../Services/PatientService";
 import PatientOverviewComponent from "../Components/Patient/PatientOverviewComponent";
+import PatientEncounterList from "../Components/Patient/PatientEncounterList";
 
 const patientService = new PatientService();
 
@@ -63,6 +64,9 @@ export default function PatientPage() {
           patientID={patientID!}
         ></PatientQuestionnaireComponent>
       );
+      break;
+    case "Encounters":
+        componentToRender = (<PatientEncounterList patientID={patientID!}></PatientEncounterList>)
       break;
     default:
   }

@@ -24,6 +24,10 @@ export default function PatientGeneralWidgetComponent({
       <div className={styles.table}>
         <ul className={styles["text-wrapper"]}>
           <div className={styles.item}>
+            <div className={styles.text1}>ID</div>
+            <div className={styles.text2}>{patientService.getFirstIdentifierOrId(patient)}</div>
+          </div>
+          <div className={styles.item}>
             <div className={styles.text1}>Fecha de Nacimiento</div>
             <div className={styles.text2}>
               {" "}
@@ -45,10 +49,23 @@ export default function PatientGeneralWidgetComponent({
               {patientService.obtenerPrimerNumeroTelefono(patient)}
             </div>
           </div>
+        </ul>
+      </div>
+      <div className={styles.table}>
+        <ul className={styles["text-wrapper"]}>
           <div className={styles.item}>
-            <div className={styles.text1}>ID</div>
-            <div className={styles.text2}>{patient.id}</div>
+            <div className={styles.text1}>Estado Civil</div>
+            <div className={styles.text2}>Sin Registro</div>
           </div>
+          <div className={styles.item}>
+            <div className={styles.text1}>Nacionalidad</div>
+            <div className={styles.text2}>Sin Registro</div>
+          </div>
+          <div className={styles.item}>
+            <div className={styles.text1}>E-Mail</div>
+            <div className={styles.text2}>Sin Registro</div>
+          </div>
+          
         </ul>
       </div>
     </div>

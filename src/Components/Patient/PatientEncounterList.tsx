@@ -10,6 +10,10 @@ import {
   IconButton,
   InputAdornment,
 } from "@mui/material";
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker, DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
+
 import { useNavigate } from "react-router-dom";
 import PatientCreateComponent from "./PatientCreateComponent";
 import styles from "./PatientEncounterList.module.css";
@@ -93,7 +97,7 @@ export default function PatientEncounterList({patientID,}: {patientID: string;})
             justifyContent: "space-between",
           }}
         >
-          <h1>Lista de Pacientes</h1>
+          <h1>Lista de Encuentros</h1>
           <IconButton
             onClick={() => setOpenDialog(true)}
             color="primary"
@@ -134,6 +138,31 @@ export default function PatientEncounterList({patientID,}: {patientID: string;})
             }}
           />
         </form>
+
+
+        <form
+          className={styles.searchContainer}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch();
+          }}
+        >
+        <div>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker></DatePicker>
+          </LocalizationProvider>
+          
+          <IconButton type="submit" size="large">
+            <Search />
+          </IconButton>
+        </div>
+
+
+        
+
+        </form>
+
+
         <List className={styles.listContent}>
           {encounters.map((encounter) => (
             <ListItem

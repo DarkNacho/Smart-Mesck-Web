@@ -62,5 +62,15 @@ export default class PatientService extends FhirResourceService<Patient>{
     }
     return "no phone";
   }
+
+  public getFirstIdentifierOrId(patient: Patient): string {
+    if (patient.identifier && patient.identifier.length > 0) {
+      // Devuelve el valor del primer identificador si existe
+      return patient.identifier[0].value || patient.id || '';
+    } else {
+      // Si no hay identificadores, devuelve el ID del paciente
+      return patient.id || '';
+    }
+  }
   
 }

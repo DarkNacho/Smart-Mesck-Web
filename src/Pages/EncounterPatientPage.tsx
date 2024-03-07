@@ -1,5 +1,4 @@
-import { Encounter } from "fhir/r4";
-import PatientGeneralWidgetComponent from "../Components/Patient/PatientGeneralWidgetComponent";
+
 import ObservationService from "../Services/ObservationService";
 import InfoListComponent from "../Components/InfoListComponent";
 import { useEffect, useState } from "react";

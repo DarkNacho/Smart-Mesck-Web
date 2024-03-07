@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker, DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 
 import { useNavigate } from "react-router-dom";
 import PatientCreateComponent from "./PatientCreateComponent";

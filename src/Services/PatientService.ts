@@ -60,7 +60,7 @@ export default class PatientService extends FhirResourceService<Patient>{
         return numeroTelefono.value;
       }
     }
-    return "no phone";
+    return "N/A";
   }
 
   public getFirstIdentifierOrId(patient: Patient): string {

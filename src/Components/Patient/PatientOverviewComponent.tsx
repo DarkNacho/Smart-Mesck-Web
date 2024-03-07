@@ -3,24 +3,59 @@ import PatientGeneralWidgetComponent from "./PatientGeneralWidgetComponent";
 import ObservationService from "../../Services/ObservationService";
 import InfoListComponent from "../InfoListComponent";
 import { useEffect, useState } from "react";
-
+import ConditionService from "../../Services/ConditionService";
+import MedicationService from "../../Services/MedicationService";
 export default function PatientOverviewComponent({patient}:{patient: Patient})
 {
- const observationService = new ObservationService();
-  const [data,setData] = useState<{ name: string; value: string; }[]>([]);
-  const fetchData = async () =>
+  const observationService = new ObservationService();
+  const conditionService = new ConditionService();
+  const medicationService = new MedicationService();
+
+  const [observationData,setObservationData] = useState<{ name: string; value: string; }[]>([]);
+  const [conditionData,setConditionData] = useState<{ name: string; value: string; }[]>([]);
+  const [medication,setMedicationData] = useState<{ name: string; value: string; }[]>([]);
+
+
+  const fetchObservationData = async () =>
   {
     const result = await observationService.getResources( {subject: patient.id!});
     if(result.success)
     {
-      setData(observationService.extractObservationInfo(result.data));
+      setObservationData(observationService.extractObservationInfo(result.data));
+      console.log(result.data);
+    } 
+  }
+
+  const fetchConditionData = async () =>
+  {
+    const result = await conditionService.getResources( {subject: patient.id!});
+    if(result.success)
+    {
+      setConditionData(conditionService.extractConditionName(result.data));
+      console.log(result.data);
+    } 
+  }
+
+  const fetchMedicationData = async () =>
+  {
+    const result = await medicationService.getResources( {subject: patient.id!});
+    if(result.success)
+    {
+      setMedicationData(medicationService.extractMedicationInfo(result.data));
+      //setConditionData(conditionService.extractConditionName(result.data));
+      console.log("medication")
       console.log(result.data);
     } 
   }
 
   useEffect(() => {
-    setData([]);
-    fetchData();
+    setObservationData([]);
+    setConditionData([]);
+    setMedicationData([]);
+    fetchObservationData();
+    fetchConditionData();
+    fetchMedicationData();
+
   }, [patient.id]);
 
   
@@ -32,13 +67,13 @@ export default function PatientOverviewComponent({patient}:{patient: Patient})
             </div>
             <div style={{display: "flex", flexWrap: "wrap", gap: "30px"}}>
               <div style={{flex:1}}>
-              <InfoListComponent data={data} title={"Observaciones"} icon={"/hearth.svg"}></InfoListComponent>
+              <InfoListComponent data={observationData} title={"Observaciones"} icon={"/hearth.svg"}></InfoListComponent>
               </div>
               <div style={{flex:1}}>
-              <InfoListComponent data={[]} title={"Condiciones"} icon={"/inercial.svg"}></InfoListComponent>
+              <InfoListComponent data={conditionData} title={"Condiciones"} icon={"/inercial.svg"}></InfoListComponent>
               </div>
               <div style={{flex:1}}>
-              <InfoListComponent data={[]} title={"Medicamentos"} icon={"/medication.svg"}></InfoListComponent>
+              <InfoListComponent data={medication} title={"Medicamentos"} icon={"/medication.svg"}></InfoListComponent>
               </div>
             </div>
         </div>

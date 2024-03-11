@@ -1,7 +1,8 @@
 import Client, { SearchParams } from "fhir-kit-client";
-import { Bundle, OperationOutcome, FhirResource } from "fhir/r4";
+import { Bundle, OperationOutcome, FhirResource, CodeableConcept } from "fhir/r4";
 
 type FhirType =
+  | "FhirResource"
   | "Patient"
   | "Questionnaire"
   | "QuestionnaireResponse"
@@ -190,5 +191,13 @@ export default class FhirResourceService<T extends FhirResource> {
 
   private parseOperationOutcome(operation: OperationOutcome): string {
     return operation.issue[0]?.diagnostics || "Unknown error";
+  }
+
+  public getCodingBySystem(code: CodeableConcept, system: string)
+  {
+    var coding = code.coding;
+    if(!coding || coding.length === 0) return null;
+    const section = coding.find(e => e.system === system) || null;
+    return section;
   }
 }

@@ -1,4 +1,6 @@
 import {
+  Condition,
+  FhirResource,
   Observation,
   Questionnaire,
   QuestionnaireItem,
@@ -12,7 +14,7 @@ import FhirResourceService from "../../Services/FhirService";
 import ObservationService from "../../Services/ObservationService";
 //import "./QuestionnaireComponent.css";
 
-const fhirService = new FhirResourceService("Observation");
+const fhirService = new FhirResourceService("FhirResource");
 const questionnaireResponseService = new QuestionnaireResponseService();
 const observationService = new ObservationService();
 
@@ -169,7 +171,7 @@ export default function QuestionnaireComponent({
       for (let i = 0; i < contained.length; i++) {
         const observation = contained[i] as Observation;
         const item = items[i] as QuestionnaireItem;
-
+        
         observation.id = undefined;
         observation.meta = undefined;
         observation.subject = questionnaireResponse.subject;
@@ -217,13 +219,40 @@ export default function QuestionnaireComponent({
     }*/
   };
 
-  const sendObservations = async (observations: Observation[]) => {
+  const sendResources = async (resources: FhirResource[]) => {
     fhirService
-      .sendArray(observations)
+      .sendArray(resources)
       .then((res) =>
         res.success ? console.log("Observaciones enviadas") : res.error
       );
   };
+
+  const observationAsConditions = (observations: Observation[]) =>
+  {
+    //const observations = responseAsObservations(response); //Asumir que el cuestionario ya fue guardado en el servidor
+    var conditions = [] as Condition[];
+    observations.forEach(item => 
+      {
+        const coding = fhirService.getCodingBySystem(item.code, "SM");
+        //if(!coding || !coding.code) return;
+        if(coding && coding.code === "CON")  
+          conditions.push(observationService.convertirObservacionACondicion(item));      
+      });
+    return conditions;
+  }
+
+  const getFinalObservation = (observations: Observation[]) =>
+  {
+    var obs = [] as Observation[];
+    observations.forEach(item => 
+      {
+        const coding = fhirService.getCodingBySystem(item.code, "SM");
+        //if(!coding || !coding.code) return;
+        if(coding && coding.code === "OBS")  
+          obs.push(item);      
+      });
+    return obs;
+  } 
 
   const postData = async () => {
     const formContainer = formContainerRef.current;
@@ -241,12 +270,20 @@ export default function QuestionnaireComponent({
     sendQuestionnaireResponse(qr).then((res) => {
       if (res.success) {
         questionnaireResponse = res.data;
-        const newObservation = responseAsObservations(qr);
-        const finalObservation = generateUpdateObservations(
+        const newObservation = responseAsObservations(qr); 
+        const updatedObservation = generateUpdateObservations(
           originalObservation,
           newObservation
         );
-        sendObservations(finalObservation);
+
+        const finalObservation = getFinalObservation(updatedObservation)
+        const conditions = observationAsConditions(updatedObservation);
+
+        console.log("conditions final: ", conditions);
+        console.log("obsevation final:", finalObservation);
+        sendResources(finalObservation);
+        //sendResources(conditions)
+        
       } else console.error(res.error);
     });
 

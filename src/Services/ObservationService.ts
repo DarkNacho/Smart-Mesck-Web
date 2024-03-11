@@ -1,4 +1,4 @@
-import { Observation } from "fhir/r4";
+import { Condition, Observation } from "fhir/r4";
 import FhirResourceService from "./FhirService";
 
 export default class ObservationService extends FhirResourceService<Observation> {
@@ -65,5 +65,27 @@ export default class ObservationService extends FhirResourceService<Observation>
       return { name, value };
     });
   }
+
+  public convertirObservacionACondicion(observation: Observation): Condition {
+    const condition: Condition = {
+        resourceType: "Condition",
+        subject: observation.subject!,
+        code: {
+            coding: observation.code.coding,
+            text: observation.code.text,
+        },
+        evidence: observation.hasMember
+            ? [
+                  {
+                      detail: observation.hasMember.map(member => ({
+                          reference: member.reference,
+                      })),
+                  },
+              ]
+            : undefined,
+        extension: observation.extension,
+    };
+    return condition;
+}
 
 }

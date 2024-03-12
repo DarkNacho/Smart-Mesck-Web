@@ -69,6 +69,7 @@ export default class ObservationService extends FhirResourceService<Observation>
   public convertirObservacionACondicion(observation: Observation): Condition {
     const condition: Condition = {
         resourceType: "Condition",
+        id: observation.id,
         subject: observation.subject!,
         code: {
             coding: observation.code.coding,

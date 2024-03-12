@@ -111,7 +111,7 @@ export default class FhirResourceService<T extends FhirResource> {
           resourceType: "Bundle",
           type: "transaction",
           entry: newResources.map((resource) => {
-            const method = this.bundleAction(resource);
+            const method = this.bundleAction(resource); //TODO: verificar aquí para los casos de actualizar y eliminar
             const request = { method: method, url: this.resourceUrl(resource, method)}
             return {resource, request}
           }),

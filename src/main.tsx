@@ -12,6 +12,7 @@ import PatientPage from "./Pages/PatientPage.tsx";
 import HeaderComponent from "./Components/HeaderComponent.tsx";
 import EncounterListPage from "./Pages/EncounterListPage.tsx";
 import EncounterPatientPage from "./Pages/EncounterPatientPage.tsx";
+import ObservationHistoryPage from "./Pages/ObservationHistoryPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
   {
     path: "/Patient/:patientID/Encounter/:encounterID",
     element: <EncounterPatientPage></EncounterPatientPage>
+  },
+  {
+    path: "/Observation/:observationID",
+    element: <ObservationHistoryPage></ObservationHistoryPage>
   },
   {
     path: "/Encounter",

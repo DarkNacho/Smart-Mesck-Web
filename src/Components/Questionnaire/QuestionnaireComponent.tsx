@@ -57,26 +57,27 @@ export default function QuestionnaireComponent({
   }, [questionnaire, questionnaireResponse]);
 
   // Función para actualizar las observaciones originales con las nuevas
-  const generateUpdateObservations = (
-    originalObservations: Observation[],
-    newObservations: Observation[]
+  const generateUpdateResources = (
+    originalObservations: FhirResource[],
+    newObservations: FhirResource[]
   ) => {
     // Crear una copia profunda de las observaciones originales
     const updatedObservations = originalObservations;
 
     // Iterar sobre las nuevas observaciones
-    newObservations.forEach((newObservation) => {
+    newObservations.forEach((newObservation: any) => {
+
       // Buscar el valor deseado dentro de la propiedad extension
       const newValueString = newObservation.extension?.find(
-        (ext) =>
+        (ext: any) =>
           ext.url ===
           "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId"
       )?.valueString;
 
       // Buscar la observación correspondiente en las observaciones originales por el valor deseado
-      const index = updatedObservations.findIndex((originalObservation) =>
+      const index = updatedObservations.findIndex((originalObservation:any) =>
         originalObservation.extension?.some(
-          (ext) =>
+          (ext:any) =>
             ext.url ===
               "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
             ext.valueString === newValueString
@@ -115,15 +116,15 @@ export default function QuestionnaireComponent({
     */
 
     // Modificar las observaciones eliminadas en updatedObservations
-    updatedObservations.forEach((observation, index) => {
-      const shouldDelete = !newObservations.some((newObservation) =>
+    updatedObservations.forEach((observation:any, index) => {
+      const shouldDelete = !newObservations.some((newObservation: any) =>
         newObservation.extension?.some(
-          (ext) =>
+          (ext : any) =>
             ext.url ===
               "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
             ext.valueString ===
               observation.extension?.find(
-                (origExt) =>
+                (origExt :any) =>
                   origExt.url ===
                   "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId"
               )?.valueString
@@ -133,10 +134,7 @@ export default function QuestionnaireComponent({
       if (shouldDelete) {
         // Establecer la propiedad id en undefined
         //observation.id = undefined;
-        updatedObservations[index] = {
-          id: observation.id,
-          resourceType: "Observation",
-        } as Observation;
+        updatedObservations[index] = {} as Observation;
       }
     });
 
@@ -144,6 +142,17 @@ export default function QuestionnaireComponent({
 
     //TODO: existe un bug al momento de eliminar, no sé en que ocación hay que hacer bien el testing.
   };
+
+  /*
+  const getConditions = async (): Promise<Condition[]> => {
+    if (!questionnaireResponse.id) return [];
+    const result =
+      await observationService.getObservationsOfQuestionnaireResponse(
+        questionnaireResponse.id
+      );
+    return result.success ? result.data : [];
+  };
+  */
 
   const getObservations = async (): Promise<Observation[]> => {
     if (!questionnaireResponse.id) return [];
@@ -252,7 +261,24 @@ export default function QuestionnaireComponent({
           obs.push(item);      
       });
     return obs;
-  } 
+  }
+  
+  const getFinalArray = (resources: FhirResource[]) =>
+  {
+    var res = [] as FhirResource[];
+    resources.forEach( (item : any) => 
+      {
+        const coding = fhirService.getCodingBySystem(item.code, "SM");
+        if(coding)
+        {
+          if(coding.code === "OBS") res.push(item);
+          else if(coding.code === "CON") res.push(observationService.convertirObservacionACondicion(item));
+        }
+        
+        //if(coding && coding.code === "OBS")  res.push(item);
+      })
+    return res;
+  }
 
   const postData = async () => {
     const formContainer = formContainerRef.current;
@@ -266,23 +292,27 @@ export default function QuestionnaireComponent({
       formContainer
     ) as QuestionnaireResponse;
 
-    const originalObservation = await getObservations(); //quizás llamar al inicio
+    const originalObservation = await getObservations(); //obtiene obsevaciones desde Observation,  quizás llamar al inicio
+    const originalConditions = await 
     sendQuestionnaireResponse(qr).then((res) => {
       if (res.success) {
         questionnaireResponse = res.data;
-        const newObservation = responseAsObservations(qr); 
-        const updatedObservation = generateUpdateObservations(
+        const responsesObservation = responseAsObservations(qr); 
+        const updatedObservation = generateUpdateResources(
           originalObservation,
-          newObservation
+          responsesObservation
         );
 
-        const finalObservation = getFinalObservation(updatedObservation)
-        const conditions = observationAsConditions(updatedObservation);
-
-        console.log("conditions final: ", conditions);
-        console.log("obsevation final:", finalObservation);
-        sendResources(finalObservation);
+        //const finalObservation = getFinalObservation(updatedObservation)
+        //const conditions = observationAsConditions(updatedObservation);
+        
+        const final = getFinalArray(updatedObservation);
+        console.log("bla final: ", final);
+        //console.log("conditions final: ", conditions);
+        //console.log("obsevation final:", finalObservation);
+        //sendResources(finalObservation);
         //sendResources(conditions)
+        //sendResources(final);
         
       } else console.error(res.error);
     });

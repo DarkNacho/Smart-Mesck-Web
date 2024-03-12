@@ -45,10 +45,8 @@
   }
   .text1,
   .text2 {
-    flex: 1;
-    position: relative;
+    align-items: end;
     line-height: 22px;
-    font-weight: 500;
   }
   .text2 {
     color: #000;
@@ -58,7 +56,7 @@
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 8px;
   }
 

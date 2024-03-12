@@ -62,6 +62,21 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
+  
+  public async getHistoryById(id: string): Promise<Result<T[]>> {
+    const result = await this.handleResult<Bundle>(
+      this.fhirClient.history({resourceType: this.resourceTypeName, id: id}) as Promise<Bundle>
+    );
+
+    if (result.success) {
+      const resources =
+        result.data.entry?.map((entry) => entry.resource as T) || [];
+      return { success: true, data: resources };
+    } else {
+      return { success: false, error: result.error };
+    }
+  }
+
   public async postResource(newResource: T): Promise<Result<T>> {
     return this.handleResult<T>(
       this.fhirClient.create({
@@ -111,7 +126,7 @@ export default class FhirResourceService<T extends FhirResource> {
           resourceType: "Bundle",
           type: "transaction",
           entry: newResources.map((resource) => {
-            const method = this.bundleAction(resource);
+            const method = this.bundleAction(resource); //TODO: verificar aquí para los casos de actualizar y eliminar
             const request = { method: method, url: this.resourceUrl(resource, method)}
             return {resource, request}
           }),

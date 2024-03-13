@@ -1,5 +1,4 @@
 import {
-  Condition,
   FhirResource,
   Observation,
   Questionnaire,
@@ -236,6 +235,7 @@ export default function QuestionnaireComponent({
       );
   };
 
+  /* TODO: descomentar, solo esta comentado para compilar
   const observationAsConditions = (observations: Observation[]) =>
   {
     //const observations = responseAsObservations(response); //Asumir que el cuestionario ya fue guardado en el servidor
@@ -249,7 +249,9 @@ export default function QuestionnaireComponent({
       });
     return conditions;
   }
+  */
 
+  /* TODO: descomentar, solo esta comentado para compilar
   const getFinalObservation = (observations: Observation[]) =>
   {
     var obs = [] as Observation[];
@@ -262,6 +264,7 @@ export default function QuestionnaireComponent({
       });
     return obs;
   }
+  */
   
   const getFinalArray = (resources: FhirResource[]) =>
   {
@@ -293,7 +296,6 @@ export default function QuestionnaireComponent({
     ) as QuestionnaireResponse;
 
     const originalObservation = await getObservations(); //obtiene obsevaciones desde Observation,  quizás llamar al inicio
-    const originalConditions = await 
     sendQuestionnaireResponse(qr).then((res) => {
       if (res.success) {
         questionnaireResponse = res.data;
@@ -312,7 +314,7 @@ export default function QuestionnaireComponent({
         //console.log("obsevation final:", finalObservation);
         //sendResources(finalObservation);
         //sendResources(conditions)
-        //sendResources(final);
+        sendResources(final);
         
       } else console.error(res.error);
     });

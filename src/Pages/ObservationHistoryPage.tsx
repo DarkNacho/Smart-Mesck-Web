@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import axios from 'axios';
+import HistoryChartComponent from "../Components/Charts/HistoryChartComponent";
 
 export default function ObservationHistoryPage()
 {
@@ -67,6 +68,9 @@ export default function ObservationHistoryPage()
             </div>
             <div>
             { iframeContent && ( <iframe srcDoc={iframeContent} title="Graph" width={600} height={500}/> ) }
+            </div>
+            <div>
+              <HistoryChartComponent data={obvservationData}></HistoryChartComponent>
             </div>
         </div>
     )

@@ -1,4 +1,5 @@
 import {
+  Condition,
   FhirResource,
   Observation,
   Questionnaire,
@@ -11,11 +12,13 @@ import Button from "@mui/material/Button";
 import QuestionnaireResponseService from "../../Services/QuestionnaireResponseService";
 import FhirResourceService from "../../Services/FhirService";
 import ObservationService from "../../Services/ObservationService";
+import ConditionService from "../../Services/ConditionService";
 //import "./QuestionnaireComponent.css";
 
 const fhirService = new FhirResourceService("FhirResource");
 const questionnaireResponseService = new QuestionnaireResponseService();
 const observationService = new ObservationService();
+const conditionService = new ConditionService();
 
 export default function QuestionnaireComponent({
   questionnaire = {} as Questionnaire,
@@ -142,16 +145,11 @@ export default function QuestionnaireComponent({
     //TODO: existe un bug al momento de eliminar, no sé en que ocación hay que hacer bien el testing.
   };
 
-  /*
   const getConditions = async (): Promise<Condition[]> => {
     if (!questionnaireResponse.id) return [];
-    const result =
-      await observationService.getObservationsOfQuestionnaireResponse(
-        questionnaireResponse.id
-      );
+    const result = await conditionService.getConditonsWithQuestionnaireResponse(subjectId!, questionnaireResponse.id!)
     return result.success ? result.data : [];
   };
-  */
 
   const getObservations = async (): Promise<Observation[]> => {
     if (!questionnaireResponse.id) return [];
@@ -331,6 +329,16 @@ export default function QuestionnaireComponent({
     */
   };
 
+
+  const test = async () =>
+  {
+    console.log("subject: ", subjectId, "quesresId:", questionnaireResponse.id);
+    const result = await getConditions();
+    console.log(result);
+    
+    
+  }
+
   return (
     <div>
       <div ref={formContainerRef}></div>
@@ -349,6 +357,7 @@ export default function QuestionnaireComponent({
         >
           Guardar
         </Button>
+        <Button onClick={() => test()}>TEST</Button>
       </div>
     </div>
   );

@@ -11,23 +11,24 @@ import {
   InputAdornment,
 } from "@mui/material";
 
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 
 import { useNavigate } from "react-router-dom";
-import PatientCreateComponent from "./PatientCreateComponent";
 import styles from "./PatientEncounterList.module.css";
 
 import EncounterService from "../../Services/EncounterService";
 import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
+import EncounterCreateComponent from "../Encounter/EncounterCreateComponent";
 
 const encounterService = new EncounterService();
 
-
-export default function PatientEncounterList({patientID,}: {patientID: string;}) {
-
-
+export default function PatientEncounterList({
+  patientID,
+}: {
+  patientID: string;
+}) {
   const [encounters, setEncounters] = useState<Encounter[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -53,7 +54,7 @@ export default function PatientEncounterList({patientID,}: {patientID: string;})
       },
       error: (result) => result.toString(),
     });
-  
+
     if (response.success) {
       setEncounters(response.data);
       console.log(response.data);
@@ -68,17 +69,17 @@ export default function PatientEncounterList({patientID,}: {patientID: string;})
       "Encuentros Obtenidos exitosamente"
     );
   };
-  
+
   const fetchEncounters = async () => {
     handleOperation(
-      () => encounterService.getResources( {_count: 5, subject: patientID}),
+      () => encounterService.getResources({ _count: 5, subject: patientID }),
       "Encuentros Obtenidos exitosamente"
     );
   };
-  
+
   const handleSearch = async () => {
     handleOperation(
-      () => encounterService.getResources( {_content: searchTerm, _count: 5}),
+      () => encounterService.getResources({ _content: searchTerm, _count: 5 }),
       "Encuentros buscados obtenidos exitosamente"
     );
   };
@@ -110,11 +111,12 @@ export default function PatientEncounterList({patientID,}: {patientID: string;})
           >
             <Add />
           </IconButton>
-          <PatientCreateComponent
+          <EncounterCreateComponent
             isOpen={openDialog}
             onOpen={handleIsOpen}
-          ></PatientCreateComponent>
+          ></EncounterCreateComponent>
         </div>
+        {/*
         <form
           className={styles.searchContainer}
           onSubmit={(e) => {
@@ -138,7 +140,7 @@ export default function PatientEncounterList({patientID,}: {patientID: string;})
             }}
           />
         </form>
-
+          */}
 
         <form
           className={styles.searchContainer}
@@ -147,32 +149,37 @@ export default function PatientEncounterList({patientID,}: {patientID: string;})
             handleSearch();
           }}
         >
-        <div>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker></DatePicker>
-          </LocalizationProvider>
-          
-          <IconButton type="submit" size="large">
-            <Search />
-          </IconButton>
-        </div>
+          <div>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker></DatePicker>
+            </LocalizationProvider>
 
-
-        
-
+            <IconButton type="submit" size="large">
+              <Search />
+            </IconButton>
+          </div>
         </form>
-
 
         <List className={styles.listContent}>
           {encounters.map((encounter) => (
             <ListItem
               className={styles.listItem}
               key={encounter.id}
-              onClick={() => navigate(`/Patient/${encounterService.getSubjectID(encounter.subject!)}`)}
+              onClick={() =>
+                navigate(
+                  `/Patient/${encounterService.getSubjectID(
+                    encounter.subject!
+                  )}`
+                )
+              }
             >
               <ListItemText
-                primary={`${encounterService.getPrimaryPractitioner(encounter)}`}
-                secondary={`${encounterService.getFormatPeriod(encounter.period!)}`}
+                primary={`${encounterService.getPrimaryPractitioner(
+                  encounter
+                )}`}
+                secondary={`${encounterService.getFormatPeriod(
+                  encounter.period!
+                )}`}
               />
             </ListItem>
           ))}

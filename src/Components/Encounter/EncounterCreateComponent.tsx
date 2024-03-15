@@ -1,4 +1,9 @@
-import { useForm, SubmitHandler } from "react-hook-form";
+import {
+  useForm,
+  SubmitHandler,
+  Controller,
+  useFormContext,
+} from "react-hook-form";
 import {
   TextField,
   Button,
@@ -11,71 +16,36 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { Close } from "@mui/icons-material";
 
-import styles from "./PatientCreateComponent.module.css";
+import styles from "./EncounterCreateComponent.module.css";
 import { Patient } from "fhir/r4";
 import PatientService from "../../Services/PatientService";
 
-// Función para validar el Rut
-const validarRut = (rut: string) => {
-  // Eliminar puntos y guiones del RUT y convertir la letra a mayúscula
-  rut = rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
-
-  // Extraer dígito verificador y número
-  const dv = rut.slice(-1);
-  var rutNumerico = parseInt(rut.slice(0, -1), 10);
-
-  // Calcular dígito verificador esperado
-  var m = 0;
-  let s = 1;
-  for (; rutNumerico; rutNumerico = Math.floor(rutNumerico / 10)) {
-    s = (s + (rutNumerico % 10) * (9 - (m++ % 6))) % 11;
-  }
-
-  const dvEsperado = (s ? s - 1 : "K").toString();
-
-  // Verificar si el dígito verificador es correcto
-  return dv === dvEsperado;
-};
-
-// Opciones para el campo de género
-const generoOptions = [
-  { value: "unknown", label: "No especificado" },
-  { value: "male", label: "Masculino" },
-  { value: "female", label: "Femenino" },
-  { value: "other", label: "Otro" },
-];
-
-const maritalOptions = [
-  { value: "A", label: "Annulled" },
-  { value: "D", label: "Divorced" },
-  { value: "I", label: "Interlocutory" },
-  { value: "L", label: "Legally Separated" },
-  { value: "M", label: "Married" },
-  { value: "C", label: "Common Law" },
-  { value: "S", label: "Never Married" },
-  { value: "UNK", label: "unknown" },
-];
+import dayjs, { Dayjs } from "dayjs";
+import {
+  DatePicker,
+  DateTimePicker,
+  LocalizationProvider,
+  MobileDateTimePicker,
+  TimePicker,
+} from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // Interfaz para los datos del formulario
 interface FormData {
-  nombre: string;
-  segundoNombre: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string;
-  fechaNacimiento: string;
-  genero: string;
-  rut: string;
-  numeroTelefonico: string;
-  email: string;
-  photo: string;
-  maritalStatus: string;
+  patientId: string;
+  profesionalId: string;
+  day: Dayjs;
+  start: Dayjs;
+  end: Dayjs;
+  type: string;
 }
 
-export default function PatientCreateComponent({
+export default function EncounterCreateComponent({
   onOpen,
   isOpen,
 }: {
@@ -83,6 +53,7 @@ export default function PatientCreateComponent({
   isOpen: boolean;
 }) {
   const {
+    control,
     register,
     trigger,
     handleSubmit,
@@ -96,6 +67,15 @@ export default function PatientCreateComponent({
   const handleClose = () => {
     onOpen(false);
   };
+
+  const encounterType = [
+    { value: "UKN", label: "No especificado" },
+    { value: "A", label: "Ambulatorio" },
+    { value: "otro1", label: "adsada" },
+    { value: "other", label: "Otro" },
+  ];
+
+  const setDefaultValues = () => {};
 
   const postPatient = async (newPatient: Patient) => {
     const response = await toast.promise(
@@ -122,31 +102,159 @@ export default function PatientCreateComponent({
 
   // Función que se ejecuta al enviar el formulario
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
-    var newPatient: Patient = {
-      resourceType: "Patient",
-      identifier: [{ system: "RUT", value: rut }],
-      name: [
-        {
-          family: data.apellidoPaterno,
-          given: [data.nombre, data.segundoNombre],
-          suffix: [data.apellidoMaterno],
-          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`,
-        },
-      ],
-      birthDate: data.fechaNacimiento,
-      gender: data.genero as "male" | "female" | "other" | "unknown",
-      telecom: [{ system: "phone", value: data.numeroTelefonico }],
-      photo: [{ url: data.photo }],
-    };
-    postPatient(newPatient);
+    console.log("send form");
+    console.log(data);
   };
 
   return (
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Añadir Nuevo Paciente
+          Crear nuevo encuentro
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={{
+              color: "white",
+              backgroundColor: "#7e94ff",
+              "&:hover": { backgroundColor: "red" },
+            }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Container className={styles.container}>
+            <form id="encounterForm" onSubmit={handleSubmit(onSubmit)}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Paciente"
+                    {...register("patientId", {
+                      required: "Es necesario ingresar el paciente",
+                    })}
+                    fullWidth
+                    error={Boolean(errors.patientId)}
+                    helperText={errors.patientId && errors.patientId.message}
+                    onBlur={() => trigger("patientId")}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Profesional"
+                    {...register("profesionalId", {
+                      required: "Es necesario ingresar el profesional",
+                    })}
+                    fullWidth
+                    error={Boolean(errors.profesionalId)}
+                    helperText={
+                      errors.profesionalId && errors.profesionalId.message
+                    }
+                    onBlur={() => trigger("profesionalId")}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <Controller
+                    control={control}
+                    name="day"
+                    defaultValue={dayjs()}
+                    render={({ field: { onChange, value, ref } }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Fecha inicio test"
+                          onChange={onChange}
+                          value={value}
+                          inputRef={ref}
+                          sx={{ width: "100%" }}
+                        ></DatePicker>
+                      </LocalizationProvider>
+                    )}
+                  ></Controller>
+                </Grid>
+                <Grid item xs={12} sm={2.5}>
+                  <Controller
+                    control={control}
+                    name="start"
+                    defaultValue={dayjs()}
+                    render={({ field: { onChange, value, ref } }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <TimePicker
+                          label="start"
+                          onChange={onChange}
+                          value={value}
+                          inputRef={ref}
+                          sx={{ width: "100%" }}
+                        ></TimePicker>
+                      </LocalizationProvider>
+                    )}
+                  ></Controller>
+                </Grid>
+                <Grid item xs={12} sm={2.5}>
+                  <Controller
+                    control={control}
+                    defaultValue={dayjs().add(30, "minutes")}
+                    name="end"
+                    render={({ field: { onChange, value, ref } }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <TimePicker
+                          label="end"
+                          onChange={onChange}
+                          value={value}
+                          inputRef={ref}
+                          sx={{ width: "100%" }}
+                        ></TimePicker>
+                      </LocalizationProvider>
+                    )}
+                  ></Controller>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    select
+                    label="Tipo"
+                    defaultValue="A"
+                    {...register("type", {
+                      required: "Tipo de consulta requerida",
+                    })}
+                    fullWidth
+                    error={Boolean(errors.type)}
+                    helperText={errors.type && errors.type.message}
+                    onBlur={() => trigger("type")}
+                  >
+                    {encounterType.map((item) => (
+                      <MenuItem key={item.value} value={item.value}>
+                        {item.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </Grid>
+            </form>
+          </Container>
+        </DialogContent>
+        <DialogActions className={styles.dialogActions}>
+          <Button onClick={handleClose} variant="contained" color="error">
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            form="encounterForm"
+          >
+            Enviar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+
+  {
+    /*
+  return (
+    <div>
+      <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
+        <DialogTitle className={styles.dialogTitle}>
+          Crear nuevo encuentro
           <IconButton
             aria-label="close"
             onClick={handleClose}
@@ -320,4 +428,6 @@ export default function PatientCreateComponent({
       </Dialog>
     </div>
   );
+                    */
+  }
 }

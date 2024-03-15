@@ -18,7 +18,6 @@ import { Close, Search } from "@mui/icons-material";
 import styles from "./QuestionnaireListDialogComponent.module.css";
 import QuestionnaireService from "../../Services/QuestionnaireService";
 
-
 const questionnaireService = new QuestionnaireService();
 
 export default function QuestionnaireListDialogComponent({
@@ -49,7 +48,7 @@ export default function QuestionnaireListDialogComponent({
       },
       error: (result) => result.toString(),
     });
-  
+
     if (response.success) {
       setQuestionnaires(response.data);
       console.log(response.data);
@@ -64,28 +63,25 @@ export default function QuestionnaireListDialogComponent({
       "Formularios Obtenidos exitosamente"
     );
   };
-  
+
   const fetchQuestionnaires = async () => {
     handleOperation(
-      () => questionnaireService.getResources({_count: 10}),
+      () => questionnaireService.getResources({ _count: 10 }),
       "Forumularios Obtenidos exitosamente"
     );
   };
-  
+
   const handleSearch = async () => {
     handleOperation(
-      () => questionnaireService.getResources({_content: searchTerm, _count: 10}),
+      () =>
+        questionnaireService.getResources({ _content: searchTerm, _count: 10 }),
       "Questionnaires buscados obtenidos exitosamente"
     );
   };
 
-
   useEffect(() => {
-    if(showModal)
-      fetchQuestionnaires();
+    if (showModal) fetchQuestionnaires();
   }, [showModal]);
-
-
 
   return (
     <div>
@@ -98,40 +94,40 @@ export default function QuestionnaireListDialogComponent({
       </Button>
       <Dialog open={showModal} onClose={closeModal} maxWidth="md" fullWidth>
         <DialogTitle className={styles.dialogTitle}>
-          Formularios Disponibles
+          Evaluaciones Disponibles
           <IconButton
             aria-label="close"
             onClick={closeModal}
-            sx={{color: "white", "&:hover": { backgroundColor: "red"}}}
+            sx={{ color: "white", "&:hover": { backgroundColor: "red" } }}
           >
             <Close />
           </IconButton>
         </DialogTitle>
         <DialogContent className={styles.dialog}>
           <div className={styles.dialogContent}>
-          <form
-          className={styles.searchContainer}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch();
-          }}
-        >
-          <TextField
-            style={{ width: "100%" }}
-            label="Buscar un paciente"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton type="submit">
-                    <Search />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </form>
+            <form
+              className={styles.searchContainer}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSearch();
+              }}
+            >
+              <TextField
+                style={{ width: "100%" }}
+                label="Buscar un paciente"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton type="submit">
+                        <Search />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </form>
             <List className={styles.listContent}>
               {questionnaires.map((ques) => (
                 <ListItem
@@ -152,8 +148,8 @@ export default function QuestionnaireListDialogComponent({
           </div>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>
-        <Button
-            style={{ marginRight: 'auto'}}
+          <Button
+            style={{ marginRight: "auto" }}
             variant="contained"
             color="error"
             onClick={closeModal}
@@ -178,6 +174,6 @@ export default function QuestionnaireListDialogComponent({
           </Button>
         </DialogActions>
       </Dialog>
-      </div>
+    </div>
   );
 }

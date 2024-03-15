@@ -1,10 +1,7 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { Toaster } from "react-hot-toast";
 import PatientListPage from "./Pages/PatientListPage.tsx";
@@ -17,40 +14,39 @@ import ObservationHistoryPage from "./Pages/ObservationHistoryPage.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App></App>
+    element: <App></App>,
   },
   {
     path: "/Patient",
-    element: <PatientListPage></PatientListPage>
+    element: <PatientListPage></PatientListPage>,
   },
   {
     path: "/Patient/:patientID",
-    element: <PatientPage></PatientPage>
-  },
-  {
-    path: "/Patient/:patientID/Encounter/:encounterID",
-    element: <EncounterPatientPage></EncounterPatientPage>
+    element: <PatientPage></PatientPage>,
   },
   {
     path: "/Observation/:observationID",
-    element: <ObservationHistoryPage></ObservationHistoryPage>
+    element: <ObservationHistoryPage></ObservationHistoryPage>,
   },
   {
     path: "/Encounter",
-    element: <EncounterListPage></EncounterListPage>
+    element: <EncounterListPage></EncounterListPage>,
+  },
+  {
+    path: "/Encounter/:encounterID",
+    element: <EncounterPatientPage></EncounterPatientPage>,
   },
   {
     path: "/op4",
-  }
+  },
 ]);
-
 
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
     <Toaster></Toaster>
     <HeaderComponent></HeaderComponent>
-    <RouterProvider router={router} ></RouterProvider>
+    <RouterProvider router={router}></RouterProvider>
   </div>
 );
 

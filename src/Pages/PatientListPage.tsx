@@ -9,6 +9,9 @@ import {
   TextField,
   IconButton,
   InputAdornment,
+  Select,
+  MenuItem,
+  InputLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PatientCreateComponent from "../Components/Patient/PatientCreateComponent";
@@ -20,11 +23,7 @@ import toast from "react-hot-toast";
 
 const patientService = new PatientService();
 
-
 export default function PatientListPage() {
-
-
-
   const [patients, setPatients] = useState<Patient[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,7 +49,7 @@ export default function PatientListPage() {
       },
       error: (result) => result.toString(),
     });
-  
+
     if (response.success) {
       setPatients(response.data);
       console.log(response.data);
@@ -65,17 +64,17 @@ export default function PatientListPage() {
       "Pacientes Obtenidos exitosamente"
     );
   };
-  
+
   const fetchPatients = async () => {
     handleOperation(
-      () => patientService.getResources( {_count: 5}),
+      () => patientService.getResources({ _count: 5 }),
       "Pacientes Obtenidos exitosamente"
     );
   };
-  
+
   const handleSearch = async () => {
     handleOperation(
-      () => patientService.getResources( {_content: searchTerm, _count: 5}),
+      () => patientService.getResources({ identifier: searchTerm, _count: 5 }),
       "Pacientes buscados obtenidos exitosamente"
     );
   };
@@ -134,6 +133,16 @@ export default function PatientListPage() {
               ),
             }}
           />
+          <TextField
+            select
+            value={1}
+            variant="standard"
+            label="Modo de Busqueda"
+            sx={{ m: 1, minWidth: 120 }}
+          >
+            <MenuItem value={1}>Rut</MenuItem>
+            <MenuItem value={2}>Nombre</MenuItem>
+          </TextField>
         </form>
         <List className={styles.listContent}>
           {patients.map((patient) => (

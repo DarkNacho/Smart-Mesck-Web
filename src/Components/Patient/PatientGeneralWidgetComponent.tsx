@@ -18,15 +18,31 @@ export default function PatientGeneralWidgetComponent({
           <div className={styles.ellipse} />
           <img className={styles["contacts-icon"]} alt="" src="/contacts.svg" />
         </div>
-        <b className={styles.title1}>Información General</b>
+        <b className={styles.title1}>Antecedentes Personales</b>
         {edit && <b className={styles.text}>Edit</b>}
       </div>
       <div className={styles.table}>
         <ul className={styles["text-wrapper"]}>
           <div className={styles.item}>
             <div className={styles.text1}>ID</div>
-            <div className={styles.text2}>{patientService.getFirstIdentifierOrId(patient)}</div>
+            <div className={styles.text2}>
+              {patientService.getFirstIdentifierOrId(patient)}
+            </div>
           </div>
+          <div className={styles.item}>
+            <div className={styles.text1}>E-Mail</div>
+            <div className={styles.text2}>Sin Registro</div>
+          </div>
+          <div className={styles.item}>
+            <div className={styles.text1}>Número Telefónico</div>
+            <div className={styles.text2}>
+              {patientService.obtenerPrimerNumeroTelefono(patient)}
+            </div>
+          </div>
+        </ul>
+      </div>
+      <div className={styles.table}>
+        <ul className={styles["text-wrapper"]}>
           <div className={styles.item}>
             <div className={styles.text1}>Fecha de Nacimiento</div>
             <div className={styles.text2}>
@@ -44,28 +60,9 @@ export default function PatientGeneralWidgetComponent({
             <div className={styles.text2}>{patient.gender}</div>
           </div>
           <div className={styles.item}>
-            <div className={styles.text1}>Número Telefónico</div>
-            <div className={styles.text2}>
-              {patientService.obtenerPrimerNumeroTelefono(patient)}
-            </div>
-          </div>
-        </ul>
-      </div>
-      <div className={styles.table}>
-        <ul className={styles["text-wrapper"]}>
-          <div className={styles.item}>
             <div className={styles.text1}>Estado Civil</div>
             <div className={styles.text2}>Sin Registro</div>
           </div>
-          <div className={styles.item}>
-            <div className={styles.text1}>Nacionalidad</div>
-            <div className={styles.text2}>Sin Registro</div>
-          </div>
-          <div className={styles.item}>
-            <div className={styles.text1}>E-Mail</div>
-            <div className={styles.text2}>Sin Registro</div>
-          </div>
-          
         </ul>
       </div>
     </div>

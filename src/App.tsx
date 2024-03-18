@@ -6,7 +6,16 @@ function App() {
     <>
       <div>
         <h1>root aqui</h1>
-        <AutocompleteComponent></AutocompleteComponent>
+        <AutocompleteComponent
+          name="Condiciones"
+          table="icd9cm_dx"
+          searchArguments="df=long_name"
+        />
+        <AutocompleteComponent
+          name="Medicamentos"
+          table="rxterms"
+          searchArguments=""
+        />
       </div>
     </>
   );

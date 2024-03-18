@@ -9,8 +9,18 @@ interface Condition {
   display: string;
 }
 
+interface AutocompleteComponentProps {
+  name: string;
+  table: string;
+  searchArguments: string;
+}
+
 // Componente AutocompleteComponent
-const AutocompleteComponent: React.FC = () => {
+const AutocompleteComponent: React.FC<AutocompleteComponentProps> = ({
+  name,
+  table,
+  searchArguments,
+}) => {
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -18,32 +28,27 @@ const AutocompleteComponent: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?df=code_dotted,long_name&terms=${searchTerm}&maxList=10`
+        `https://clinicaltables.nlm.nih.gov/api/${table}/v3/search?${searchArguments}&terms=${searchTerm}&maxList=10`
       );
       const data = await response.json();
       console.log("data: ", data);
 
       // Manejar la respuesta y extraer las condiciones
       const total: number = data[0];
-      console.log("total: ", total);
-      const conditionsData: any[] = data[3];
+      //const conditionsData: any[] = data[3];
+      const conditionsData: any[] = data[3].map((item: any) => item.join());
       const code: any[] = data[1];
 
-      console.log("conditionsData: ", conditionsData);
-      console.log("codeCondition: ", code);
+      if (conditionsData.length !== code.length)
+        throw new Error("problema de obtención de datos");
 
-      if (conditionsData.length != code.length)
-        throw new Error("problama de obtención de datos");
-
-      var newConditions: Condition[] = new Array(conditionsData.length);
-
-      for (let i = 0; i < newConditions.length; ++i) {
-        newConditions[i] = {
-          code: code[i],
+      const newConditions: Condition[] = conditionsData.map(
+        (conditionData, index) => ({
+          code: code[index],
           system: "systema de prueba",
-          display: conditionsData[i][1],
-        };
-      }
+          display: conditionData,
+        })
+      );
 
       setConditions(newConditions);
     } catch (error) {
@@ -67,7 +72,7 @@ const AutocompleteComponent: React.FC = () => {
       onChange={(event, value) => handleSelectCondition(value)}
       onInputChange={(event, value) => fetchData(value)}
       renderInput={(params) => (
-        <TextField {...params} label="Conditions" variant="outlined" />
+        <TextField {...params} label={name} variant="outlined" />
       )}
     />
   );

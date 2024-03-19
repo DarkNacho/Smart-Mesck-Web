@@ -6,7 +6,6 @@ import { ValueSet, ValueSetExpansionContains } from "fhir/r4";
 interface AutocompleteComponentProps {
   name: string;
   table: string;
-  searchArguments: string;
 }
 
 // Componente AutocompleteComponent

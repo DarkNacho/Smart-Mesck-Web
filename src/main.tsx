@@ -25,16 +25,16 @@ const router = createBrowserRouter([
     element: <PatientPage></PatientPage>,
   },
   {
+    path: "/Patient/:patientID/Encounter/:encounterID",
+    element: <EncounterPatientPage></EncounterPatientPage>,
+  },
+  {
     path: "/Observation/:observationID",
     element: <ObservationHistoryPage></ObservationHistoryPage>,
   },
   {
     path: "/Encounter",
     element: <EncounterListPage></EncounterListPage>,
-  },
-  {
-    path: "/Encounter/:encounterID",
-    element: <EncounterPatientPage></EncounterPatientPage>,
   },
   {
     path: "/op4",

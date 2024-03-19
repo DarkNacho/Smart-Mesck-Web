@@ -9,9 +9,7 @@ import {
   TextField,
   IconButton,
   InputAdornment,
-  Select,
   MenuItem,
-  InputLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PatientCreateComponent from "../Components/Patient/PatientCreateComponent";

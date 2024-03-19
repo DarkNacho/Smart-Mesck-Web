@@ -34,7 +34,7 @@ const AutocompleteComponent: React.FC<AutocompleteComponentProps> = ({
       console.log("data: ", data);
 
       // Manejar la respuesta y extraer las condiciones
-      const total: number = data[0];
+      //const total: number = data[0];
       //const conditionsData: any[] = data[3];
       const conditionsData: any[] = data[3].map((item: any) => item.join());
       const code: any[] = data[1];
@@ -69,8 +69,8 @@ const AutocompleteComponent: React.FC<AutocompleteComponentProps> = ({
       options={conditions}
       loading={loading}
       getOptionLabel={(option) => option.display}
-      onChange={(event, value) => handleSelectCondition(value)}
-      onInputChange={(event, value) => fetchData(value)}
+      onChange={(_, value) => handleSelectCondition(value)}
+      onInputChange={(_, value) => fetchData(value)}
       renderInput={(params) => (
         <TextField {...params} label={name} variant="outlined" />
       )}

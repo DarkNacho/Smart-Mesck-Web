@@ -12,8 +12,10 @@ const questionnaireService = new QuestionnaireService();
 
 export default function PatientQuestionnaireComponent({
   patientID,
+  encounterID,
 }: {
   patientID: string;
+  encounterID?: string;
 }) {
   const [questionnaireResponses, setQuestionnaireResponses] = useState<
     QuestionnaireResponse[]
@@ -30,32 +32,29 @@ export default function PatientQuestionnaireComponent({
     console.log("Questionario seleccionado", ques);
   };
 
-  const fetchQuestionnaireResponses = async () => 
-  {
-    try
-    {
-    var responseBundle = await questionnaireResponseService.getResources({subject: patientID})
-    if(!responseBundle.success) throw Error(responseBundle.error); 
-    
-    console.log(responseBundle.data)
-    setQuestionnaireResponses(responseBundle.data);
-    const updatedQuestionnaires: Record<string, Questionnaire> = {};
+  const fetchQuestionnaireResponses = async () => {
+    try {
+      var responseBundle = await questionnaireResponseService.getResources({
+        subject: patientID,
+        encounter: encounterID!,
+      });
+      if (!responseBundle.success) throw Error(responseBundle.error);
 
-    for (const quetionnaireResponse of responseBundle.data) {
-      const quesR_id = quetionnaireResponse.questionnaire;
-      if (!quesR_id) continue;
-      
-      const res = await questionnaireService.getById(
-        quesR_id
-      );
-      if(res.success) updatedQuestionnaires[quesR_id] = res.data;
+      console.log(responseBundle.data);
+      setQuestionnaireResponses(responseBundle.data);
+      const updatedQuestionnaires: Record<string, Questionnaire> = {};
+
+      for (const quetionnaireResponse of responseBundle.data) {
+        const quesR_id = quetionnaireResponse.questionnaire;
+        if (!quesR_id) continue;
+
+        const res = await questionnaireService.getById(quesR_id);
+        if (res.success) updatedQuestionnaires[quesR_id] = res.data;
+      }
+      setQuestionnaires(updatedQuestionnaires);
+    } catch {
+      console.log("entro al catch");
     }
-    setQuestionnaires(updatedQuestionnaires);
-  }
-  catch
-  {
-    console.log("entro al catch");
-  }
   };
 
   useEffect(() => {
@@ -89,6 +88,7 @@ export default function PatientQuestionnaireComponent({
                   <QuestionnaireComponent
                     questionnaire={newQues}
                     subjectId={patientID}
+                    encounterId={encounterID}
                   ></QuestionnaireComponent>
                 </div>
               ))}
@@ -97,35 +97,38 @@ export default function PatientQuestionnaireComponent({
         )}
       </div>
       <div>
-      { Object.keys(questionnaires).length > 0 && (
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1-content"
-            id="panel1-header"
-          >
-            Formularios cargados del paciente
-          </AccordionSummary>
-          <AccordionDetails>
-            {Object.keys(questionnaires).length > 0 && (
-              <div>
-                {questionnaireResponses.map(
-                  (quesRes, index) =>
-                    quesRes.questionnaire && (
-                      <div style={{paddingBottom: "50px"}} key={index}>
-                        <QuestionnaireComponent
-                          questionnaire={questionnaires[quesRes.questionnaire]}
-                          questionnaireResponse={quesRes}
-                          subjectId={patientID}
-                        ></QuestionnaireComponent>
-                      </div>
-                    )
-                )}
-              </div>
-            )}
-          </AccordionDetails>
-        </Accordion>
-      )}
+        {Object.keys(questionnaires).length > 0 && (
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              Formularios cargados del paciente
+            </AccordionSummary>
+            <AccordionDetails>
+              {Object.keys(questionnaires).length > 0 && (
+                <div>
+                  {questionnaireResponses.map(
+                    (quesRes, index) =>
+                      quesRes.questionnaire && (
+                        <div style={{ paddingBottom: "50px" }} key={index}>
+                          <QuestionnaireComponent
+                            questionnaire={
+                              questionnaires[quesRes.questionnaire]
+                            }
+                            questionnaireResponse={quesRes}
+                            subjectId={patientID}
+                            encounterId={encounterID}
+                          ></QuestionnaireComponent>
+                        </div>
+                      )
+                  )}
+                </div>
+              )}
+            </AccordionDetails>
+          </Accordion>
+        )}
       </div>
     </div>
   );

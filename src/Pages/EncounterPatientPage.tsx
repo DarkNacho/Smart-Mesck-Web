@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import ConditionService from "../Services/ConditionService";
+import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 
 export default function EncounterPatientPage() {
   const observationService = new ObservationService();
@@ -16,24 +17,33 @@ export default function EncounterPatientPage() {
     { name: string; value: string }[]
   >([]);
 
+  const [conditionData, setConditionData] = useState<
+    { name: string; value: string }[]
+  >([]);
+
   const fetchData = async () => {
     const result = await observationService.getResources({
       subject: patientID!,
       encounter: encounterID!,
     });
+
+    console.log("patientID ", patientID);
+    console.log("encounterID ", encounterID);
     if (result.success) {
       setObvservationData(
         observationService.extractObservationInfo(result.data)
       );
-      console.log(result.data);
+      console.log("observation:", result.data);
     }
+
     const resultCon = await conditionService.getResources({
       subject: patientID!,
+      encounter: encounterID!,
     });
     if (resultCon.success) {
-      console.log("Conditions");
-      console.log(resultCon.data);
-      console.log(conditionService.extractConditionName(resultCon.data));
+      console.log("conditions: ", resultCon.data);
+      setConditionData(conditionService.extractConditionName(resultCon.data));
+      //console.log(conditionService.extractConditionName(resultCon.data));
     }
   };
 
@@ -47,6 +57,12 @@ export default function EncounterPatientPage() {
       <div style={{ paddingBottom: "30px" }}>
         <h1>info encountro</h1>
       </div>
+      <div>
+        <PatientQuestionnaireComponent
+          patientID={patientID!}
+          encounterID={encounterID!}
+        ></PatientQuestionnaireComponent>
+      </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
         <div style={{ flex: 1 }}>
           <InfoListComponent
@@ -57,7 +73,7 @@ export default function EncounterPatientPage() {
         </div>
         <div style={{ flex: 1 }}>
           <InfoListComponent
-            data={[]}
+            data={conditionData}
             title={"Condiciones"}
             icon={"/inercial.svg"}
           ></InfoListComponent>

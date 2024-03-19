@@ -6,9 +6,7 @@ import {
   ListItem,
   ListItemText,
   Button,
-  TextField,
   IconButton,
-  InputAdornment,
 } from "@mui/material";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -21,6 +19,7 @@ import EncounterService from "../../Services/EncounterService";
 import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import EncounterCreateComponent from "../Encounter/EncounterCreateComponent";
+import dayjs from "dayjs";
 
 const encounterService = new EncounterService();
 
@@ -31,7 +30,7 @@ export default function PatientEncounterList({
 }) {
   const [encounters, setEncounters] = useState<Encounter[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(dayjs());
 
   const navigate = useNavigate();
 
@@ -79,7 +78,12 @@ export default function PatientEncounterList({
 
   const handleSearch = async () => {
     handleOperation(
-      () => encounterService.getResources({ _content: searchTerm, _count: 5 }),
+      () =>
+        encounterService.getResources({
+          _count: 5,
+          subject: patientID,
+          date: searchTerm.toISOString(),
+        }),
       "Encuentros buscados obtenidos exitosamente"
     );
   };
@@ -98,7 +102,7 @@ export default function PatientEncounterList({
             justifyContent: "space-between",
           }}
         >
-          <h1>Lista de Encuentros</h1>
+          <h1>Lista de Encuentros paciente</h1>
           <IconButton
             onClick={() => setOpenDialog(true)}
             color="primary"
@@ -145,13 +149,17 @@ export default function PatientEncounterList({
         <form
           className={styles.searchContainer}
           onSubmit={(e) => {
+            alert(searchTerm);
             e.preventDefault();
             handleSearch();
           }}
         >
           <div>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker></DatePicker>
+              <DatePicker
+                defaultValue={searchTerm}
+                onChange={(value) => setSearchTerm(dayjs(value))}
+              ></DatePicker>
             </LocalizationProvider>
 
             <IconButton type="submit" size="large">
@@ -165,13 +173,7 @@ export default function PatientEncounterList({
             <ListItem
               className={styles.listItem}
               key={encounter.id}
-              onClick={() =>
-                navigate(
-                  `/Patient/${encounterService.getSubjectID(
-                    encounter.subject!
-                  )}`
-                )
-              }
+              onClick={() => navigate(`Encounter/${encounter.id}`)}
             >
               <ListItemText
                 primary={`${encounterService.getPrimaryPractitioner(

@@ -1,9 +1,4 @@
-import {
-  useForm,
-  SubmitHandler,
-  Controller,
-  useFormContext,
-} from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import {
   TextField,
   Button,
@@ -22,18 +17,16 @@ import toast from "react-hot-toast";
 import { Close } from "@mui/icons-material";
 
 import styles from "./EncounterCreateComponent.module.css";
-import { Patient } from "fhir/r4";
-import PatientService from "../../Services/PatientService";
+import { Encounter } from "fhir/r4";
 
 import dayjs, { Dayjs } from "dayjs";
 import {
   DatePicker,
-  DateTimePicker,
   LocalizationProvider,
-  MobileDateTimePicker,
   TimePicker,
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import EncounterService from "../../Services/EncounterService";
 
 // Interfaz para los datos del formulario
 interface FormData {
@@ -75,16 +68,14 @@ export default function EncounterCreateComponent({
     { value: "other", label: "Otro" },
   ];
 
-  const setDefaultValues = () => {};
-
-  const postPatient = async (newPatient: Patient) => {
+  const postEncounter = async (newEncounter: Encounter) => {
     const response = await toast.promise(
-      new PatientService().postResource(newPatient),
+      new EncounterService().postResource(newEncounter),
       {
-        loading: "Enviado Paciente",
+        loading: "Enviado...",
         success: (result) => {
           if (result.success) {
-            return "Paciente enviado de forma exitosa";
+            return "Encuentro guardado de forma exitosa";
           } else {
             throw Error(result.error);
           }
@@ -104,6 +95,29 @@ export default function EncounterCreateComponent({
   const onSubmit: SubmitHandler<FormData> = (data) => {
     console.log("send form");
     console.log(data);
+
+    const newEncounter: Encounter = {
+      resourceType: "Encounter",
+      subject: { reference: `Patient/${data.patientId}` },
+      participant: [
+        {
+          individual: {
+            reference: `Practitioner/${data.profesionalId}`,
+            display: "prueba nacho",
+          },
+        },
+      ],
+      period: {
+        start: data.start.toISOString(),
+        end: data.end.toISOString(),
+      },
+      status: "finished",
+      class: {
+        code: data.type,
+        system: "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+      },
+    };
+    postEncounter(newEncounter);
   };
 
   return (
@@ -143,7 +157,7 @@ export default function EncounterCreateComponent({
                   <TextField
                     label="Profesional"
                     {...register("profesionalId", {
-                      required: "Es necesario ingresar el profesional",
+                      //required: "Es necesario ingresar el profesional",
                     })}
                     fullWidth
                     error={Boolean(errors.profesionalId)}

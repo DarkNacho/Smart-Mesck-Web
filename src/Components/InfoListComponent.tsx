@@ -1,17 +1,26 @@
-
+import { useNavigate } from "react-router-dom";
 import styles from "./InfoListComponent.module.css";
+
+export interface InfoListData {
+  id?: string;
+  name: string;
+  value: string;
+}
 
 export default function InfoListComponent({
   data,
   title,
   icon,
   edit = false,
+  resourceType,
 }: {
-  data: { name: string; value: string }[];
+  resourceType: string;
+  data: InfoListData[];
   title: string;
   icon: string;
   edit?: Boolean;
 }) {
+  const navigate = useNavigate();
   return (
     <div className={styles.infolist}>
       <div className={styles.title}>
@@ -27,7 +36,13 @@ export default function InfoListComponent({
           <ul className={styles["text-wrapper"]}>
             {data.length > 0 ? (
               data.map((dato, index) => (
-                <div className={styles.item} key={index}>
+                <div
+                  className={`${styles.item} ${dato.id ? styles.item2 : ""}`}
+                  key={index}
+                  onClick={() => {
+                    if (dato.id) navigate(`/${resourceType}/${dato.id}`);
+                  }}
+                >
                   <div className={styles.text1}>{dato.name}</div>
                   <div className={styles.text2}>{dato.value}</div>
                 </div>

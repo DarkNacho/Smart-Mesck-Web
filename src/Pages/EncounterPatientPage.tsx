@@ -1,5 +1,7 @@
 import ObservationService from "../Services/ObservationService";
-import InfoListComponent from "../Components/InfoListComponent";
+import InfoListComponent, {
+  InfoListData,
+} from "../Components/InfoListComponent";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -13,13 +15,9 @@ export default function EncounterPatientPage() {
   const { patientID } = useParams();
   const { encounterID } = useParams();
 
-  const [obvservationData, setObvservationData] = useState<
-    { name: string; value: string }[]
-  >([]);
+  const [obvservationData, setObvservationData] = useState<InfoListData[]>([]);
 
-  const [conditionData, setConditionData] = useState<
-    { name: string; value: string }[]
-  >([]);
+  const [conditionData, setConditionData] = useState<InfoListData[]>([]);
 
   const fetchData = async () => {
     const result = await observationService.getResources({
@@ -57,18 +55,13 @@ export default function EncounterPatientPage() {
       <div style={{ paddingBottom: "30px" }}>
         <h1>info encountro</h1>
       </div>
-      <div>
-        <PatientQuestionnaireComponent
-          patientID={patientID!}
-          encounterID={encounterID!}
-        ></PatientQuestionnaireComponent>
-      </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
         <div style={{ flex: 1 }}>
           <InfoListComponent
             data={obvservationData}
             title={"Observaciones"}
             icon={"/hearth.svg"}
+            resourceType="Observation"
           ></InfoListComponent>
         </div>
         <div style={{ flex: 1 }}>
@@ -76,6 +69,7 @@ export default function EncounterPatientPage() {
             data={conditionData}
             title={"Condiciones"}
             icon={"/inercial.svg"}
+            resourceType="Condition"
           ></InfoListComponent>
         </div>
         <div style={{ flex: 1 }}>
@@ -83,8 +77,15 @@ export default function EncounterPatientPage() {
             data={[]}
             title={"Medicamentos"}
             icon={"/medication.svg"}
+            resourceType="Medica"
           ></InfoListComponent>
         </div>
+      </div>
+      <div>
+        <PatientQuestionnaireComponent
+          patientID={patientID!}
+          encounterID={encounterID!}
+        ></PatientQuestionnaireComponent>
       </div>
     </div>
   );

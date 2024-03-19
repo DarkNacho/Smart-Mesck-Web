@@ -74,11 +74,11 @@ export default function PatientQuestionnaireComponent({
       <h1>Lista de cuestionarios:</h1>
       <div>
         {newQuestionnaires.length > 0 && (
-          <Accordion>
+          <Accordion sx={{ backgroundColor: "transparent" }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1-content"
-              id="panel1-header"
+              aria-controls="panel1-content-new"
+              id="panel1-header-new"
             >
               Nuevos formularios
             </AccordionSummary>
@@ -98,13 +98,13 @@ export default function PatientQuestionnaireComponent({
       </div>
       <div>
         {Object.keys(questionnaires).length > 0 && (
-          <Accordion>
+          <Accordion defaultExpanded sx={{ backgroundColor: "transparent" }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1-content"
-              id="panel1-header"
+              aria-controls="panel1-content-old"
+              id="panel1-header-old"
             >
-              Formularios cargados del paciente
+              <h1>Formularios cargados del paciente</h1>
             </AccordionSummary>
             <AccordionDetails>
               {Object.keys(questionnaires).length > 0 && (

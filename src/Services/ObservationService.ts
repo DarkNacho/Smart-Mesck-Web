@@ -1,5 +1,6 @@
 import { Condition, Observation } from "fhir/r4";
 import FhirResourceService from "./FhirService";
+import { InfoListData } from "../Components/InfoListComponent";
 
 export default class ObservationService extends FhirResourceService<Observation> {
   constructor() {
@@ -89,10 +90,9 @@ export default class ObservationService extends FhirResourceService<Observation>
     return name;
   }
 
-  public extractObservationInfo(
-    observations: Observation[]
-  ): { name: string; value: string }[] {
+  public extractObservationInfo(observations: Observation[]): InfoListData[] {
     return observations.map((observation) => {
+      const id = observation.id;
       const name =
         observation.code?.coding?.[0]?.display ||
         observation.code?.text ||
@@ -150,7 +150,7 @@ export default class ObservationService extends FhirResourceService<Observation>
       } else {
         value = "Unknown Value";
       }
-      return { name, value };
+      return { id, name, value };
     });
   }
 

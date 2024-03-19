@@ -3,7 +3,6 @@ import InfoListComponent from "../Components/InfoListComponent";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import axios from "axios";
 import HistoryChartComponent from "../Components/Charts/HistoryChartComponent";
 
 export default function ObservationHistoryPage() {
@@ -15,10 +14,11 @@ export default function ObservationHistoryPage() {
     { name: string; value: string }[]
   >([]);
 
-  const [iframeContent, setIframeContent] = useState<string | null>(null);
+  //const [iframeContent, setIframeContent] = useState<string | null>(null);
 
   const [name, setName] = useState("");
 
+  /*
   const fetchGraph = async (data: { name: string; value: string }[]) => {
     const response = await axios.post(
       "http://localhost:8000/observationHistory",
@@ -32,6 +32,7 @@ export default function ObservationHistoryPage() {
     await setIframeContent(response.data);
     console.log("graph html ", response.data);
   };
+  */
 
   const fetchData = async () => {
     const result = await observationService.getHistoryById(observationID!);
@@ -43,7 +44,7 @@ export default function ObservationHistoryPage() {
         return { name, value };
       });
 
-      fetchGraph(obs);
+      //fetchGraph(obs);
       setObvservationData(obs);
       setName(obs.length > 0 ? observationService.getName(result.data[0]) : "");
       console.log(obs);
@@ -70,7 +71,7 @@ export default function ObservationHistoryPage() {
           ></InfoListComponent>
         </div>
       </div>
-      <div>
+      {/*<div>
         {iframeContent && (
           <iframe
             srcDoc={iframeContent}
@@ -79,10 +80,14 @@ export default function ObservationHistoryPage() {
             height={500}
           />
         )}
-      </div>
-      <div>
-        <HistoryChartComponent data={obvservationData}></HistoryChartComponent>
-      </div>
+        </div>*/}
+      {obvservationData.length > 1 && (
+        <div>
+          <HistoryChartComponent
+            data={obvservationData}
+          ></HistoryChartComponent>
+        </div>
+      )}
     </div>
   );
 }

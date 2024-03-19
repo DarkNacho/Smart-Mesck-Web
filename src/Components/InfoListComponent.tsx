@@ -31,31 +31,29 @@ export default function InfoListComponent({
         <b className={styles.title1}>{title}</b>
         {edit && <b className={styles.text}>Edit</b>}
       </div>
-      <div>
-        <div className={styles.table}>
-          <ul className={styles["text-wrapper"]}>
-            {data.length > 0 ? (
-              data.map((dato, index) => (
-                <div
-                  className={`${styles.item} ${dato.id ? styles.item2 : ""}`}
-                  key={index}
-                  onClick={() => {
-                    if (dato.id) navigate(`/${resourceType}/${dato.id}`);
-                  }}
-                >
-                  <div className={styles.text1}>{dato.name}</div>
-                  <div className={styles.text2}>{dato.value}</div>
-                </div>
-              ))
-            ) : (
-              <div>
-                <div className={styles.emptyMessage}>
-                  No hay datos disponibles
-                </div>
+      <div className={styles.table}>
+        <ul className={styles["text-wrapper"]}>
+          {data.length > 0 ? (
+            data.map((dato, index) => (
+              <div
+                className={`${styles.item} ${dato.id ? styles.item2 : ""}`}
+                key={index}
+                onClick={() => {
+                  if (dato.id) navigate(`/${resourceType}/${dato.id}`);
+                }}
+              >
+                <div className={styles.text1}>{dato.name}</div>
+                <div className={styles.text2}>{dato.value}</div>
               </div>
-            )}
-          </ul>
-        </div>
+            ))
+          ) : (
+            <div>
+              <div className={styles.emptyMessage}>
+                No hay datos disponibles
+              </div>
+            </div>
+          )}
+        </ul>
       </div>
     </div>
   );

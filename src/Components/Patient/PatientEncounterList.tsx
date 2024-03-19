@@ -116,6 +116,7 @@ export default function PatientEncounterList({
             <Add />
           </IconButton>
           <EncounterCreateComponent
+            patientId={patientID}
             isOpen={openDialog}
             onOpen={handleIsOpen}
           ></EncounterCreateComponent>

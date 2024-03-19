@@ -9,8 +9,8 @@ function App() {
         <h1>root aqui</h1>
         <AutocompleteComponent
           name="Condiciones"
-          table="icd9cm_dx"
-          searchArguments="df=long_name"
+          table="conditions"
+          searchArguments=""
         />
         <AutocompleteComponent
           name="Medicamentos"

@@ -41,9 +41,11 @@ interface FormData {
 export default function EncounterCreateComponent({
   onOpen,
   isOpen,
+  patientId,
 }: {
   onOpen: (isOpen: boolean) => void;
   isOpen: boolean;
+  patientId: string;
 }) {
   const {
     control,
@@ -143,6 +145,8 @@ export default function EncounterCreateComponent({
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
+                    defaultValue={patientId}
+                    disabled
                     label="Paciente"
                     {...register("patientId", {
                       required: "Es necesario ingresar el paciente",
@@ -155,9 +159,11 @@ export default function EncounterCreateComponent({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
+                    defaultValue={"204"} //profesional de prueba
+                    disabled
                     label="Profesional"
                     {...register("profesionalId", {
-                      //required: "Es necesario ingresar el profesional",
+                      required: "Es necesario ingresar el profesional",
                     })}
                     fullWidth
                     error={Boolean(errors.profesionalId)}
@@ -167,7 +173,7 @@ export default function EncounterCreateComponent({
                     onBlur={() => trigger("profesionalId")}
                   />
                 </Grid>
-                <Grid item xs={12} sm={3}>
+                <Grid item xs={12} sm={2.8}>
                   <Controller
                     control={control}
                     name="day"
@@ -185,7 +191,7 @@ export default function EncounterCreateComponent({
                     )}
                   ></Controller>
                 </Grid>
-                <Grid item xs={12} sm={2.5}>
+                <Grid item xs={12} sm={2.6}>
                   <Controller
                     control={control}
                     name="start"
@@ -203,7 +209,7 @@ export default function EncounterCreateComponent({
                     )}
                   ></Controller>
                 </Grid>
-                <Grid item xs={12} sm={2.5}>
+                <Grid item xs={12} sm={2.6}>
                   <Controller
                     control={control}
                     defaultValue={dayjs().add(30, "minutes")}

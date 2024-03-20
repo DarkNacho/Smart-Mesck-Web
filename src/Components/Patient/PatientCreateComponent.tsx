@@ -1,10 +1,7 @@
-import { useForm, SubmitHandler } from "react-hook-form";
+import { SubmitHandler } from "react-hook-form";
 import {
-  TextField,
   Button,
   Container,
-  Grid,
-  MenuItem,
   IconButton,
   Dialog,
   DialogTitle,
@@ -18,63 +15,9 @@ import { Close } from "@mui/icons-material";
 import styles from "./PatientCreateComponent.module.css";
 import { Patient } from "fhir/r4";
 import PatientService from "../../Services/PatientService";
-
-// Función para validar el Rut
-const validarRut = (rut: string) => {
-  // Eliminar puntos y guiones del RUT y convertir la letra a mayúscula
-  rut = rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
-
-  // Extraer dígito verificador y número
-  const dv = rut.slice(-1);
-  var rutNumerico = parseInt(rut.slice(0, -1), 10);
-
-  // Calcular dígito verificador esperado
-  var m = 0;
-  let s = 1;
-  for (; rutNumerico; rutNumerico = Math.floor(rutNumerico / 10)) {
-    s = (s + (rutNumerico % 10) * (9 - (m++ % 6))) % 11;
-  }
-
-  const dvEsperado = (s ? s - 1 : "K").toString();
-
-  // Verificar si el dígito verificador es correcto
-  return dv === dvEsperado;
-};
-
-// Opciones para el campo de género
-const generoOptions = [
-  { value: "unknown", label: "No especificado" },
-  { value: "male", label: "Masculino" },
-  { value: "female", label: "Femenino" },
-  { value: "other", label: "Otro" },
-];
-
-const maritalOptions = [
-  { value: "A", label: "Annulled" },
-  { value: "D", label: "Divorced" },
-  { value: "I", label: "Interlocutory" },
-  { value: "L", label: "Legally Separated" },
-  { value: "M", label: "Married" },
-  { value: "C", label: "Common Law" },
-  { value: "S", label: "Never Married" },
-  { value: "UNK", label: "unknown" },
-];
-
-// Interfaz para los datos del formulario
-interface FormData {
-  nombre: string;
-  segundoNombre: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string;
-  fechaNacimiento: string;
-  genero: string;
-  rut: string;
-  numeroTelefonico: string;
-  email: string;
-  photo: string;
-  maritalStatus: string;
-}
-
+import PatientFormComponent, {
+  PatientFormData,
+} from "../Forms/PatientFormComponent";
 export default function PatientCreateComponent({
   onOpen,
   isOpen,
@@ -82,13 +25,6 @@ export default function PatientCreateComponent({
   onOpen: (isOpen: boolean) => void;
   isOpen: boolean;
 }) {
-  const {
-    register,
-    trigger,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>();
-
   useEffect(() => {
     onOpen(isOpen);
   }, [isOpen]);
@@ -121,7 +57,7 @@ export default function PatientCreateComponent({
   };
 
   // Función que se ejecuta al enviar el formulario
-  const onSubmit: SubmitHandler<FormData> = (data) => {
+  const onSubmitForm: SubmitHandler<PatientFormData> = (data) => {
     const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
     var newPatient: Patient = {
       resourceType: "Patient",
@@ -161,147 +97,10 @@ export default function PatientCreateComponent({
         </DialogTitle>
         <DialogContent>
           <Container className={styles.container}>
-            <form id="pacienteForm" onSubmit={handleSubmit(onSubmit)}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Nombre"
-                    {...register("nombre", {
-                      required: "El Nombre es necesario",
-                    })}
-                    fullWidth
-                    error={Boolean(errors.nombre)}
-                    helperText={errors.nombre && errors.nombre.message}
-                    onBlur={() => trigger("nombre")}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Segundo Nombre"
-                    {...register("segundoNombre")}
-                    fullWidth
-                    onBlur={() => trigger("segundoNombre")}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Apellido Paterno"
-                    {...register("apellidoPaterno", {
-                      required: "El Apellido Paterno es necesario",
-                    })}
-                    fullWidth
-                    error={Boolean(errors.apellidoPaterno)}
-                    helperText={
-                      errors.apellidoPaterno && errors.apellidoPaterno.message
-                    }
-                    onBlur={() => trigger("apellidoPaterno")}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Apellido Materno"
-                    {...register("apellidoMaterno")}
-                    fullWidth
-                    onBlur={() => trigger("apellidoMaterno")}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Fecha de Nacimiento"
-                    type="date"
-                    {...register("fechaNacimiento", {
-                      required: "La Fecha de Nacimiento es necesaria",
-                    })}
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                    error={Boolean(errors.fechaNacimiento)}
-                    helperText={
-                      errors.fechaNacimiento && errors.fechaNacimiento.message
-                    }
-                    onBlur={() => trigger("fechaNacimiento")}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    select
-                    label="Género"
-                    defaultValue="unknown"
-                    {...register("genero", {
-                      required: "El Género es necesario",
-                    })}
-                    fullWidth
-                    error={Boolean(errors.genero)}
-                    helperText={errors.genero && errors.genero.message}
-                    onBlur={() => trigger("genero")}
-                  >
-                    {generoOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Rut"
-                    {...register("rut", {
-                      required: "El Rut es necesario",
-                      validate: (value) => validarRut(value) || "Rut inválido",
-                    })}
-                    fullWidth
-                    error={Boolean(errors.rut)}
-                    helperText={errors.rut && errors.rut.message}
-                    onBlur={() => trigger("rut")}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Número Telefónico"
-                    {...register("numeroTelefonico")}
-                    fullWidth
-                    onBlur={() => trigger("numeroTelefonico")}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    type="email"
-                    label="Email"
-                    {...register("email", {
-                      required: "Correo electronico requerido",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Correo electrónico inválido",
-                      },
-                    })}
-                    error={Boolean(errors.email)}
-                    helperText={errors.email && errors.email.message}
-                    fullWidth
-                    onBlur={() => trigger("email")}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    select
-                    label="Estado Civil"
-                    defaultValue="S"
-                    {...register("maritalStatus")}
-                    fullWidth
-                    error={Boolean(errors.genero)}
-                    helperText={errors.genero && errors.genero.message}
-                    onBlur={() => trigger("maritalStatus")}
-                  >
-                    {maritalOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <TextField label="Foto" {...register("photo")} fullWidth />
-                </Grid>
-              </Grid>
-            </form>
+            <PatientFormComponent
+              formId="pacienteForm"
+              submitForm={onSubmitForm}
+            ></PatientFormComponent>
           </Container>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>

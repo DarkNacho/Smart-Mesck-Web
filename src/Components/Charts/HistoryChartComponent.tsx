@@ -99,7 +99,7 @@ const HistoryChartComponent: React.FC<HistoryChartComponentProps> = ({
         />
       </Grid>
       <Button variant="outlined" onClick={resetChart}>
-        Resent
+        Reset
       </Button>
     </div>
   );

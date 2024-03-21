@@ -37,6 +37,7 @@ const HistoryChartComponent: React.FC<HistoryChartComponentProps> = ({
 
   const labels = data.map((entry) => {
     const time = new Date(entry.value);
+    console.log("time", entry.value);
     return time.toLocaleTimeString("en-US", {
       month: "short",
       day: "numeric",

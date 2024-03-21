@@ -7,6 +7,9 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Observation, ValueSetExpansionContains } from "fhir/r4";
 import AutocompleteFromServerComponent from "../AutocompleteFromServerComponent";
+
+import ObservationService from "../../Services/ObservationService";
+
 // Interfaz para los datos del formulario
 export interface ObservationFormData {
   subject: string;
@@ -17,6 +20,7 @@ export interface ObservationFormData {
   interpretation: ValueSetExpansionContains[]; // https://hl7.org/fhir/valueset-observation-interpretation.html
   note: string; // https://hl7.org/fhir/datatypes.html#Annotation
   issued: Dayjs;
+  valueString: string;
 }
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -333,14 +337,14 @@ export default function ObservationFormComponent({
           <Controller
             name="code"
             control={control}
-            defaultValue={observation.code?.coding?.[0]}
+            defaultValue={observation? observation.code?.coding?.[0] : {}}
             render={({ field: { onChange, value } }) => (
               <AutocompleteFromServerComponent
                 name="loinct"
                 table="loinc-items"
                 onChange={onChange}
                 value={value}
-                readOnly={!!observation.code.coding}
+                readOnly={!!observation.code?.coding || false}
                 textFieldProps={{
                   ...register("code", {
                     required: "Código requerido",
@@ -375,7 +379,7 @@ export default function ObservationFormComponent({
           <Controller
             name="category"
             control={control}
-            defaultValue={observation.category?.[0].coding}
+            defaultValue={observation.category?.[0].coding || []}
             render={({ field: { onChange, value } }) => (
               <Autocomplete
                 multiple
@@ -407,7 +411,7 @@ export default function ObservationFormComponent({
           <Controller
             name="interpretation"
             control={control}
-            defaultValue={observation.interpretation?.[0].coding}
+            defaultValue={observation.interpretation?.[0].coding || []}
             render={({ field: { onChange, value } }) => (
               <Autocomplete
                 multiple
@@ -439,13 +443,24 @@ export default function ObservationFormComponent({
           <TextField
             multiline
             fullWidth
-            defaultValue={observation?.note?.[0].text}
+            defaultValue={observation?.note?.[0].text || ""}
             rows={3}
             label="Notas"
             {...register("note")}
             error={Boolean(errors.note)}
             helperText={errors.note && errors.note.message}
             onBlur={() => trigger("note")}
+          ></TextField>
+        </Grid>
+        <Grid item xs={12} sm={12}>
+          <TextField
+            fullWidth
+            defaultValue={ new ObservationService().getValue(observation)}
+            label="Valor"
+            {...register("valueString")}
+            error={Boolean(errors.valueString)}
+            helperText={errors.valueString && errors.valueString.message}
+            onBlur={() => trigger("valueString")}
           ></TextField>
         </Grid>
       </Grid>

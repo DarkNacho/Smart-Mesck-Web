@@ -17,6 +17,8 @@ export default function PatientOverviewComponent({
   const [observationData, setObservationData] = useState<InfoListData[]>([]);
   const [conditionData, setConditionData] = useState<InfoListData[]>([]);
   const [medication, setMedicationData] = useState<InfoListData[]>([]);
+  
+
 
   const fetchObservationData = async () => {
     const result = await observationService.getResources({
@@ -61,6 +63,7 @@ export default function PatientOverviewComponent({
     fetchMedicationData();
   }, [patient.id]);
 
+
   return (
     <div style={{ padding: "50px" }}>
       <div style={{ paddingBottom: "30px" }}>
@@ -75,6 +78,8 @@ export default function PatientOverviewComponent({
             title={"Observaciones"}
             icon={"/hearth.svg"}
             resourceType="Observation"
+            patientId={patient.id!}
+            
           ></InfoListComponent>
         </div>
         <div style={{ flex: 1 }}>

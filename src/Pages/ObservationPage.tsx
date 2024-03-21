@@ -30,7 +30,7 @@ export default function ObservationPage() {
       const obs = result.data.map((item) => {
         const name = observationService.getValue(item);
         const value =
-          dayjs(item.meta?.lastUpdated).format("HH:mm:ss YYYY-MM-DD") || "";
+          dayjs(item.issued || item.meta?.lastUpdated).toISOString();
         return { name, value };
       });
 
@@ -46,6 +46,8 @@ export default function ObservationPage() {
     var newObservation = observationData?.[0] || {} as Observation;
     newObservation = {
       ...newObservation,
+      valueString: data.valueString,
+      
       subject: { reference: `Patient/${data.subject}` },
       //encounter: { reference: `Encounter/${data.encounter}` },
       performer: [{ reference: `Practitioner/${data.performer}` }],
@@ -53,9 +55,9 @@ export default function ObservationPage() {
       code: { coding: [data.code] },
       interpretation: [{ coding: data.interpretation }],
       issued: dayjs(data.issued).toISOString(),
-      note: [{ text: data.note }]
+      note: [{ text: data.note }],
     };
-
+    alert(JSON.stringify(newObservation))
     console.log(newObservation);
     sendObservation(newObservation);
   };
@@ -102,11 +104,8 @@ export default function ObservationPage() {
         }}
       >
         <div style={{ background: "#e4e9f2" }}>
-          {JSON.stringify(observationData?.[0] || "")}
-        </div>
-        <div style={{ background: "#e4e9f2" }}>
 
-          {obvservationInfoData.length > 1 && (<div>
+          {obvservationInfoData.length >= 1 && (<div>
             <ObservationFormComponent formId="form"
               observation={observationData?.[0]!}
               patientId={patientID!}

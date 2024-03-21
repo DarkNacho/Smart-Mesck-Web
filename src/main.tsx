@@ -33,6 +33,10 @@ const router = createBrowserRouter([
     element: <ObservationPage></ObservationPage>,
   },
   {
+    path: "/Patient/:patientID/Encounter/:encounterID/Observation/:observationID",
+    element: <ObservationPage></ObservationPage>
+  },
+  {
     path: "/Encounter",
     element: <EncounterListPage></EncounterListPage>,
   },

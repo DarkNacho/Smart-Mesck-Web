@@ -8,10 +8,11 @@ import { useParams } from "react-router-dom";
 import HistoryChartComponent from "../Components/Charts/HistoryChartComponent";
 import { Observation } from "fhir/r4";
 import dayjs from "dayjs";
+import ObservationFormComponent, { ObservationFormData } from "../Components/Forms/ObservationFormComponent";
 
 export default function ObservationPage() {
   const observationService = new ObservationService();
-  const { observationID } = useParams();
+  const { patientID, observationID } = useParams();
 
   const [obvservationInfoData, setObvservationInfoData] = useState<
     InfoListData[]
@@ -57,6 +58,15 @@ export default function ObservationPage() {
       >
         <div style={{ background: "#e4e9f2" }}>
           {JSON.stringify(observationData?.[0] || "")}
+        </div>
+        <div style={{ background: "#e4e9f2" }}>
+
+        {obvservationInfoData.length > 1 && ( <div>
+          <ObservationFormComponent formId="form" data={observationData?.[0].code?.coding?.[0]} readOnly patientId={patientID!} submitForm={function (data: ObservationFormData): void {
+            alert(JSON.stringify(data))
+          } }></ObservationFormComponent>
+          <button form="form" type="submit">test</button>
+          </div>)}
         </div>
         <InfoListComponent
           data={obvservationInfoData}

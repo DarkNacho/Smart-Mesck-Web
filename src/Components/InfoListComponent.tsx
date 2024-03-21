@@ -39,7 +39,7 @@ export default function InfoListComponent({
                 className={`${styles.item} ${dato.id ? styles.item2 : ""}`}
                 key={index}
                 onClick={() => {
-                  if (dato.id) navigate(`/${resourceType}/${dato.id}`);
+                  if (dato.id) navigate(`${resourceType}/${dato.id}`);
                 }}
               >
                 <div className={styles.text1}>{dato.name}</div>

@@ -29,7 +29,7 @@ const router = createBrowserRouter([
     element: <EncounterPatientPage></EncounterPatientPage>,
   },
   {
-    path: "/Observation/:observationID",
+    path: "/Patient/:patientID/Observation/:observationID",
     element: <ObservationPage></ObservationPage>,
   },
   {

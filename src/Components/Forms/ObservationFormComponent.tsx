@@ -22,10 +22,12 @@ export default function ObservationFormComponent({
   formId,
   patientId,
   submitForm,
+  data
 }: {
   formId: string;
   patientId: string;
   submitForm: SubmitHandler<ObservationFormData>;
+  data?: ValueSetExpansionContains;
 }) {
   const category: ValueSetExpansionContains[] = [
     {
@@ -118,12 +120,14 @@ export default function ObservationFormComponent({
           <Controller
             name="code"
             control={control}
+            defaultValue={data}
             render={({ field: { onChange, value } }) => (
               <AutocompleteFromServerComponent
                 name="loinct"
                 table="loinc-items"
                 onChange={onChange}
                 value={value}
+                readOnly={!!data}
                 textFieldProps={{
                   ...register("code", {
                     required: "Código requerido",

@@ -9,6 +9,7 @@ interface AutocompleteComponentProps {
   onChange: (value: ValueSetExpansionContains | null) => void;
   value: ValueSetExpansionContains | null;
   textFieldProps?: TextFieldProps;
+  readOnly?: boolean;
 }
 
 export default function AutocompleteFromServerComponent({
@@ -17,6 +18,7 @@ export default function AutocompleteFromServerComponent({
   onChange,
   value,
   textFieldProps,
+  readOnly,
 }: AutocompleteComponentProps) {
   const [dataSet, setDataSet] = useState<ValueSetExpansionContains[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -47,10 +49,11 @@ export default function AutocompleteFromServerComponent({
     <Autocomplete
       options={dataSet}
       loading={loading}
-      getOptionLabel={(option) => option.display!}
+      getOptionLabel={(option) => `${option.code} - ${option.display!}`}
       onChange={(_, newValue) => onChange(newValue)}
       onInputChange={(_, value) => fetchData(value)}
       value={value}
+      readOnly={readOnly}
       renderInput={(params) => (
         <TextField
           {...params}

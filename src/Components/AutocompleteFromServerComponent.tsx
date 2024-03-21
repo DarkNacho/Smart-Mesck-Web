@@ -49,7 +49,7 @@ export default function AutocompleteFromServerComponent({
     <Autocomplete
       options={dataSet}
       loading={loading}
-      getOptionLabel={(option) => `${option.code} - ${option.display!}`}
+      getOptionLabel={(option) => `${option.code} - ${option.display}`}
       onChange={(_, newValue) => onChange(newValue)}
       onInputChange={(_, value) => fetchData(value)}
       value={value}

@@ -9,6 +9,8 @@ import HistoryChartComponent from "../Components/Charts/HistoryChartComponent";
 import { Observation } from "fhir/r4";
 import dayjs from "dayjs";
 import ObservationFormComponent, { ObservationFormData } from "../Components/Forms/ObservationFormComponent";
+import toast from "react-hot-toast";
+import { SubmitHandler } from "react-hook-form";
 
 export default function ObservationPage() {
   const observationService = new ObservationService();
@@ -38,6 +40,49 @@ export default function ObservationPage() {
     }
   };
 
+
+  const onSubmitForm: SubmitHandler<ObservationFormData> = (data) => {
+
+    var newObservation = observationData?.[0] || {} as Observation;
+    newObservation = {
+      ...newObservation,
+      subject: { reference: `Patient/${data.subject}` },
+      //encounter: { reference: `Encounter/${data.encounter}` },
+      performer: [{ reference: `Practitioner/${data.performer}` }],
+      category: [{ coding: data.category }], //TODO: cardinalidad a muchos, por lo que debería cambiarlo a lista en vez de sólo un item
+      code: { coding: [data.code] },
+      interpretation: [{ coding: data.interpretation }],
+      issued: dayjs(data.issued).toISOString(),
+      note: [{ text: data.note }]
+    };
+
+    console.log(newObservation);
+    sendObservation(newObservation);
+  };
+
+  const sendObservation = async (newObservation: Observation) => {
+    const response = await toast.promise(
+      new ObservationService().sendResource(newObservation),
+      {
+        loading: "Enviado..",
+        success: (result) => {
+          if (result.success) {
+            return "Enviado de forma exitosa";
+          } else {
+            throw Error(result.error);
+          }
+        },
+        error: (result) => result.toString(),
+      }
+    );
+
+    if (response.success) {
+      console.log(response.data);
+    } else {
+      console.error(response.error);
+    }
+  };
+
   useEffect(() => {
     setObvservationInfoData([]);
     fetchData();
@@ -61,11 +106,13 @@ export default function ObservationPage() {
         </div>
         <div style={{ background: "#e4e9f2" }}>
 
-        {obvservationInfoData.length > 1 && ( <div>
-          <ObservationFormComponent formId="form" data={observationData?.[0].code?.coding?.[0]} readOnly patientId={patientID!} submitForm={function (data: ObservationFormData): void {
-            alert(JSON.stringify(data))
-          } }></ObservationFormComponent>
-          <button form="form" type="submit">test</button>
+          {obvservationInfoData.length > 1 && (<div>
+            <ObservationFormComponent formId="form"
+              observation={observationData?.[0]!}
+              patientId={patientID!}
+              submitForm={onSubmitForm}>
+            </ObservationFormComponent>
+            <button form="form" type="submit">test</button>
           </div>)}
         </div>
         <InfoListComponent

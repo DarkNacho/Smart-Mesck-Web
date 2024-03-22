@@ -6,8 +6,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Observation, ValueSetExpansionContains } from "fhir/r4";
-import AutocompleteFromServerComponent from "../AutocompleteFromServerComponent";
-
+import AutocompleteFromServerComponent from "../AutoCompleteComponets/AutocompleteFromServerComponent";
 import ObservationService from "../../Services/ObservationService";
 
 // Interfaz para los datos del formulario
@@ -337,7 +336,7 @@ export default function ObservationFormComponent({
           <Controller
             name="code"
             control={control}
-            defaultValue={observation? observation.code?.coding?.[0] : {}}
+            defaultValue={observation ? observation.code?.coding?.[0] : {}}
             render={({ field: { onChange, value } }) => (
               <AutocompleteFromServerComponent
                 name="loinct"
@@ -455,7 +454,7 @@ export default function ObservationFormComponent({
         <Grid item xs={12} sm={12}>
           <TextField
             fullWidth
-            defaultValue={ new ObservationService().getValue(observation)}
+            defaultValue={new ObservationService().getValue(observation)}
             label="Valor"
             {...register("valueString")}
             error={Boolean(errors.valueString)}

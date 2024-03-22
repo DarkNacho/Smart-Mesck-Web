@@ -1,21 +1,12 @@
 import Client, { SearchParams } from "fhir-kit-client";
+import FhirType from "./Utils/Fhirtypes";
+
 import {
   Bundle,
   OperationOutcome,
   FhirResource,
   CodeableConcept,
 } from "fhir/r4";
-
-type FhirType =
-  | "FhirResource"
-  | "Patient"
-  | "Questionnaire"
-  | "QuestionnaireResponse"
-  | "Observation"
-  | "Encounter"
-  | "Condition"
-  | "MedicationStatement"
-  | "Practitioner";
 
 export default class FhirResourceService<T extends FhirResource> {
   public resourceTypeName: string;

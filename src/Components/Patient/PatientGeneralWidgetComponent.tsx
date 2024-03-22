@@ -1,4 +1,4 @@
-import PersonUtil from "../../Utils/PersonUtil";
+import PersonUtil from "../../Services/Utils/PersonUtil";
 import styles from "./PatientGeneralWidgetComponent.module.css";
 import { Patient } from "fhir/r4";
 

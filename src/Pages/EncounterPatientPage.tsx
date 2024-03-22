@@ -62,6 +62,7 @@ export default function EncounterPatientPage() {
             title={"Observaciones"}
             icon={"/hearth.svg"}
             resourceType="Observation"
+            patientId={patientID}
           ></InfoListComponent>
         </div>
         <div style={{ flex: 1 }}>

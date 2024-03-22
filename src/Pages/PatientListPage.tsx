@@ -18,7 +18,7 @@ import styles from "./PatientListPage.module.css";
 import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import FhirResourceService from "../Services/FhirService";
-import PersonUtil from "../Utils/PersonUtil";
+import PersonUtil from "../Services/Utils/PersonUtil";
 
 const fhirService = new FhirResourceService('Patient');
 

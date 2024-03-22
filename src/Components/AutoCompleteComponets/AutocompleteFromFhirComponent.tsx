@@ -1,39 +1,48 @@
 import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
-import { Patient } from "fhir/r4";
+import { FhirResource } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
-import PersonUtil from "../../Utils/PersonUtil";
+import FhirType from "../../Services/Utils/Fhirtypes";
 
-interface PatientAutocompleteFromServerComponentProps {
+interface AutocompleteFromFhirComponentProps {
   label: string;
-  onChange: (value: Patient | null) => void;
-  value: Patient | null;
+  onChange: (value: FhirResource | null) => void;
+  getDispay: (value: FhirResource) => string;
+  value: FhirResource | null;
+  resourceType: FhirType;
   textFieldProps?: TextFieldProps;
   readOnly?: boolean;
+  searchParam: string;
 }
 
-export default function PatientAutocompleteFromServerComponent({
+export default function AutocompleteFromFhirComponent({
   label,
   onChange,
   value,
   textFieldProps,
   readOnly,
-}: PatientAutocompleteFromServerComponentProps) {
-  const [dataSet, setDataSet] = useState<Patient[]>([]);
+  resourceType,
+  getDispay,
+  searchParam,
+}: AutocompleteFromFhirComponentProps) {
+  const [dataSet, setDataSet] = useState<FhirResource[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const fhirService = new FhirResourceService('Patient');
+  const fhirService = new FhirResourceService(resourceType);
 
   const fetchData = async (searchTerm: string) => {
     setLoading(true);
     try {
 
-      const result = await fhirService.getResources({ name: searchTerm });
+      const stringJson = `{"${searchParam}": "${searchTerm}"}`;
+      const param = JSON.parse(stringJson);
+
+      const result = await fhirService.getResources(param);
 
       if (!result.success) throw new Error(result.error);
 
-      setDataSet(result.data as Patient[]);
+      setDataSet(result.data as FhirResource[]);
+      console.log("obtenidos de auto complete: ", result.data)
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -50,7 +59,7 @@ export default function PatientAutocompleteFromServerComponent({
     <Autocomplete
       options={dataSet}
       loading={loading}
-      getOptionLabel={(option) => `${PersonUtil.parsePersonName(option)}`}
+      getOptionLabel={(option) => getDispay(option)}
       onChange={(_, newValue) => onChange(newValue)}
       onInputChange={(_, value) => fetchData(value)}
       value={value}

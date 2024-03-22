@@ -42,11 +42,11 @@ export default function QuestionnaireComponent({
       //formStatus: readonly ? 'display' : 'preview'
     };
 
-    var lformsQ = window.LForms.Util.convertFHIRQuestionnaireToLForms(
+    const lformsQ = window.LForms.Util.convertFHIRQuestionnaireToLForms(
       questionnaire,
       "R4"
     );
-    var formWithUserData = window.LForms.Util.mergeFHIRDataIntoLForms(
+    const formWithUserData = window.LForms.Util.mergeFHIRDataIntoLForms(
       "QuestionnaireResponse",
       questionnaireResponse,
       lformsQ,
@@ -82,7 +82,7 @@ export default function QuestionnaireComponent({
         originalObservation.extension?.some(
           (ext: any) =>
             ext.url ===
-              "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
+            "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
             ext.valueString === newValueString
         )
       );
@@ -124,13 +124,13 @@ export default function QuestionnaireComponent({
         newObservation.extension?.some(
           (ext: any) =>
             ext.url ===
-              "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
+            "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
             ext.valueString ===
-              observation.extension?.find(
-                (origExt: any) =>
-                  origExt.url ===
-                  "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId"
-              )?.valueString
+            observation.extension?.find(
+              (origExt: any) =>
+                origExt.url ===
+                "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId"
+            )?.valueString
         )
       );
 
@@ -172,7 +172,7 @@ export default function QuestionnaireComponent({
       formContainer
     ) as QuestionnaireResponse;
 
-    var newObservations: Observation[] = [];
+    const newObservations: Observation[] = [];
 
     const contained = diagnosticReport.contained;
     const items = responses.item;
@@ -276,7 +276,7 @@ export default function QuestionnaireComponent({
   */
 
   const getFinalArray = (resources: FhirResource[]) => {
-    var res = [] as FhirResource[];
+    const res = [] as FhirResource[];
     resources.forEach((item: any) => {
       if (!item.code) return;
       const coding = fhirService.getCodingBySystem(item.code, "SM");

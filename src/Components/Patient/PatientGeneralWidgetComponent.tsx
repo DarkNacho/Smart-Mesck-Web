@@ -1,15 +1,14 @@
+import PersonUtil from "../../Utils/PersonUtil";
 import styles from "./PatientGeneralWidgetComponent.module.css";
-import PatientService from "../../Services/PatientService";
 import { Patient } from "fhir/r4";
 
-const patientService = new PatientService();
 
 export default function PatientGeneralWidgetComponent({
   patient,
   edit = false,
 }: {
   patient: Patient;
-  edit?: Boolean;
+  edit?: boolean;
 }) {
   return (
     <div className={styles.generalwidget}>
@@ -26,7 +25,7 @@ export default function PatientGeneralWidgetComponent({
           <div className={styles.item}>
             <div className={styles.text1}>ID</div>
             <div className={styles.text2}>
-              {patientService.getFirstIdentifierOrId(patient)}
+              {PersonUtil.getFirstIdentifierOrId(patient)}
             </div>
           </div>
           <div className={styles.item}>
@@ -36,7 +35,7 @@ export default function PatientGeneralWidgetComponent({
           <div className={styles.item}>
             <div className={styles.text1}>Número Telefónico</div>
             <div className={styles.text2}>
-              {patientService.obtenerPrimerNumeroTelefono(patient)}
+              {PersonUtil.obtenerPrimerNumeroTelefono(patient)}
             </div>
           </div>
         </ul>
@@ -50,7 +49,7 @@ export default function PatientGeneralWidgetComponent({
               {patient.birthDate && (
                 <>
                   {patient.birthDate} •{" "}
-                  {patientService.calcularEdad(patient.birthDate)} y.o.
+                  {PersonUtil.calcularEdad(patient.birthDate)} y.o.
                 </>
               )}{" "}
             </div>

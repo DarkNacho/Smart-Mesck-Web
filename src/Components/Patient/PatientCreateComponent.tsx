@@ -14,7 +14,7 @@ import { Close } from "@mui/icons-material";
 
 import styles from "./PatientCreateComponent.module.css";
 import { Patient } from "fhir/r4";
-import PatientService from "../../Services/PatientService";
+import FhirResourceService from "../../Services/FhirService";
 import PatientFormComponent, {
   PatientFormData,
 } from "../Forms/PatientFormComponent";
@@ -35,7 +35,7 @@ export default function PatientCreateComponent({
 
   const postPatient = async (newPatient: Patient) => {
     const response = await toast.promise(
-      new PatientService().postResource(newPatient),
+      new FhirResourceService('Patient').postResource(newPatient),
       {
         loading: "Enviado Paciente",
         success: (result) => {
@@ -59,7 +59,7 @@ export default function PatientCreateComponent({
   // Función que se ejecuta al enviar el formulario
   const onSubmitForm: SubmitHandler<PatientFormData> = (data) => {
     const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
-    var newPatient: Patient = {
+    const newPatient: Patient = {
       resourceType: "Patient",
       identifier: [{ system: "RUT", value: rut }],
       name: [

@@ -8,10 +8,10 @@ const validarRut = (rut: string) => {
 
   // Extraer dígito verificador y número
   const dv = rut.slice(-1);
-  var rutNumerico = parseInt(rut.slice(0, -1), 10);
+  let rutNumerico = parseInt(rut.slice(0, -1), 10);
 
   // Calcular dígito verificador esperado
-  var m = 0;
+  let m = 0;
   let s = 1;
   for (; rutNumerico; rutNumerico = Math.floor(rutNumerico / 10)) {
     s = (s + (rutNumerico % 10) * (9 - (m++ % 6))) % 11;

@@ -5,18 +5,18 @@ import toast from "react-hot-toast";
 import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent";
 
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
-import PatientService from "../Services/PatientService";
 import PatientOverviewComponent from "../Components/Patient/PatientOverviewComponent";
 import PatientEncounterList from "../Components/Patient/PatientEncounterList";
+import FhirResourceService from "../Services/FhirService";
 
-const patientService = new PatientService();
+const fhirService = new FhirResourceService('Patient')
 
 
 export default function PatientPage() {
   const { patientID } = useParams();
   const [patient, setPatient] = useState<Patient>({} as Patient);
 
-  const [selectedOption, setSelectedOption] = useState<String>("Overview");
+  const [selectedOption, setSelectedOption] = useState<string>("Overview");
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
@@ -26,7 +26,7 @@ export default function PatientPage() {
 
 
   const fetchPatient = async () => {
-    const response = await toast.promise(patientService.getById(patientID!), {
+    const response = await toast.promise(fhirService.getById(patientID!), {
       loading: "Cargando Paciente",
       success: (result) => {
         if (result.success) {
@@ -39,7 +39,7 @@ export default function PatientPage() {
     });
 
     if (response.success) {
-      setPatient(response.data);
+      setPatient(response.data as Patient);
       console.log(response.data);
     } else {
       console.error(response.error);
@@ -66,7 +66,7 @@ export default function PatientPage() {
       );
       break;
     case "Encounters":
-        componentToRender = (<PatientEncounterList patientID={patientID!}></PatientEncounterList>)
+      componentToRender = (<PatientEncounterList patientID={patientID!}></PatientEncounterList>)
       break;
     default:
   }

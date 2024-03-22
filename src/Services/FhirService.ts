@@ -1,5 +1,10 @@
 import Client, { SearchParams } from "fhir-kit-client";
-import { Bundle, OperationOutcome, FhirResource, CodeableConcept } from "fhir/r4";
+import {
+  Bundle,
+  OperationOutcome,
+  FhirResource,
+  CodeableConcept,
+} from "fhir/r4";
 
 type FhirType =
   | "FhirResource"
@@ -9,7 +14,8 @@ type FhirType =
   | "Observation"
   | "Encounter"
   | "Condition"
-  | "MedicationStatement";
+  | "MedicationStatement"
+  | "Practitioner";
 
 export default class FhirResourceService<T extends FhirResource> {
   public resourceTypeName: string;
@@ -62,10 +68,12 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
-  
   public async getHistoryById(id: string): Promise<Result<T[]>> {
     const result = await this.handleResult<Bundle>(
-      this.fhirClient.history({resourceType: this.resourceTypeName, id: id}) as Promise<Bundle>
+      this.fhirClient.history({
+        resourceType: this.resourceTypeName,
+        id: id,
+      }) as Promise<Bundle>
     );
 
     if (result.success) {
@@ -86,38 +94,49 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
-  private bundleAction(objeto: any) : "POST" | "PUT" | "DELETE" | "GET" | "PATCH"
-  {
+  private bundleAction(
+    objeto: any
+  ): "POST" | "PUT" | "DELETE" | "GET" | "PATCH" {
     // Verificar que "id" y "resourceType" tengan valores
-    const idResourceTypeLlenos = objeto.id !== undefined && objeto.resourceType !== undefined;
-  
+    const idResourceTypeLlenos =
+      objeto.id !== undefined && objeto.resourceType !== undefined;
+
     // Verificar que el resto de los atributos estén vacíos o indefinidos
     const restoAtributosVaciosOIndefinidos = Object.keys(objeto).every(
-      key => key === 'id' || key === 'resourceType' || objeto[key] === null || objeto[key] === undefined || objeto[key] === ''
+      (key) =>
+        key === "id" ||
+        key === "resourceType" ||
+        objeto[key] === null ||
+        objeto[key] === undefined ||
+        objeto[key] === ""
     );
-  
+
     // Devolver true si "id" y "resourceType" tienen valores y el resto está vacío o indefinido
-    if(idResourceTypeLlenos && restoAtributosVaciosOIndefinidos)
+    if (idResourceTypeLlenos && restoAtributosVaciosOIndefinidos)
       return "DELETE";
-    else if(objeto.id) return "PUT";
+    else if (objeto.id) return "PUT";
     else return "POST";
   }
-  private resourceUrl(resource: FhirResource, method: "POST" | "PUT" | "DELETE" | "GET" | "PATCH") : string
-  {
-    return method === "POST" ? resource.resourceType : `${resource.resourceType}/${resource.id}`
+  private resourceUrl(
+    resource: FhirResource,
+    method: "POST" | "PUT" | "DELETE" | "GET" | "PATCH"
+  ): string {
+    return method === "POST"
+      ? resource.resourceType
+      : `${resource.resourceType}/${resource.id}`;
   }
-  
+
   /**
-   * 
+   *
    * @param newResources Arreglo del recurso,
    *  este se encarga de enviarlo como un bundle.
-   * 
+   *
    * Condiciones:
-   * 
+   *
    * sólo @id y @resourceType elimina el recurso,
    * si tiene @id actualiza el recurso,
    * en caso de que el @id no existe, lo añade.
-   * @returns 
+   * @returns
    */
   public async sendArray(newResources: T[]): Promise<Result<T>> {
     const result = await this.handleResult(
@@ -127,8 +146,11 @@ export default class FhirResourceService<T extends FhirResource> {
           type: "transaction",
           entry: newResources.map((resource) => {
             const method = this.bundleAction(resource); //TODO: verificar aquí para los casos de actualizar y eliminar
-            const request = { method: method, url: this.resourceUrl(resource, method)}
-            return {resource, request}
+            const request = {
+              method: method,
+              url: this.resourceUrl(resource, method),
+            };
+            return { resource, request };
           }),
         },
       })
@@ -208,11 +230,10 @@ export default class FhirResourceService<T extends FhirResource> {
     return operation.issue[0]?.diagnostics || "Unknown error";
   }
 
-  public getCodingBySystem(code: CodeableConcept, system: string)
-  {
-    var coding = code.coding;
-    if(!coding || coding.length === 0) return null;
-    const section = coding.find(e => e.system === system) || null;
+  public getCodingBySystem(code: CodeableConcept, system: string) {
+    const coding = code.coding;
+    if (!coding || coding.length === 0) return null;
+    const section = coding.find((e) => e.system === system) || null;
     return section;
   }
 }

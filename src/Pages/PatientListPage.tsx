@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Patient } from "fhir/r4";
+import { FhirResource, Patient } from "fhir/r4";
 
 import {
   List,
@@ -15,16 +15,19 @@ import { useNavigate } from "react-router-dom";
 import PatientCreateComponent from "../Components/Patient/PatientCreateComponent";
 import styles from "./PatientListPage.module.css";
 
-import PatientService from "../Services/PatientService";
 import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
+import FhirResourceService from "../Services/FhirService";
+import PersonUtil from "../Utils/PersonUtil";
 
-const patientService = new PatientService();
+const fhirService = new FhirResourceService('Patient');
 
 export default function PatientListPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState('1');
+
 
   const navigate = useNavigate();
 
@@ -33,7 +36,7 @@ export default function PatientListPage() {
   };
 
   const handleOperation = async (
-    operation: () => Promise<Result<Patient[]>>,
+    operation: () => Promise<Result<FhirResource[]>>,
     successMessage: string
   ) => {
     const response = await toast.promise(operation(), {
@@ -49,7 +52,7 @@ export default function PatientListPage() {
     });
 
     if (response.success) {
-      setPatients(response.data);
+      setPatients(response.data as Patient[]);
       console.log(response.data);
     } else {
       console.error(response.error);
@@ -58,21 +61,31 @@ export default function PatientListPage() {
 
   const handleNewPatients = async (direction: "next" | "prev") => {
     handleOperation(
-      () => patientService.getNewResources(direction),
+      () => fhirService.getNewResources(direction),
       "Pacientes Obtenidos exitosamente"
     );
   };
 
   const fetchPatients = async () => {
     handleOperation(
-      () => patientService.getResources({ _count: 5 }),
+      () => fhirService.getResources({ _count: 5 }),
       "Pacientes Obtenidos exitosamente"
     );
   };
 
   const handleSearch = async () => {
+    let searchParams;
+    switch (searchType) {
+      case '0':
+        searchParams = { identifier: searchTerm };
+        break;
+      case '1':
+        searchParams = { name: searchTerm };
+        break;
+    }
+    searchParams = { ...searchParams, _count: 5 };
     handleOperation(
-      () => patientService.getResources({ identifier: searchTerm, _count: 5 }),
+      () => fhirService.getResources(searchParams),
       "Pacientes buscados obtenidos exitosamente"
     );
   };
@@ -133,13 +146,14 @@ export default function PatientListPage() {
           />
           <TextField
             select
-            value={1}
+            value={searchType}
             variant="standard"
             label="Modo de Busqueda"
+            onChange={event => setSearchType(event.target.value)}
             sx={{ m: 1, minWidth: 120 }}
           >
-            <MenuItem value={1}>Rut</MenuItem>
-            <MenuItem value={2}>Nombre</MenuItem>
+            <MenuItem value='0'>Rut</MenuItem>
+            <MenuItem value='1'>Nombre</MenuItem>
           </TextField>
         </form>
         <List className={styles.listContent}>
@@ -151,7 +165,7 @@ export default function PatientListPage() {
             >
               <ListItemText
                 primary={`ID: ${patient.id}`}
-                secondary={`Name: ${patientService.parsePatientName(
+                secondary={`Name: ${PersonUtil.parsePersonName(
                   patient
                 )}, Gender: ${patient.gender || "N/A"}`}
               />
@@ -163,7 +177,7 @@ export default function PatientListPage() {
             variant="contained"
             color="primary"
             onClick={() => handleNewPatients("prev")}
-            disabled={!patientService.hasPrevPage}
+            disabled={!fhirService.hasPrevPage}
           >
             Previous Page
           </Button>
@@ -171,7 +185,7 @@ export default function PatientListPage() {
             variant="contained"
             color="primary"
             onClick={() => handleNewPatients("next")}
-            disabled={!patientService.hasNextPage}
+            disabled={!fhirService.hasNextPage}
           >
             Next Page
           </Button>

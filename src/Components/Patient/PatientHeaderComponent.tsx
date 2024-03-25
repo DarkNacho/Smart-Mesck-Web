@@ -1,7 +1,7 @@
 import { Patient } from "fhir/r4";
 import { useState } from "react";
 import styles from "./PatientHeaderComponent.module.css";
-import PersonUtil from "../../Services/Utils/PersonUtil";
+import PersonUtil from "../../Services/Utils/PersonUtils";
 
 export default function PatientHeaderComponent({
   patient,

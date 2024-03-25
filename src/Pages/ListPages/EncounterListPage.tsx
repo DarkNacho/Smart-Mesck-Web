@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FhirResource, Patient } from "fhir/r4";
+import { Encounter } from "fhir/r4";
 
 import {
   List,
@@ -9,25 +9,24 @@ import {
   TextField,
   IconButton,
   InputAdornment,
-  MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import PatientCreateComponent from "../Components/Patient/PatientCreateComponent";
-import styles from "./PatientListPage.module.css";
+import styles from "./EncounterListPage.module.css";
 
+import EncounterService from "../../Services/EncounterService";
 import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
-import FhirResourceService from "../Services/FhirService";
-import PersonUtil from "../Services/Utils/PersonUtil";
+import EncounterCreateComponent from "../../Components/Encounter/EncounterCreateComponent";
 
-const fhirService = new FhirResourceService('Patient');
+const encounterService = new EncounterService();
 
-export default function PatientListPage() {
-  const [patients, setPatients] = useState<Patient[]>([]);
+
+export default function EncounterListPage() {
+
+
+  const [encounters, setEncounters] = useState<Encounter[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchType, setSearchType] = useState('1');
-
 
   const navigate = useNavigate();
 
@@ -36,11 +35,11 @@ export default function PatientListPage() {
   };
 
   const handleOperation = async (
-    operation: () => Promise<Result<FhirResource[]>>,
+    operation: () => Promise<Result<Encounter[]>>,
     successMessage: string
   ) => {
     const response = await toast.promise(operation(), {
-      loading: "Obteniendo Pacientes",
+      loading: "Obteniendo Encuentros",
       success: (result) => {
         if (result.success) {
           return successMessage;
@@ -52,46 +51,36 @@ export default function PatientListPage() {
     });
 
     if (response.success) {
-      setPatients(response.data as Patient[]);
+      setEncounters(response.data);
       console.log(response.data);
     } else {
       console.error(response.error);
     }
   };
 
-  const handleNewPatients = async (direction: "next" | "prev") => {
+  const handleNewEncounters = async (direction: "next" | "prev") => {
     handleOperation(
-      () => fhirService.getNewResources(direction),
-      "Pacientes Obtenidos exitosamente"
+      () => encounterService.getNewResources(direction),
+      "Encuentros Obtenidos exitosamente"
     );
   };
 
-  const fetchPatients = async () => {
+  const fetchEncounters = async () => {
     handleOperation(
-      () => fhirService.getResources({ _count: 5 }),
-      "Pacientes Obtenidos exitosamente"
+      () => encounterService.getResources({ _count: 5 }),
+      "Encuentros Obtenidos exitosamente"
     );
   };
 
   const handleSearch = async () => {
-    let searchParams;
-    switch (searchType) {
-      case '0':
-        searchParams = { identifier: searchTerm };
-        break;
-      case '1':
-        searchParams = { name: searchTerm };
-        break;
-    }
-    searchParams = { ...searchParams, _count: 5 };
     handleOperation(
-      () => fhirService.getResources(searchParams),
-      "Pacientes buscados obtenidos exitosamente"
+      () => encounterService.getResources({ _content: searchTerm, _count: 5 }),
+      "Encuentros buscados obtenidos exitosamente"
     );
   };
 
   useEffect(() => {
-    fetchPatients();
+    fetchEncounters();
   }, []);
 
   return (
@@ -117,10 +106,10 @@ export default function PatientListPage() {
           >
             <Add />
           </IconButton>
-          <PatientCreateComponent
+          <EncounterCreateComponent
             isOpen={openDialog}
             onOpen={handleIsOpen}
-          ></PatientCreateComponent>
+          ></EncounterCreateComponent>
         </div>
         <form
           className={styles.searchContainer}
@@ -144,30 +133,17 @@ export default function PatientListPage() {
               ),
             }}
           />
-          <TextField
-            select
-            value={searchType}
-            variant="standard"
-            label="Modo de Busqueda"
-            onChange={event => setSearchType(event.target.value)}
-            sx={{ m: 1, minWidth: 120 }}
-          >
-            <MenuItem value='0'>Rut</MenuItem>
-            <MenuItem value='1'>Nombre</MenuItem>
-          </TextField>
         </form>
         <List className={styles.listContent}>
-          {patients.map((patient) => (
+          {encounters.map((encounter) => (
             <ListItem
               className={styles.listItem}
-              key={patient.id}
-              onClick={() => navigate(`/Patient/${patient.id}`)}
+              key={encounter.id}
+              onClick={() => navigate(`/Patient/${encounterService.getSubjectID(encounter.subject!)}`)}
             >
               <ListItemText
-                primary={`ID: ${patient.id}`}
-                secondary={`Name: ${PersonUtil.parsePersonName(
-                  patient
-                )}, Gender: ${patient.gender || "N/A"}`}
+                primary={`Paciente: ${encounterService.getSubjectDisplayOrID(encounter.subject!)}`}
+                secondary={`Period: ${encounterService.getFormatPeriod(encounter.period!)}`}
               />
             </ListItem>
           ))}
@@ -176,16 +152,16 @@ export default function PatientListPage() {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleNewPatients("prev")}
-            disabled={!fhirService.hasPrevPage}
+            onClick={() => handleNewEncounters("prev")}
+            disabled={!encounterService.hasPrevPage}
           >
             Previous Page
           </Button>
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleNewPatients("next")}
-            disabled={!fhirService.hasNextPage}
+            onClick={() => handleNewEncounters("next")}
+            disabled={!encounterService.hasNextPage}
           >
             Next Page
           </Button>

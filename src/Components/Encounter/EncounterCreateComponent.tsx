@@ -29,7 +29,7 @@ export default function EncounterCreateComponent({
 }: {
   onOpen: (isOpen: boolean) => void;
   isOpen: boolean;
-  patientId: string;
+  patientId?: string;
 }) {
   useEffect(() => {
     onOpen(isOpen);

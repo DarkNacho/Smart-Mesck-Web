@@ -25,7 +25,7 @@ export default function EncounterFormComponent({
   submitForm,
 }: {
   formId: string;
-  patientId: string;
+  patientId?: string;
   submitForm: SubmitHandler<EncounterFormData>;
 }) {
   const {
@@ -57,7 +57,7 @@ export default function EncounterFormComponent({
             error={Boolean(errors.patientId)}
             helperText={errors.patientId && errors.patientId.message}
             onBlur={() => trigger("patientId")}
-            inputProps={{ readOnly: true }}
+            inputProps={{ readOnly: !!patientId }}
           />
         </Grid>
         <Grid item xs={12} sm={6}>

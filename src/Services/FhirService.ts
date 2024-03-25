@@ -198,6 +198,7 @@ export default class FhirResourceService<T extends FhirResource> {
   public async getNewResources(
     direction: "next" | "prev"
   ): Promise<Result<T[]>> {
+    console.log(this._resourceBundle);
     const response = await this.handleResult<Bundle>(
       direction === "next"
         ? (this.fhirClient.nextPage({

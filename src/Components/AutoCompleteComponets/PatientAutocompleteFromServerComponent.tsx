@@ -3,7 +3,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import { Patient } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
-import PersonUtil from "../../Services/Utils/PersonUtil";
+import PersonUtil from "../../Services/Utils/PersonUtils";
 
 interface PatientAutocompleteFromServerComponentProps {
   label: string;

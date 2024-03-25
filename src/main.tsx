@@ -4,12 +4,12 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { Toaster } from "react-hot-toast";
-import PatientListPage from "./Pages/PatientListPage.tsx";
 import PatientPage from "./Pages/PatientPage.tsx";
 import HeaderComponent from "./Components/HeaderComponent.tsx";
-import EncounterListPage from "./Pages/EncounterListPage.tsx";
-import EncounterPatientPage from "./Pages/EncounterPatientPage.tsx";
+import EncounterListPage from "./Pages/ListPages/EncounterListPage.tsx";
+import EncounterPatientPage from "./Pages/ListPages/EncounterPatientPage.tsx";
 import ObservationPage from "./Pages/ObservationPage.tsx";
+import PatientListPage from "./Pages/ListPages/PatientListPage.tsx";
 
 const router = createBrowserRouter([
   {

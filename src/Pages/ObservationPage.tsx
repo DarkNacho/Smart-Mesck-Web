@@ -8,7 +8,9 @@ import { useParams } from "react-router-dom";
 import HistoryChartComponent from "../Components/Charts/HistoryChartComponent";
 import { Observation } from "fhir/r4";
 import dayjs from "dayjs";
-import ObservationFormComponent, { ObservationFormData } from "../Components/Forms/ObservationFormComponent";
+import ObservationFormComponent, {
+  ObservationFormData,
+} from "../Components/Forms/ObservationFormComponent";
 import toast from "react-hot-toast";
 import { SubmitHandler } from "react-hook-form";
 
@@ -29,8 +31,9 @@ export default function ObservationPage() {
       setObservationData(result.data);
       const obs = result.data.map((item) => {
         const name = observationService.getValue(item);
-        const value =
-          dayjs(item.issued || item.meta?.lastUpdated).toISOString();
+        const value = dayjs(
+          item.issued || item.meta?.lastUpdated
+        ).toISOString();
         return { name, value };
       });
 
@@ -40,14 +43,12 @@ export default function ObservationPage() {
     }
   };
 
-
   const onSubmitForm: SubmitHandler<ObservationFormData> = (data) => {
-
-    var newObservation = observationData?.[0] || {} as Observation;
+    var newObservation = observationData?.[0] || ({} as Observation);
     newObservation = {
       ...newObservation,
       valueString: data.valueString,
-      
+
       subject: { reference: `Patient/${data.subject}` },
       //encounter: { reference: `Encounter/${data.encounter}` },
       performer: [{ reference: `Practitioner/${data.performer}` }],
@@ -57,7 +58,7 @@ export default function ObservationPage() {
       issued: dayjs(data.issued).toISOString(),
       note: [{ text: data.note }],
     };
-    alert(JSON.stringify(newObservation))
+    alert(JSON.stringify(newObservation));
     console.log(newObservation);
     sendObservation(newObservation);
   };
@@ -103,16 +104,20 @@ export default function ObservationPage() {
           flexDirection: "column",
         }}
       >
-        <div style={{ background: "#e4e9f2" }}>
-
-          {obvservationInfoData.length >= 1 && (<div>
-            <ObservationFormComponent formId="form"
-              observation={observationData?.[0]!}
-              patientId={patientID!}
-              submitForm={onSubmitForm}>
-            </ObservationFormComponent>
-            <button form="form" type="submit">test</button>
-          </div>)}
+        <div style={{ background: "#e4e9f2", padding: "10px" }}>
+          {obvservationInfoData.length >= 1 && (
+            <div>
+              <ObservationFormComponent
+                formId="form"
+                observation={observationData?.[0]!}
+                patientId={patientID!}
+                submitForm={onSubmitForm}
+              ></ObservationFormComponent>
+              <button form="form" type="submit">
+                test
+              </button>
+            </div>
+          )}
         </div>
         <InfoListComponent
           data={obvservationInfoData}
@@ -123,7 +128,7 @@ export default function ObservationPage() {
 
         {obvservationInfoData.length > 1 && (
           <HistoryChartComponent
-            data={obvservationInfoData}
+            data={obvservationInfoData.reverse()}
           ></HistoryChartComponent>
         )}
       </div>

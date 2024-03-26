@@ -4,7 +4,7 @@ import ListResourceComponent from "./Components/ListResourceComponent";
 import FhirResourceService from "./Services/FhirService";
 
 //Datos default de practicante
-localStorage.setItem("userRol", "Practitioner");
+localStorage.setItem("userRol", "Admin");
 localStorage.setItem("id", "204");
 
 const fhirService = new FhirResourceService("Patient");

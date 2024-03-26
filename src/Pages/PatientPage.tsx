@@ -9,8 +9,7 @@ import PatientOverviewComponent from "../Components/Patient/PatientOverviewCompo
 import PatientEncounterList from "../Components/Patient/PatientEncounterList";
 import FhirResourceService from "../Services/FhirService";
 
-const fhirService = new FhirResourceService('Patient')
-
+const fhirService = new FhirResourceService("Patient");
 
 export default function PatientPage() {
   const { patientID } = useParams();
@@ -21,9 +20,6 @@ export default function PatientPage() {
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
   };
-
-
-
 
   const fetchPatient = async () => {
     const response = await toast.promise(fhirService.getById(patientID!), {
@@ -54,8 +50,8 @@ export default function PatientPage() {
 
   switch (selectedOption) {
     case "Overview":
-      componentToRender = (
-        patient.id && <PatientOverviewComponent patient={patient}></PatientOverviewComponent>
+      componentToRender = patient.id && (
+        <PatientOverviewComponent patient={patient}></PatientOverviewComponent>
       );
       break;
     case "Formularios":
@@ -66,7 +62,9 @@ export default function PatientPage() {
       );
       break;
     case "Encounters":
-      componentToRender = (<PatientEncounterList patientID={patientID!}></PatientEncounterList>)
+      componentToRender = (
+        <PatientEncounterList patientID={patientID!}></PatientEncounterList>
+      );
       break;
     default:
   }

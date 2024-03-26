@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { TextField, IconButton, InputAdornment, MenuItem } from "@mui/material";
 import styles from "./ListPage.module.css";
@@ -11,6 +11,7 @@ import { Encounter, FhirResource } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
 import EncounterCreateComponent from "../../Components/Encounter/EncounterCreateComponent";
+import { loadUserRoleFromLocalStorage, RolUser } from "../../RolUser";
 
 const fhirService = new FhirResourceService("Encounter");
 
@@ -25,7 +26,19 @@ export default function Encounter2ListPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("1");
-  const [searchParam, setSeachParam] = useState({ _count: 5 });
+  const [searchParam, setSeachParam] = useState({});
+  const [userRole, setUserRole] = useState<RolUser>();
+
+  useEffect(() => {
+    const storedUserRole = loadUserRoleFromLocalStorage();
+
+    if (storedUserRole === "Practitioner") {
+      setSeachParam({
+        practitioner: `${localStorage.getItem("id")}`,
+      }); // WARNING: quizás Practitioner/${id}
+    }
+    if (storedUserRole !== "Patient") setUserRole(storedUserRole);
+  }, []);
 
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
@@ -48,34 +61,35 @@ export default function Encounter2ListPage() {
 
   return (
     <div>
-      <div className={styles.content}>
-        <div
-          className="titleandBtn"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <h1>Encuentros</h1>
-          <IconButton
-            onClick={() => setOpenDialog(true)}
-            color="primary"
-            aria-label="add"
-            sx={{
-              marginLeft: "auto",
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "#1b2455" },
+      {userRole && (
+        <div className={styles.content}>
+          <div
+            className="titleandBtn"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
-            <Add />
-          </IconButton>
-          <EncounterCreateComponent
-            onOpen={handleIsOpen}
-            isOpen={openDialog}
-          ></EncounterCreateComponent>
-        </div>
-        {/* <form
+            <h1>Encuentros</h1>
+            <IconButton
+              onClick={() => setOpenDialog(true)}
+              color="primary"
+              aria-label="add"
+              sx={{
+                marginLeft: "auto",
+                backgroundColor: "white",
+                "&:hover": { backgroundColor: "#1b2455" },
+              }}
+            >
+              <Add />
+            </IconButton>
+            <EncounterCreateComponent
+              onOpen={handleIsOpen}
+              isOpen={openDialog}
+            ></EncounterCreateComponent>
+          </div>
+          {/* <form
           className={styles.searchContainer}
           onSubmit={(e) => {
             e.preventDefault();
@@ -109,14 +123,15 @@ export default function Encounter2ListPage() {
             <MenuItem value="1">Nombre</MenuItem>
           </TextField>
           </form>*/}
-        <div>
-          <ListResourceComponent
-            searchParam={searchParam}
-            getDisplay={getDisplay}
-            fhirService={fhirService}
-          ></ListResourceComponent>
+          <div>
+            <ListResourceComponent
+              searchParam={searchParam}
+              getDisplay={getDisplay}
+              fhirService={fhirService}
+            ></ListResourceComponent>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,12 +1,6 @@
 import { useState } from "react";
 
-import {
-  TextField,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-} from "@mui/material";
-import PatientCreateComponent from "../../Components/Patient/PatientCreateComponent";
+import { TextField, IconButton, InputAdornment, MenuItem } from "@mui/material";
 import styles from "./ListPage.module.css";
 
 import { Add, Search } from "@mui/icons-material";
@@ -14,21 +8,21 @@ import ListResourceComponent from "../../Components/ListResourceComponent";
 import { FhirResource, Patient } from "fhir/r4";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import FhirResourceService from "../../Services/FhirService";
+import PractitionerCreateComponent from "../../Components/Practitioner/PractitionerCreateComponent";
 
-
-
-const fhirService = new FhirResourceService('Practitioner');
+const fhirService = new FhirResourceService("Practitioner");
 
 function getDisplay(resource: FhirResource): string {
-  return `ID: ${resource.id}\nName: ${PersonUtil.parsePersonName(resource)}\nGender: ${(resource as Patient).gender || "N/A"}`
+  return `ID: ${resource.id}\nName: ${PersonUtil.parsePersonName(
+    resource
+  )}\nGender: ${(resource as Patient).gender || "N/A"}`;
 }
 
 export default function PractitionerListPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchType, setSearchType] = useState('1');
+  const [searchType, setSearchType] = useState("1");
   const [searchParam, setSeachParam] = useState({ _count: 5 });
-
 
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
@@ -37,10 +31,10 @@ export default function PractitionerListPage() {
   const handleSearch = async () => {
     let search;
     switch (searchType) {
-      case '0':
+      case "0":
         search = { identifier: searchTerm };
         break;
-      case '1':
+      case "1":
         search = { name: searchTerm };
         break;
     }
@@ -72,10 +66,10 @@ export default function PractitionerListPage() {
           >
             <Add />
           </IconButton>
-          <PatientCreateComponent
+          <PractitionerCreateComponent
             isOpen={openDialog}
             onOpen={handleIsOpen}
-          ></PatientCreateComponent>
+          ></PractitionerCreateComponent>
         </div>
         <form
           className={styles.searchContainer}
@@ -104,15 +98,19 @@ export default function PractitionerListPage() {
             value={searchType}
             variant="standard"
             label="Modo de Busqueda"
-            onChange={event => setSearchType(event.target.value)}
+            onChange={(event) => setSearchType(event.target.value)}
             sx={{ m: 1, minWidth: 120 }}
           >
-            <MenuItem value='0'>Rut</MenuItem>
-            <MenuItem value='1'>Nombre</MenuItem>
+            <MenuItem value="0">Rut</MenuItem>
+            <MenuItem value="1">Nombre</MenuItem>
           </TextField>
         </form>
         <div>
-          <ListResourceComponent searchParam={searchParam} getDisplay={getDisplay} fhirService={fhirService}></ListResourceComponent>
+          <ListResourceComponent
+            searchParam={searchParam}
+            getDisplay={getDisplay}
+            fhirService={fhirService}
+          ></ListResourceComponent>
         </div>
       </div>
     </div>

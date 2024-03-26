@@ -3,14 +3,14 @@ import styles from "./HeaderComponent.module.css";
 import { useState } from "react";
 
 export default function HeaderComponent() {
-  const [selectedTab, setSelectedTab] = useState<string>( localStorage.getItem("selectedTab") || "Patient");
+  const [selectedTab, setSelectedTab] = useState<string>(
+    localStorage.getItem("selectedTab") || "Patient"
+  );
 
   const handleSelectedTab = (tab: string) => {
     setSelectedTab(tab);
     localStorage.setItem("selectedTab", tab);
   };
-
-
 
   const sxStyleActive = {
     fontSize: "18px",
@@ -41,12 +41,10 @@ export default function HeaderComponent() {
   const tabs = {
     Patient: "Pacientes",
     Encounter: "Encuentros",
-    op3: "Opción3",
+    Practitioner: "Profesionales",
     op4: "Opción4",
   };
 
-  
-  
   return (
     <div>
       <img
@@ -55,20 +53,20 @@ export default function HeaderComponent() {
         src="/smart-mesck-blanco-6@2x.png"
       />
       <ul className={styles.items}>
-      <ul className={styles.menulegacy}>
-      {Object.entries(tabs).map(([tabKey, tabText]) => (
-        <Button
-          key={tabKey}
-          variant="text"
-          color="error"
-          onClick={() => handleSelectedTab(tabKey)}
-          sx={selectedTab === tabKey ? sxStyleActive : sxStyle}
-          href={`/${tabKey}`}
-        >
-          {tabText}
-        </Button>
-      ))}
-    </ul>
+        <ul className={styles.menulegacy}>
+          {Object.entries(tabs).map(([tabKey, tabText]) => (
+            <Button
+              key={tabKey}
+              variant="text"
+              color="error"
+              onClick={() => handleSelectedTab(tabKey)}
+              sx={selectedTab === tabKey ? sxStyleActive : sxStyle}
+              href={`/${tabKey}`}
+            >
+              {tabText}
+            </Button>
+          ))}
+        </ul>
         <ul className={styles.salir}>
           <Button
             sx={{ width: 64 }}

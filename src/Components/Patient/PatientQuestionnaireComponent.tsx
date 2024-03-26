@@ -6,6 +6,7 @@ import QuestionnaireListComponent from "../Questionnaire/QuestionnaireListDialog
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import QuestionnaireService from "../../Services/QuestionnaireService";
+import { isAdminOrPractitioner } from "../../RolUser";
 
 const questionnaireResponseService = new QuestionnaireResponseService();
 const questionnaireService = new QuestionnaireService();
@@ -34,7 +35,7 @@ export default function PatientQuestionnaireComponent({
 
   const fetchQuestionnaireResponses = async () => {
     try {
-      var responseBundle = await questionnaireResponseService.getResources({
+      const responseBundle = await questionnaireResponseService.getResources({
         subject: patientID,
         encounter: encounterID!,
       });
@@ -66,12 +67,13 @@ export default function PatientQuestionnaireComponent({
 
   return (
     <div>
-      <div>
-        <QuestionnaireListComponent
-          onQuestionnaireSelect={handleQuesSelect}
-        ></QuestionnaireListComponent>
-      </div>
-      <h1>Lista de cuestionarios:</h1>
+      {isAdminOrPractitioner() && (
+        <div>
+          <QuestionnaireListComponent
+            onQuestionnaireSelect={handleQuesSelect}
+          ></QuestionnaireListComponent>
+        </div>
+      )}
       <div>
         {newQuestionnaires.length > 0 && (
           <Accordion sx={{ backgroundColor: "transparent" }}>
@@ -80,7 +82,10 @@ export default function PatientQuestionnaireComponent({
               aria-controls="panel1-content-new"
               id="panel1-header-new"
             >
-              Nuevos formularios
+              <h1 style={{ textDecoration: "underline" }}>
+                {" "}
+                Nuevos Formularios:
+              </h1>
             </AccordionSummary>
             <AccordionDetails>
               {newQuestionnaires.map((newQues, index) => (
@@ -104,7 +109,9 @@ export default function PatientQuestionnaireComponent({
               aria-controls="panel1-content-old"
               id="panel1-header-old"
             >
-              <h1>Formularios cargados del paciente</h1>
+              <h1 style={{ textDecoration: "underline" }}>
+                Formularios cargados del paciente:
+              </h1>
             </AccordionSummary>
             <AccordionDetails>
               {Object.keys(questionnaires).length > 0 && (

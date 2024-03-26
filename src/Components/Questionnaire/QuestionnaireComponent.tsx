@@ -13,6 +13,7 @@ import QuestionnaireResponseService from "../../Services/QuestionnaireResponseSe
 import FhirResourceService from "../../Services/FhirService";
 import ObservationService from "../../Services/ObservationService";
 import ConditionService from "../../Services/ConditionService";
+import { isAdminOrPractitioner } from "../../RolUser";
 //import "./QuestionnaireComponent.css";
 
 const fhirService = new FhirResourceService("FhirResource");
@@ -82,7 +83,7 @@ export default function QuestionnaireComponent({
         originalObservation.extension?.some(
           (ext: any) =>
             ext.url ===
-            "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
+              "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
             ext.valueString === newValueString
         )
       );
@@ -124,13 +125,13 @@ export default function QuestionnaireComponent({
         newObservation.extension?.some(
           (ext: any) =>
             ext.url ===
-            "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
+              "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
             ext.valueString ===
-            observation.extension?.find(
-              (origExt: any) =>
-                origExt.url ===
-                "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId"
-            )?.valueString
+              observation.extension?.find(
+                (origExt: any) =>
+                  origExt.url ===
+                  "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId"
+              )?.valueString
         )
       );
 
@@ -354,23 +355,25 @@ export default function QuestionnaireComponent({
   return (
     <div>
       <div ref={formContainerRef}></div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={postData}
-          sx={{ marginLeft: "auto" }}
+      {isAdminOrPractitioner() && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
-          Guardar
-        </Button>
-        <Button onClick={() => test()}>TEST</Button>
-      </div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={postData}
+            sx={{ marginLeft: "auto" }}
+          >
+            Guardar
+          </Button>
+          <Button onClick={() => test()}>TEST</Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./InfoListComponent.module.css";
-import { IconButton,  } from "@mui/material";
+import { IconButton } from "@mui/material";
 
 import { Add } from "@mui/icons-material";
 import { useState } from "react";
 import PatientCreateComponent from "./Patient/PatientCreateComponent";
 import ObservationCreateComponent from "./Observation/ObservationCreateComponent";
+import { isAdminOrPractitioner } from "../RolUser";
 
 export interface InfoListData {
   id?: string;
@@ -18,7 +19,7 @@ export default function InfoListComponent({
   title,
   icon,
   resourceType,
-  patientId
+  patientId,
 }: {
   resourceType: string;
   data: InfoListData[];
@@ -28,45 +29,46 @@ export default function InfoListComponent({
 }) {
   const navigate = useNavigate();
 
-  
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
   };
 
-
-  
   return (
-    <><div>
-      <PatientCreateComponent
-        isOpen={resourceType==="ds"? openDialog: false }
-        onOpen={handleIsOpen}
-      ></PatientCreateComponent>
-      <ObservationCreateComponent
-      onOpen={handleIsOpen}
-      isOpen={resourceType==="Observation"? openDialog: false }
-      patientId={patientId!}
-      ></ObservationCreateComponent>
-    </div><div className={styles.infolist}>
+    <>
+      <div>
+        <PatientCreateComponent
+          isOpen={resourceType === "ds" ? openDialog : false}
+          onOpen={handleIsOpen}
+        ></PatientCreateComponent>
+        <ObservationCreateComponent
+          onOpen={handleIsOpen}
+          isOpen={resourceType === "Observation" ? openDialog : false}
+          patientId={patientId!}
+        ></ObservationCreateComponent>
+      </div>
+      <div className={styles.infolist}>
         <div className={styles.title}>
           <div className={styles.icon}>
             <div className={styles.ellipse} />
             <img className={styles["contacts-icon"]} alt="" src={icon} />
           </div>
           <b className={styles.title1}>{title}</b>
-          <IconButton
-            onClick={() => setOpenDialog(true)}
-            color="primary"
-            aria-label="add"
-            sx={{
-              marginLeft: "auto",
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "#1b2455" },
-            }}
-          >
-            <Add />
-          </IconButton>
+          {isAdminOrPractitioner() && (
+            <IconButton
+              onClick={() => setOpenDialog(true)}
+              color="primary"
+              aria-label="add"
+              sx={{
+                marginLeft: "auto",
+                backgroundColor: "white",
+                "&:hover": { backgroundColor: "#1b2455" },
+              }}
+            >
+              <Add />
+            </IconButton>
+          )}
         </div>
         <div className={styles.table}>
           <ul className={styles["text-wrapper"]}>
@@ -77,7 +79,7 @@ export default function InfoListComponent({
                   key={index}
                   onClick={() => {
                     if (dato.id) navigate(`${resourceType}/${dato.id}`);
-                  } }
+                  }}
                 >
                   <div className={styles.text1}>{dato.name}</div>
                   <div className={styles.text2}>{dato.value}</div>
@@ -92,6 +94,7 @@ export default function InfoListComponent({
             )}
           </ul>
         </div>
-      </div></>
+      </div>
+    </>
   );
 }

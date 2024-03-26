@@ -10,6 +10,7 @@ import EncounterListPage from "./Pages/ListPages/EncounterListPage.tsx";
 import EncounterPatientPage from "./Pages/ListPages/EncounterPatientPage.tsx";
 import ObservationPage from "./Pages/ObservationPage.tsx";
 import PatientListPage from "./Pages/ListPages/PatientListPage.tsx";
+import Encounter2ListPage from "./Pages/ListPages/Encounter2ListPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
   {
     path: "/op4",
   },
+  {
+    path: "/Encounter2",
+    element: <Encounter2ListPage></Encounter2ListPage>
+  }
 ]);
 
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>

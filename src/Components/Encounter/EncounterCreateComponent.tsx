@@ -17,6 +17,7 @@ import styles from "./EncounterCreateComponent.module.css";
 import { Encounter } from "fhir/r4";
 
 import EncounterService from "../../Services/EncounterService";
+import PersonUtil from "../../Services/Utils/PersonUtils";
 
 import EncounterFormComponent, {
   EncounterFormData,
@@ -69,12 +70,12 @@ export default function EncounterCreateComponent({
 
     const newEncounter: Encounter = {
       resourceType: "Encounter",
-      subject: { reference: `Patient/${data.patientId}` },
+      subject: { reference: `Patient/${data.patient.id}` },
       participant: [
         {
           individual: {
-            reference: `Practitioner/${data.profesionalId}`,
-            display: "prueba nacho",
+            reference: `Practitioner/${data.practitioner.id}`,
+            display: PersonUtil.parsePersonName(data.patient),
           },
         },
       ],
@@ -88,7 +89,8 @@ export default function EncounterCreateComponent({
         system: "http://terminology.hl7.org/CodeSystem/v3-ActCode",
       },
     };
-    postEncounter(newEncounter);
+    alert(JSON.stringify(newEncounter, null, 2));
+    //postEncounter(newEncounter);
   };
 
   return (

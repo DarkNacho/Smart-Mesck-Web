@@ -19,6 +19,7 @@ import ObservationFormComponent, {
   ObservationFormData,
 } from "../Forms/ObservationFormComponent";
 import dayjs from "dayjs";
+import { checkPatientRol } from "../../RolUser";
 
 export default function ObservationCreateComponent({
   patientId,
@@ -101,6 +102,7 @@ export default function ObservationCreateComponent({
               observation={{} as Observation}
               patientId={patientId}
               submitForm={onSubmitForm}
+              readOnly={false}
             ></ObservationFormComponent>
           </Container>
         </DialogContent>

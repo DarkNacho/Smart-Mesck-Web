@@ -13,6 +13,8 @@ import ObservationFormComponent, {
 } from "../Components/Forms/ObservationFormComponent";
 import toast from "react-hot-toast";
 import { SubmitHandler } from "react-hook-form";
+import { checkPatientRol } from "../RolUser";
+import { Button } from "@mui/material";
 
 export default function ObservationPage() {
   const observationService = new ObservationService();
@@ -44,7 +46,7 @@ export default function ObservationPage() {
   };
 
   const onSubmitForm: SubmitHandler<ObservationFormData> = (data) => {
-    var newObservation = observationData?.[0] || ({} as Observation);
+    let newObservation = observationData?.[0] || ({} as Observation);
     newObservation = {
       ...newObservation,
       valueString: data.valueString,
@@ -112,10 +114,18 @@ export default function ObservationPage() {
                 observation={observationData?.[0]!}
                 patientId={patientID!}
                 submitForm={onSubmitForm}
+                readOnly={checkPatientRol()}
               ></ObservationFormComponent>
-              <button form="form" type="submit">
-                test
-              </button>
+              {!checkPatientRol() && (
+                <Button
+                  color="primary"
+                  variant="contained"
+                  form="form"
+                  type="submit"
+                >
+                  Guardar
+                </Button>
+              )}
             </div>
           )}
         </div>

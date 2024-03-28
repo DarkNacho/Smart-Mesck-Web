@@ -1,7 +1,7 @@
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { TextField, Grid, Autocomplete, Checkbox } from "@mui/material";
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -30,11 +30,13 @@ export default function ObservationFormComponent({
   patientId,
   submitForm,
   observation,
+  readOnly = true,
 }: {
   formId: string;
   patientId: string;
   submitForm: SubmitHandler<ObservationFormData>;
   observation: Observation;
+  readOnly?: boolean;
 }) {
   const category: ValueSetExpansionContains[] = [
     {
@@ -84,214 +86,254 @@ export default function ObservationFormComponent({
     },
   ];
 
-  const interpretation: ValueSetExpansionContains[] =
-    [
-      {
-        code: "N",
-        display: "Normal",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "_GeneticObservationInterpretation icon",
-        display: "GeneticObservationInterpretation",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "CAR",
-        display: "Carrier",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "B",
-        display: "Better",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "D",
-        display: "Significant change down",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "U",
-        display: "Significant change up",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "W",
-        display: "Worse",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "<",
-        display: "Off scale low",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: ">",
-        display: "Off scale high",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "IE",
-        display: "Insufficient evidence",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "A",
-        display: "Abnormal",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "AA",
-        display: "Critical abnormal",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "HH",
-        display: "Critical high",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "LL",
-        display: "Critical low",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "H",
-        display: "High",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "HU",
-        display: "Significantly high",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "L",
-        display: "Low",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "LU",
-        display: "Significantly low",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "I",
-        display: "Intermediate",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "NCL",
-        display: "No CLSI defined breakpoint",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "NS",
-        display: "Non-susceptible",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "R",
-        display: "Resistant",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "SYN-R",
-        display: "Synergy - resistant",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "S",
-        display: "Susceptible",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "SSD",
-        display: "Susceptible-dose dependent",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "SYN-S",
-        display: "Synergy - susceptibl",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "EX",
-        display: "outside threshold",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "HX",
-        display: "above high threshold",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "LX",
-        display: "below low threshold",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "ObservationInterpretationDetection",
-        display: "ObservationInterpretationDetection",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "IND",
-        display: "Indeterminate",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "E",
-        display: "Equivocal",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "NEG",
-        display: "Negative",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "ND",
-        display: "Not detected",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "POS",
-        display: "Positive",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "DET",
-        display: "Detected",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "EXP",
-        display: "Expected",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "UNE",
-        display: "Unexpected",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "NR",
-        display: "Non-reactive",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "RR",
-        display: "Reactive",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      },
-      {
-        code: "WR",
-        display: "Weakly reactive",
-        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-      }
-    ]
+  const interpretation: ValueSetExpansionContains[] = [
+    {
+      code: "N",
+      display: "Normal",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "_GeneticObservationInterpretation icon",
+      display: "GeneticObservationInterpretation",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "CAR",
+      display: "Carrier",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "B",
+      display: "Better",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "D",
+      display: "Significant change down",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "U",
+      display: "Significant change up",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "W",
+      display: "Worse",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "<",
+      display: "Off scale low",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: ">",
+      display: "Off scale high",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "IE",
+      display: "Insufficient evidence",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "A",
+      display: "Abnormal",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "AA",
+      display: "Critical abnormal",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "HH",
+      display: "Critical high",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "LL",
+      display: "Critical low",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "H",
+      display: "High",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "HU",
+      display: "Significantly high",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "L",
+      display: "Low",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "LU",
+      display: "Significantly low",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "I",
+      display: "Intermediate",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "NCL",
+      display: "No CLSI defined breakpoint",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "NS",
+      display: "Non-susceptible",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "R",
+      display: "Resistant",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "SYN-R",
+      display: "Synergy - resistant",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "S",
+      display: "Susceptible",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "SSD",
+      display: "Susceptible-dose dependent",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "SYN-S",
+      display: "Synergy - susceptibl",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "EX",
+      display: "outside threshold",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "HX",
+      display: "above high threshold",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "LX",
+      display: "below low threshold",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "ObservationInterpretationDetection",
+      display: "ObservationInterpretationDetection",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "IND",
+      display: "Indeterminate",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "E",
+      display: "Equivocal",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "NEG",
+      display: "Negative",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "ND",
+      display: "Not detected",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "POS",
+      display: "Positive",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "DET",
+      display: "Detected",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "EXP",
+      display: "Expected",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "UNE",
+      display: "Unexpected",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "NR",
+      display: "Non-reactive",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "RR",
+      display: "Reactive",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+    {
+      code: "WR",
+      display: "Weakly reactive",
+      system:
+        "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+    },
+  ];
 
   const {
     control,
@@ -343,7 +385,7 @@ export default function ObservationFormComponent({
                 table="loinc-items"
                 onChange={onChange}
                 value={value}
-                readOnly={!!observation.code?.coding || false}
+                readOnly={!!observation.code?.coding || false || readOnly}
                 textFieldProps={{
                   ...register("code", {
                     required: "Código requerido",
@@ -369,6 +411,7 @@ export default function ObservationFormComponent({
                   value={value}
                   inputRef={ref}
                   sx={{ width: "100%" }}
+                  readOnly={readOnly}
                 ></DatePicker>
               </LocalizationProvider>
             )}
@@ -385,9 +428,10 @@ export default function ObservationFormComponent({
                 id="checkboxes-category-demo"
                 options={category}
                 disableCloseOnSelect
-                getOptionLabel={(option) => option.display || 'UNKNOW'}
+                getOptionLabel={(option) => option.display || "UNKNOW"}
                 value={value}
                 onChange={(_, newValue) => onChange(newValue)}
+                readOnly={readOnly}
                 renderOption={(props, option, { selected }) => (
                   <li {...props}>
                     <Checkbox
@@ -417,9 +461,10 @@ export default function ObservationFormComponent({
                 id="checkboxes-tags-demo"
                 options={interpretation}
                 disableCloseOnSelect
-                getOptionLabel={(option) => option.display || 'UNKNOW'}
+                getOptionLabel={(option) => option.display || "UNKNOW"}
                 value={value}
                 onChange={(_, newValue) => onChange(newValue)}
+                readOnly={readOnly}
                 renderOption={(props, option, { selected }) => (
                   <li {...props}>
                     <Checkbox
@@ -449,6 +494,7 @@ export default function ObservationFormComponent({
             error={Boolean(errors.note)}
             helperText={errors.note && errors.note.message}
             onBlur={() => trigger("note")}
+            inputProps={{ readOnly: readOnly }}
           ></TextField>
         </Grid>
         <Grid item xs={12} sm={12}>
@@ -460,6 +506,7 @@ export default function ObservationFormComponent({
             error={Boolean(errors.valueString)}
             helperText={errors.valueString && errors.valueString.message}
             onBlur={() => trigger("valueString")}
+            inputProps={{ readOnly: readOnly }}
           ></TextField>
         </Grid>
       </Grid>

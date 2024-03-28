@@ -20,6 +20,7 @@ import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import EncounterCreateComponent from "../Encounter/EncounterCreateComponent";
 import dayjs from "dayjs";
+import { checkPatientRol } from "../../RolUser";
 
 const encounterService = new EncounterService();
 
@@ -103,18 +104,20 @@ export default function PatientEncounterList({
           }}
         >
           <h1>Lista de Encuentros paciente</h1>
-          <IconButton
-            onClick={() => setOpenDialog(true)}
-            color="primary"
-            aria-label="add"
-            sx={{
-              marginLeft: "auto",
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "#1b2455" },
-            }}
-          >
-            <Add />
-          </IconButton>
+          {!checkPatientRol() && (
+            <IconButton
+              onClick={() => setOpenDialog(true)}
+              color="primary"
+              aria-label="add"
+              sx={{
+                marginLeft: "auto",
+                backgroundColor: "white",
+                "&:hover": { backgroundColor: "#1b2455" },
+              }}
+            >
+              <Add />
+            </IconButton>
+          )}
           <EncounterCreateComponent
             patientId={patientID}
             isOpen={openDialog}

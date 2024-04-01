@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 import { Close } from "@mui/icons-material";
 
 import styles from "./EncounterCreateComponent.module.css";
@@ -20,6 +19,7 @@ import PersonUtil from "../../Services/Utils/PersonUtils";
 
 import { EncounterFormData } from "../Forms/EncounterFormComponent";
 import ResourceService from "../../Services/FhirService";
+import HandleResult from "../HandleResult";
 
 export default function EncounterCreateComponent({
   onOpen,
@@ -39,26 +39,11 @@ export default function EncounterCreateComponent({
   };
 
   const postEncounter = async (newEncounter: Encounter) => {
-    const response = await toast.promise(
-      new ResourceService("Encounter").postResource(newEncounter),
-      {
-        loading: "Enviado...",
-        success: (result) => {
-          if (result.success) {
-            return "Encuentro guardado de forma exitosa";
-          } else {
-            throw Error(result.error);
-          }
-        },
-        error: (result) => result.toString(),
-      }
+    HandleResult.handleOperation(
+      () => new ResourceService("Encounter").postResource(newEncounter),
+      "Encuentro guardado de forma exitosa",
+      "Enviando..."
     );
-
-    if (response.success) {
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
   };
 
   // Función que se ejecuta al enviar el formulario

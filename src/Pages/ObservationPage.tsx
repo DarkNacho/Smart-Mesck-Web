@@ -12,10 +12,10 @@ import ObservationFormComponent, {
   ObservationFormData,
 } from "../Components/Forms/ObservationFormComponent";
 import ObservationUtil from "../Services/Utils/ObservationUtils";
-import toast from "react-hot-toast";
 import { SubmitHandler } from "react-hook-form";
 import { checkPatientRol } from "../RolUser";
 import { Button } from "@mui/material";
+import HandleResult from "../Components/HandleResult";
 
 const observationService = new ObservationService();
 
@@ -67,26 +67,11 @@ export default function ObservationPage() {
   };
 
   const sendObservation = async (newObservation: Observation) => {
-    const response = await toast.promise(
-      new ObservationService().sendResource(newObservation),
-      {
-        loading: "Enviado..",
-        success: (result) => {
-          if (result.success) {
-            return "Enviado de forma exitosa";
-          } else {
-            throw Error(result.error);
-          }
-        },
-        error: (result) => result.toString(),
-      }
+    HandleResult.handleOperation(
+      () => new ObservationService().sendResource(newObservation),
+      "Observación guardada exitosamente",
+      "Enviando..."
     );
-
-    if (response.success) {
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
   };
 
   useEffect(() => {

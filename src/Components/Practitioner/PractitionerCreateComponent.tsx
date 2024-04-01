@@ -9,7 +9,6 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 import { Close } from "@mui/icons-material";
 
 import styles from "./PractitionerCreateComponent.module.css";
@@ -18,6 +17,7 @@ import { Practitioner } from "fhir/r4";
 import PractitionerFormComponent, {
   PractitionerFormData,
 } from "../Forms/PractitionerFormComponent";
+import HandleResult from "../HandleResult";
 
 export default function PatientCreateComponent({
   onOpen,
@@ -35,27 +35,12 @@ export default function PatientCreateComponent({
   };
 
   const postPractitioner = async (newPractitioner: Practitioner) => {
-    const response = await toast.promise(
-      new FhirResourceService("Practitioner").postResource(newPractitioner),
-      {
-        loading: "Enviado Profesional",
-        success: (result) => {
-          if (result.success) {
-            handleClose();
-            return "Profesional enviado de forma exitosa";
-          } else {
-            throw Error(result.error);
-          }
-        },
-        error: (result) => result.toString(),
-      }
+    HandleResult.handleOperation(
+      () =>
+        new FhirResourceService("Practitioner").postResource(newPractitioner),
+      "Profesional Guardado exitosamente",
+      "Enviando..."
     );
-
-    if (response.success) {
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
   };
 
   // Función que se ejecuta al enviar el formulario

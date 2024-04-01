@@ -10,9 +10,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import styles from "./ListResourceComponent.module.css";
 
-import toast from "react-hot-toast";
 import FhirService from "../Services/FhirService";
-
+import HandleResult from "./HandleResult";
 
 interface ListResourceProps {
   searchParam?: any;
@@ -20,48 +19,30 @@ interface ListResourceProps {
   fhirService: FhirService<FhirResource>;
 }
 
-
-export default function ListResourceComponent({ searchParam, getDisplay, fhirService }: ListResourceProps) {
-
+export default function ListResourceComponent({
+  searchParam,
+  getDisplay,
+  fhirService,
+}: ListResourceProps) {
   const [resources, setResources] = useState<FhirResource[]>([]);
 
   const navigate = useNavigate();
 
-  const handleOperation = async (
-    operation: () => Promise<Result<FhirResource[]>>,
-    successMessage: string
-  ) => {
-    const response = await toast.promise(operation(), {
-      loading: "Obteniendo...",
-      success: (result) => {
-        if (result.success) {
-          return successMessage;
-        } else {
-          throw Error(result.error);
-        }
-      },
-      error: (result) => result.toString(),
-    });
-
-    if (response.success) {
-      setResources(response.data);
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
-  };
-
   const handleNewResources = async (direction: "next" | "prev") => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => fhirService.getNewResources(direction),
-      "Obtenidos exitosamente"
+      "Recibidos exitosamente",
+      "Obteniendo...",
+      setResources
     );
   };
 
   const fetchResources = async () => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => fhirService.getResources(searchParam),
-      "Obtenidos exitosamente"
+      "Recibidos exitosamente",
+      "Obteniendo...",
+      setResources
     );
   };
 
@@ -69,10 +50,8 @@ export default function ListResourceComponent({ searchParam, getDisplay, fhirSer
     fetchResources();
   }, [searchParam]);
 
-
   return (
     <div>
-
       <List className={styles.listContent}>
         {resources.map((resource) => (
           <ListItem
@@ -81,7 +60,6 @@ export default function ListResourceComponent({ searchParam, getDisplay, fhirSer
             onClick={() => navigate(`/${resource.resourceType}/${resource.id}`)}
           >
             <pre>{getDisplay(resource)}</pre>
-
           </ListItem>
         ))}
       </List>
@@ -103,7 +81,6 @@ export default function ListResourceComponent({ searchParam, getDisplay, fhirSer
           Next Page
         </Button>
       </div>
-
     </div>
   );
 }

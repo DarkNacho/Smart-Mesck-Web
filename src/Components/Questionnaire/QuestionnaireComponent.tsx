@@ -15,6 +15,7 @@ import ObservationService from "../../Services/ObservationService";
 import ConditionService from "../../Services/ConditionService";
 import { isAdminOrPractitioner } from "../../RolUser";
 import ObservationUtils from "../../Services/Utils/ObservationUtils";
+import HandleResult from "../HandleResult";
 //import "./QuestionnaireComponent.css";
 
 const fhirService = new FhirResourceService("FhirResource");
@@ -242,11 +243,11 @@ export default function QuestionnaireComponent({
   };
 
   const sendResources = async (resources: FhirResource[]) => {
-    fhirService
-      .sendArray(resources)
-      .then((res) =>
-        res.success ? console.log("Observaciones enviadas") : res.error
-      );
+    HandleResult.handleOperation(
+      () => fhirService.sendArray(resources),
+      "Formulario Guardado Exitosamente",
+      "Enviado..."
+    );
   };
 
   /* TODO: descomentar, solo esta comentado para compilar

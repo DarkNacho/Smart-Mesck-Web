@@ -14,9 +14,9 @@ import { useNavigate } from "react-router-dom";
 import styles from "./EncounterListPage.module.css";
 import FhirResourceService from "../../Services/FhirService";
 import { Add, Search } from "@mui/icons-material";
-import toast from "react-hot-toast";
 import EncounterCreateComponent from "../../Components/Encounter/EncounterCreateComponent";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
+import HandleResult from "../../Components/HandleResult";
 
 const encounterService = new FhirResourceService<Encounter>("Encounter");
 
@@ -31,48 +31,30 @@ export default function EncounterListPage() {
     setOpenDialog(isOpen);
   };
 
-  const handleOperation = async (
-    operation: () => Promise<Result<Encounter[]>>,
-    successMessage: string
-  ) => {
-    const response = await toast.promise(operation(), {
-      loading: "Obteniendo Encuentros",
-      success: (result) => {
-        if (result.success) {
-          return successMessage;
-        } else {
-          throw Error(result.error);
-        }
-      },
-      error: (result) => result.toString(),
-    });
-
-    if (response.success) {
-      setEncounters(response.data);
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
-  };
-
   const handleNewEncounters = async (direction: "next" | "prev") => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => encounterService.getNewResources(direction),
-      "Encuentros Obtenidos exitosamente"
+      "Encuentros Obtenidos exitosamente",
+      "Obteniendo...",
+      setEncounters
     );
   };
 
   const fetchEncounters = async () => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => encounterService.getResources({ _count: 5 }),
-      "Encuentros Obtenidos exitosamente"
+      "Encuentros Obtenidos exitosamente",
+      "Obteniendo...",
+      setEncounters
     );
   };
 
   const handleSearch = async () => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => encounterService.getResources({ _content: searchTerm, _count: 5 }),
-      "Encuentros buscados obtenidos exitosamente"
+      "Encuentros Obtenidos exitosamente",
+      "Obteniendo...",
+      setEncounters
     );
   };
 

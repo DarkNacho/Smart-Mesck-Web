@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Patient } from "fhir/r4";
-import toast from "react-hot-toast";
 import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent";
 
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 import PatientOverviewComponent from "../Components/Patient/PatientOverviewComponent";
 import PatientEncounterList from "../Components/Patient/PatientEncounterList";
 import FhirResourceService from "../Services/FhirService";
+import HandleResult from "../Components/HandleResult";
 
 const fhirService = new FhirResourceService("Patient");
 
@@ -22,24 +22,12 @@ export default function PatientPage() {
   };
 
   const fetchPatient = async () => {
-    const response = await toast.promise(fhirService.getById(patientID!), {
-      loading: "Cargando Paciente",
-      success: (result) => {
-        if (result.success) {
-          return "Paciente cargado exitosamente";
-        } else {
-          throw Error(result.error);
-        }
-      },
-      error: (result) => result.toString(),
-    });
-
-    if (response.success) {
-      setPatient(response.data as Patient);
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
+    HandleResult.handleOperation(
+      () => fhirService.getById(patientID!),
+      "Paciente cargado exitosamente",
+      "Obteniendo...",
+      setPatient
+    );
   };
 
   useEffect(() => {

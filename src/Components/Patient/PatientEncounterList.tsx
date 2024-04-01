@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Encounter, FhirResource } from "fhir/r4";
+import { Encounter } from "fhir/r4";
 
 import {
   List,
@@ -16,12 +16,13 @@ import { useNavigate } from "react-router-dom";
 import styles from "./PatientEncounterList.module.css";
 
 import { Add, Search } from "@mui/icons-material";
-import toast from "react-hot-toast";
+
 import EncounterCreateComponent from "../Encounter/EncounterCreateComponent";
 import dayjs from "dayjs";
 import { checkPatientRol } from "../../RolUser";
 import FhirResourceService from "../../Services/FhirService";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
+import HandleResult from "../HandleResult";
 
 const encounterService = new FhirResourceService("Encounter");
 
@@ -40,53 +41,35 @@ export default function PatientEncounterList({
     setOpenDialog(isOpen);
   };
 
-  const handleOperation = async (
-    operation: () => Promise<Result<FhirResource[]>>,
-    successMessage: string
-  ) => {
-    const response = await toast.promise(operation(), {
-      loading: "Obteniendo Encuentros",
-      success: (result) => {
-        if (result.success) {
-          return successMessage;
-        } else {
-          throw Error(result.error);
-        }
-      },
-      error: (result) => result.toString(),
-    });
-
-    if (response.success) {
-      setEncounters(response.data as Encounter[]);
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
-  };
-
   const handleNewEncounters = async (direction: "next" | "prev") => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => encounterService.getNewResources(direction),
-      "Encuentros Obtenidos exitosamente"
+      "Encuentros Obtenidos exitosamente",
+      "Cargando...",
+      setEncounters
     );
   };
 
   const fetchEncounters = async () => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => encounterService.getResources({ _count: 5, subject: patientID }),
-      "Encuentros Obtenidos exitosamente"
+      "Encuentros Obtenidos exitosamente",
+      "Cargando...",
+      setEncounters
     );
   };
 
   const handleSearch = async () => {
-    handleOperation(
+    HandleResult.handleOperation(
       () =>
         encounterService.getResources({
           _count: 5,
           subject: patientID,
           date: searchTerm.toISOString(),
         }),
-      "Encuentros buscados obtenidos exitosamente"
+      "Encuentros Obtenidos exitosamente",
+      "Cargando...",
+      setEncounters
     );
   };
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FhirResource, Questionnaire } from "fhir/r4";
+import { Questionnaire } from "fhir/r4";
 import {
   Dialog,
   DialogTitle,
@@ -13,10 +13,10 @@ import {
   TextField,
   InputAdornment,
 } from "@mui/material";
-import toast from "react-hot-toast";
 import { Close, Search } from "@mui/icons-material";
 import styles from "./QuestionnaireListDialogComponent.module.css";
 import FhirResourceService from "../../Services/FhirService";
+import HandleResult from "../HandleResult";
 
 const questionnaireService = new FhirResourceService("Questionnaire");
 
@@ -33,49 +33,31 @@ export default function QuestionnaireListDialogComponent({
     setShowModal(false);
   };
 
-  const handleOperation = async (
-    operation: () => Promise<Result<FhirResource[]>>,
-    successMessage: string
-  ) => {
-    const response = await toast.promise(operation(), {
-      loading: "Obteniendo Formularios",
-      success: (result) => {
-        if (result.success) {
-          return successMessage;
-        } else {
-          throw Error(result.error);
-        }
-      },
-      error: (result) => result.toString(),
-    });
-
-    if (response.success) {
-      setQuestionnaires(response.data as Questionnaire[]);
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
-  };
-
   const handleNewQuestionnaires = async (direction: "next" | "prev") => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => questionnaireService.getNewResources(direction),
-      "Formularios Obtenidos exitosamente"
+      "Formularios Obtenidos exitosamente",
+      "Cargando...",
+      setQuestionnaires
     );
   };
 
   const fetchQuestionnaires = async () => {
-    handleOperation(
+    HandleResult.handleOperation(
       () => questionnaireService.getResources({ _count: 10 }),
-      "Forumularios Obtenidos exitosamente"
+      "Formularios Obtenidos exitosamente",
+      "Cargando...",
+      setQuestionnaires
     );
   };
 
   const handleSearch = async () => {
-    handleOperation(
+    HandleResult.handleOperation(
       () =>
         questionnaireService.getResources({ _content: searchTerm, _count: 10 }),
-      "Questionnaires buscados obtenidos exitosamente"
+      "Formularios Obtenidos exitosamente",
+      "Cargando...",
+      setQuestionnaires
     );
   };
 

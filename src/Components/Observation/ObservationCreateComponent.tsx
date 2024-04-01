@@ -9,7 +9,6 @@ import {
   DialogActions,
 } from "@mui/material";
 
-import toast from "react-hot-toast";
 import { Close } from "@mui/icons-material";
 
 import styles from "./ObservationCreateComponent.module.css";
@@ -20,6 +19,7 @@ import ObservationFormComponent, {
 } from "../Forms/ObservationFormComponent";
 import dayjs from "dayjs";
 import { checkPatientRol } from "../../RolUser";
+import HandleResult from "../HandleResult";
 
 export default function ObservationCreateComponent({
   patientId,
@@ -56,26 +56,11 @@ export default function ObservationCreateComponent({
   };
 
   const sendObservation = async (newObservation: Observation) => {
-    const response = await toast.promise(
-      new ObservationService().sendResource(newObservation),
-      {
-        loading: "Enviado..",
-        success: (result) => {
-          if (result.success) {
-            return "Enviado de forma exitosa";
-          } else {
-            throw Error(result.error);
-          }
-        },
-        error: (result) => result.toString(),
-      }
+    HandleResult.handleOperation(
+      () => new ObservationService().sendResource(newObservation),
+      "Observación guardada de forma exitosa",
+      "Enviando..."
     );
-
-    if (response.success) {
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
   };
 
   return (

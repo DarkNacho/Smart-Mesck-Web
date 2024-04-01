@@ -108,6 +108,7 @@ export default class ObservationUtils {
                     ]
                 : undefined,
             extension: observation.extension,
+            onsetString: ObservationUtils.getValue(observation)
         };
         return condition;
     }

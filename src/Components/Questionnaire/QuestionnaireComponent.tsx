@@ -328,14 +328,12 @@ export default function QuestionnaireComponent({
         //const finalObservation = getFinalObservation(updatedObservation)
         //const conditions = observationAsConditions(updatedObservation);
 
-        const final = getFinalArray(updatedResource);
+        const final = getFinalArray(updatedResource); //Convierte a su tipo indicado (Observation | Condition)
         console.log("bla final: ", final);
-        //console.log("conditions final: ", conditions);
-        //console.log("obsevation final:", finalObservation);
-        //sendResources(finalObservation);
-        //sendResources(conditions)
+
         sendResources(final); //TODO: Problema al querer eliminar, y conditions genera duplicado al querer actualizar
-      } else console.error(res.error);
+      } //  ! Si en el questionario un elemento que e respondio y se guardó. Luego si lo dejo vacio. Este no cambia en Conditions pero si luego lo vuelvo a editar este cambia.
+      else console.error(res.error);
     });
 
     /*

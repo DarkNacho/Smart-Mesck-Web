@@ -11,15 +11,13 @@ export default class ConditionUtils {
                 (condition.code?.coding?.[0]?.system &&
                     condition.code?.coding?.[0]?.code
                     ? `${condition.code.coding[0].system} - ${condition.code.coding[0].code}`
-                    : "Unknown Name");
+                    : "Unknown Name dsa");
 
             const value =
                 condition.clinicalStatus?.coding?.[0]?.display ||
                 condition.clinicalStatus?.text ||
-                (condition.clinicalStatus?.coding?.[0]?.system &&
-                    condition.clinicalStatus?.coding?.[0]?.code
-                    ? `${condition.clinicalStatus.coding[0].code}`
-                    : "Unknown Name");
+                condition.clinicalStatus?.coding?.[0]?.code ||
+                condition.onsetString || "No value"
 
             return { id, name, value };
         });

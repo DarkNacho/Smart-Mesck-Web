@@ -19,6 +19,8 @@ function getDisplay(resource: FhirResource): string {
   const encounter = resource as Encounter;
   return `Paciente: ${EncounterUtils.getSubjectDisplayOrID(
     encounter.subject!
+  )}\nPracticante: ${EncounterUtils.getPrimaryPractitioner(
+    encounter
   )}\nPeriod: ${EncounterUtils.getFormatPeriod(encounter.period!)}`;
 }
 

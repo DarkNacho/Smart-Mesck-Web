@@ -11,16 +11,17 @@ import dayjs from "dayjs";
 import ObservationFormComponent, {
   ObservationFormData,
 } from "../Components/Forms/ObservationFormComponent";
+import ObservationUtil from "../Services/Utils/ObservationUtils";
 import toast from "react-hot-toast";
 import { SubmitHandler } from "react-hook-form";
 import { checkPatientRol } from "../RolUser";
 import { Button } from "@mui/material";
 
-export default function ObservationPage() {
-  const observationService = new ObservationService();
-  const { patientID, observationID } = useParams();
+const observationService = new ObservationService();
 
-  const [obvservationInfoData, setObvservationInfoData] = useState<
+export default function ObservationPage() {
+  const { patientID, observationID } = useParams();
+  const [observationInfoData, setObservationInfoData] = useState<
     InfoListData[]
   >([]);
 
@@ -32,15 +33,15 @@ export default function ObservationPage() {
     if (result.success) {
       setObservationData(result.data);
       const obs = result.data.map((item) => {
-        const name = observationService.getValue(item);
+        const name = ObservationUtil.getValue(item);
         const value = dayjs(
           item.issued || item.meta?.lastUpdated
         ).toISOString();
         return { name, value };
       });
 
-      setObvservationInfoData(obs);
-      setName(obs.length > 0 ? observationService.getName(result.data[0]) : "");
+      setObservationInfoData(obs);
+      setName(obs.length > 0 ? ObservationUtil.getName(result.data[0]) : "");
       console.log(result.data);
     }
   };
@@ -89,7 +90,7 @@ export default function ObservationPage() {
   };
 
   useEffect(() => {
-    setObvservationInfoData([]);
+    setObservationInfoData([]);
     fetchData();
   }, [observationID]);
 
@@ -107,7 +108,7 @@ export default function ObservationPage() {
         }}
       >
         <div style={{ background: "#e4e9f2", padding: "10px" }}>
-          {obvservationInfoData.length >= 1 && (
+          {observationInfoData.length >= 1 && (
             <div>
               <ObservationFormComponent
                 formId="form"
@@ -130,15 +131,15 @@ export default function ObservationPage() {
           )}
         </div>
         <InfoListComponent
-          data={obvservationInfoData}
+          data={observationInfoData}
           title={"Historial"}
           icon={"/hearth.svg"}
           resourceType="Observation"
         ></InfoListComponent>
 
-        {obvservationInfoData.length > 1 && (
+        {observationInfoData.length > 1 && (
           <HistoryChartComponent
-            data={obvservationInfoData.reverse()}
+            data={observationInfoData.reverse()}
           ></HistoryChartComponent>
         )}
       </div>

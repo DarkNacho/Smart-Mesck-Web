@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Encounter } from "fhir/r4";
+import { Encounter, FhirResource } from "fhir/r4";
 
 import {
   List,
@@ -15,14 +15,15 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { useNavigate } from "react-router-dom";
 import styles from "./PatientEncounterList.module.css";
 
-import EncounterService from "../../Services/EncounterService";
 import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import EncounterCreateComponent from "../Encounter/EncounterCreateComponent";
 import dayjs from "dayjs";
 import { checkPatientRol } from "../../RolUser";
+import FhirResourceService from "../../Services/FhirService";
+import EncounterUtils from "../../Services/Utils/EncounterUtils";
 
-const encounterService = new EncounterService();
+const encounterService = new FhirResourceService("Encounter");
 
 export default function PatientEncounterList({
   patientID,
@@ -40,7 +41,7 @@ export default function PatientEncounterList({
   };
 
   const handleOperation = async (
-    operation: () => Promise<Result<Encounter[]>>,
+    operation: () => Promise<Result<FhirResource[]>>,
     successMessage: string
   ) => {
     const response = await toast.promise(operation(), {
@@ -56,7 +57,7 @@ export default function PatientEncounterList({
     });
 
     if (response.success) {
-      setEncounters(response.data);
+      setEncounters(response.data as Encounter[]);
       console.log(response.data);
     } else {
       console.error(response.error);
@@ -180,10 +181,8 @@ export default function PatientEncounterList({
               onClick={() => navigate(`Encounter/${encounter.id}`)}
             >
               <ListItemText
-                primary={`${encounterService.getPrimaryPractitioner(
-                  encounter
-                )}`}
-                secondary={`${encounterService.getFormatPeriod(
+                primary={`${EncounterUtils.getPrimaryPractitioner(encounter)}`}
+                secondary={`${EncounterUtils.getFormatPeriod(
                   encounter.period!
                 )}`}
               />

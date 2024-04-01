@@ -9,15 +9,18 @@ import {
 import { useEffect, useRef } from "react";
 
 import Button from "@mui/material/Button";
-import QuestionnaireResponseService from "../../Services/QuestionnaireResponseService";
+
 import FhirResourceService from "../../Services/FhirService";
 import ObservationService from "../../Services/ObservationService";
 import ConditionService from "../../Services/ConditionService";
 import { isAdminOrPractitioner } from "../../RolUser";
+import ObservationUtils from "../../Services/Utils/ObservationUtils";
 //import "./QuestionnaireComponent.css";
 
 const fhirService = new FhirResourceService("FhirResource");
-const questionnaireResponseService = new QuestionnaireResponseService();
+const questionnaireResponseService = new FhirResourceService(
+  "QuestionnaireResponse"
+);
 const observationService = new ObservationService();
 const conditionService = new ConditionService();
 
@@ -149,10 +152,11 @@ export default function QuestionnaireComponent({
 
   const getConditions = async (): Promise<Condition[]> => {
     if (!questionnaireResponse.id) return [];
-    const result = await conditionService.getConditonsWithQuestionnaireResponse(
-      subjectId!,
-      questionnaireResponse.id!
-    );
+    const result =
+      await conditionService.getConditionsWithQuestionnaireResponse(
+        subjectId!,
+        questionnaireResponse.id!
+      );
     return result.success ? result.data : [];
   };
 
@@ -284,7 +288,7 @@ export default function QuestionnaireComponent({
       if (coding && coding.code) {
         if (coding.code === "OBS") res.push(item);
         else if (coding.code === "CON")
-          res.push(observationService.convertirObservacionACondicion(item));
+          res.push(ObservationUtils.ObservationToCondition(item));
       }
 
       //if(coding && coding.code === "OBS")  res.push(item);
@@ -313,7 +317,7 @@ export default function QuestionnaireComponent({
 
     sendQuestionnaireResponse(qr).then((res) => {
       if (res.success) {
-        questionnaireResponse = res.data;
+        questionnaireResponse = res.data as QuestionnaireResponse;
         const responsesObservation = responseAsObservations(qr);
 
         const updatedResource = generateUpdateResources(

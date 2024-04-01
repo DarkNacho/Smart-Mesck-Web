@@ -16,12 +16,10 @@ import { Close } from "@mui/icons-material";
 import styles from "./EncounterCreateComponent.module.css";
 import { Encounter } from "fhir/r4";
 
-import EncounterService from "../../Services/EncounterService";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 
-import EncounterFormComponent, {
-  EncounterFormData,
-} from "../Forms/EncounterFormComponent";
+import { EncounterFormData } from "../Forms/EncounterFormComponent";
+import ResourceService from "../../Services/FhirService";
 
 export default function EncounterCreateComponent({
   onOpen,
@@ -42,7 +40,7 @@ export default function EncounterCreateComponent({
 
   const postEncounter = async (newEncounter: Encounter) => {
     const response = await toast.promise(
-      new EncounterService().postResource(newEncounter),
+      new ResourceService("Encounter").postResource(newEncounter),
       {
         loading: "Enviado...",
         success: (result) => {
@@ -112,11 +110,14 @@ export default function EncounterCreateComponent({
         </DialogTitle>
         <DialogContent>
           <Container className={styles.container}>
-            <EncounterFormComponent
+            <h1>
+              EncounterFormComponent quitado por problemas en su implementación
+            </h1>
+            {/*<EncounterFormComponent
               formId="encounterForm"
               patientId={patientId}
               submitForm={onSubmitForm}
-            ></EncounterFormComponent>
+          ></EncounterFormComponent>*/}
           </Container>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>

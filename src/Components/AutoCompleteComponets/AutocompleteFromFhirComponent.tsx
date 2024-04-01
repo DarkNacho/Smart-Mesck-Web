@@ -3,7 +3,8 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import FhirResourceService from "../../Services/FhirService";
 import FhirType from "../../Services/Utils/Fhirtypes";
-import { FhirResource, SearchParameter } from "fhir/r4";
+import { FhirResource } from "fhir/r4";
+import { SearchParams } from "fhir-kit-client";
 
 interface AutocompleteFromFhirComponentProps<T extends FhirResource> {
   resourceType: FhirType;
@@ -15,7 +16,7 @@ interface AutocompleteFromFhirComponentProps<T extends FhirResource> {
   textFieldProps?: TextFieldProps;
   readOnly?: boolean;
   searchParam: string;
-  defaultParams?: SearchParameter;
+  defaultParams?: SearchParams;
 }
 
 export default function AutocompleteFromFhirComponent<T extends FhirResource>({

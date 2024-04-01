@@ -1,11 +1,24 @@
 import { Encounter, Period, Reference } from "fhir/r4";
 
+/**
+ * Utility class for working with Encounter objects.
+ */
 export default class EncounterUtils {
-  private static padZero(number: number) {
+  /**
+   * Pads a number with zeros.
+   * @param number - The number to pad.
+   * @returns The padded number as a string.
+   */
+  private static padZero(number: number): string {
     return number.toString().padStart(2, "0");
   }
 
-  public static getFormatPeriod(period: Period) {
+  /**
+   * Formats the start and end dates of a period.
+   * @param period - The period object.
+   * @returns The formatted period as a string.
+   */
+  public static getFormatPeriod(period: Period): string {
     if (!period || !period.start) return "N/A";
 
     const startDate = new Date(period.start);
@@ -26,26 +39,46 @@ export default class EncounterUtils {
     return `${formattedStartDate} - ${formattedEndDate}`;
   }
 
-  public static getSubjectDisplayOrID(subject: Reference) {
+  /**
+   * Gets the display name or ID of the subject.
+   * @param subject - The subject object.
+   * @returns The display name or ID of the subject as a string.
+   */
+  public static getSubjectDisplayOrID(subject: Reference): string {
     if (!subject) return "N/A";
     if (subject.display) return subject.display;
 
     if (subject.reference) {
-      // Extrayendo el ID del reference (por ejemplo, "Patient/123")
+      // Extracting the ID from the reference (e.g., "Patient/123")
       const id = subject.reference.split("/")[1];
       return id ? id : subject.reference;
     }
+    return "N/A"
   }
 
-  public static getSubjectID(subject: Reference) {
+  /**
+   * Gets the ID of the subject.
+   * @param subject - The subject object.
+   * @returns The ID of the subject as a string.
+   */
+  public static getSubjectID(subject: Reference): string {
+    if (!subject) return "N/A";
     if (subject.reference) {
-      // Extrayendo el ID del reference (por ejemplo, "Patient/123")
+      // Extracting the ID from the reference (e.g., "Patient/123")
       const id = subject.reference.split("/")[1];
       return id ? id : subject.reference;
     }
+    return "N/A"
   }
 
-  public static getPrimaryPractitioner(encounter: Encounter) {
+  /**
+   * Gets the primary practitioner of the encounter.
+   * @param encounter - The encounter object.
+   * @returns The display name or ID of the primary practitioner as a string.
+   */
+  public static getPrimaryPractitioner(encounter: Encounter): string {
+    if (!encounter) return "N/A";
+
     const participants = encounter.participant || [];
 
     const primaryPerformer = participants.find((participant) => {
@@ -72,5 +105,6 @@ export default class EncounterUtils {
     if (firstParticipant) {
       return this.getSubjectDisplayOrID(firstParticipant.individual!);
     }
+    return "N/A";
   }
 }

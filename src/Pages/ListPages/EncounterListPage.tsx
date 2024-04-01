@@ -12,18 +12,15 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import styles from "./EncounterListPage.module.css";
-
-import EncounterService from "../../Services/EncounterService";
+import FhirResourceService from "../../Services/FhirService";
 import { Add, Search } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import EncounterCreateComponent from "../../Components/Encounter/EncounterCreateComponent";
+import EncounterUtils from "../../Services/Utils/EncounterUtils";
 
-const encounterService = new EncounterService();
-
+const encounterService = new FhirResourceService<Encounter>("Encounter");
 
 export default function EncounterListPage() {
-
-
   const [encounters, setEncounters] = useState<Encounter[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -139,11 +136,19 @@ export default function EncounterListPage() {
             <ListItem
               className={styles.listItem}
               key={encounter.id}
-              onClick={() => navigate(`/Patient/${encounterService.getSubjectID(encounter.subject!)}`)}
+              onClick={() =>
+                navigate(
+                  `/Patient/${EncounterUtils.getSubjectID(encounter.subject!)}`
+                )
+              }
             >
               <ListItemText
-                primary={`Paciente: ${encounterService.getSubjectDisplayOrID(encounter.subject!)}`}
-                secondary={`Period: ${encounterService.getFormatPeriod(encounter.period!)}`}
+                primary={`Paciente: ${EncounterUtils.getSubjectDisplayOrID(
+                  encounter.subject!
+                )}`}
+                secondary={`Period: ${EncounterUtils.getFormatPeriod(
+                  encounter.period!
+                )}`}
               />
             </ListItem>
           ))}

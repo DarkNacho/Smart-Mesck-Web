@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Questionnaire } from "fhir/r4";
+import { FhirResource, Questionnaire } from "fhir/r4";
 import {
   Dialog,
   DialogTitle,
@@ -16,9 +16,9 @@ import {
 import toast from "react-hot-toast";
 import { Close, Search } from "@mui/icons-material";
 import styles from "./QuestionnaireListDialogComponent.module.css";
-import QuestionnaireService from "../../Services/QuestionnaireService";
+import FhirResourceService from "../../Services/FhirService";
 
-const questionnaireService = new QuestionnaireService();
+const questionnaireService = new FhirResourceService("Questionnaire");
 
 export default function QuestionnaireListDialogComponent({
   onQuestionnaireSelect,
@@ -34,7 +34,7 @@ export default function QuestionnaireListDialogComponent({
   };
 
   const handleOperation = async (
-    operation: () => Promise<Result<Questionnaire[]>>,
+    operation: () => Promise<Result<FhirResource[]>>,
     successMessage: string
   ) => {
     const response = await toast.promise(operation(), {
@@ -50,7 +50,7 @@ export default function QuestionnaireListDialogComponent({
     });
 
     if (response.success) {
-      setQuestionnaires(response.data);
+      setQuestionnaires(response.data as Questionnaire[]);
       console.log(response.data);
     } else {
       console.error(response.error);

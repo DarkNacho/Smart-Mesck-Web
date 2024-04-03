@@ -1,23 +1,33 @@
-import AutocompleteComponent from "./Components/AutocompleteComponent";
+import { Button } from "@mui/material";
 
-//import styles from "./App.module.css";
-//https://clinicaltables.nlm.nih.gov/fhir/R4/ValueSet/conditions/$expand?_format=json&count=5&filter=dia
+function setAdmin() {
+  localStorage.setItem("userRol", "Admin");
+  localStorage.setItem("id", "204");
+}
+
+function setPatient() {
+  localStorage.setItem("userRol", "Patient");
+  localStorage.setItem("id", "4");
+}
+
+function setPractitioner() {
+  localStorage.setItem("userRol", "Practitioner");
+  localStorage.setItem("id", "231");
+}
+
 function App() {
+  localStorage.clear();
   return (
     <>
-      <div>
-        <h1>root aqui</h1>
-        <AutocompleteComponent
-          name="Condiciones"
-          table="conditions"
-          searchArguments=""
-        />
-        <AutocompleteComponent
-          name="Medicamentos"
-          table="rxterms"
-          searchArguments=""
-        />
-      </div>
+      <Button variant="contained" color="primary" onClick={setAdmin}>
+        Admin
+      </Button>
+      <Button variant="contained" color="primary" onClick={setPatient}>
+        Patient
+      </Button>
+      <Button variant="contained" color="primary" onClick={setPractitioner}>
+        Practitioner
+      </Button>
     </>
   );
 }

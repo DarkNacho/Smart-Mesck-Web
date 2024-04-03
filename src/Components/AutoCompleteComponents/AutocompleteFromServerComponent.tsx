@@ -1,19 +1,25 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
+import TextField, { TextFieldProps } from "@mui/material/TextField";
 import { ValueSet, ValueSetExpansionContains } from "fhir/r4";
 
 interface AutocompleteComponentProps {
   name: string;
   table: string;
-  searchArguments: string;
+  onChange: (value: ValueSetExpansionContains | null) => void;
+  value: ValueSetExpansionContains | null;
+  textFieldProps?: TextFieldProps;
+  readOnly?: boolean;
 }
 
-// Componente AutocompleteComponent
-const AutocompleteComponent: React.FC<AutocompleteComponentProps> = ({
+export default function AutocompleteFromServerComponent({
   name,
   table,
-}) => {
+  onChange,
+  value,
+  textFieldProps,
+  readOnly,
+}: AutocompleteComponentProps) {
   const [dataSet, setDataSet] = useState<ValueSetExpansionContains[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -35,14 +41,6 @@ const AutocompleteComponent: React.FC<AutocompleteComponentProps> = ({
     }
   };
 
-  const handleSelectCondition = (
-    condition: ValueSetExpansionContains | null
-  ) => {
-    if (condition) {
-      console.log("selected:", condition);
-    }
-  };
-
   useEffect(() => {
     fetchData("");
   }, []);
@@ -51,14 +49,19 @@ const AutocompleteComponent: React.FC<AutocompleteComponentProps> = ({
     <Autocomplete
       options={dataSet}
       loading={loading}
-      getOptionLabel={(option) => option.display!}
-      onChange={(_, value) => handleSelectCondition(value)}
+      getOptionLabel={(option) => `${option.code} - ${option.display}`}
+      onChange={(_, newValue) => onChange(newValue)}
       onInputChange={(_, value) => fetchData(value)}
+      value={value}
+      readOnly={readOnly}
       renderInput={(params) => (
-        <TextField {...params} label={name} variant="outlined" />
+        <TextField
+          {...params}
+          label={name}
+          variant="outlined"
+          {...textFieldProps}
+        />
       )}
     />
   );
-};
-
-export default AutocompleteComponent;
+}

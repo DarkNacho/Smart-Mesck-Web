@@ -11,13 +11,14 @@ import {
 import { useEffect } from "react";
 import { Close } from "@mui/icons-material";
 
-import styles from "./PatientCreateComponent.module.css";
-import { Patient } from "fhir/r4";
+import styles from "./PractitionerCreateComponent.module.css";
 import FhirResourceService from "../../Services/FhirService";
-import PatientFormComponent, {
-  PatientFormData,
-} from "../Forms/PatientFormComponent";
+import { Practitioner } from "fhir/r4";
+import PractitionerFormComponent, {
+  PractitionerFormData,
+} from "../Forms/PractitionerFormComponent";
 import HandleResult from "../HandleResult";
+
 export default function PatientCreateComponent({
   onOpen,
   isOpen,
@@ -33,19 +34,20 @@ export default function PatientCreateComponent({
     onOpen(false);
   };
 
-  const postPatient = async (newPatient: Patient) => {
+  const postPractitioner = async (newPractitioner: Practitioner) => {
     HandleResult.handleOperation(
-      () => new FhirResourceService("Patient").postResource(newPatient),
-      "Paciente Guardado con éxito",
+      () =>
+        new FhirResourceService("Practitioner").postResource(newPractitioner),
+      "Profesional Guardado exitosamente",
       "Enviando..."
     );
   };
 
   // Función que se ejecuta al enviar el formulario
-  const onSubmitForm: SubmitHandler<PatientFormData> = (data) => {
+  const onSubmitForm: SubmitHandler<PractitionerFormData> = (data) => {
     const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
-    const newPatient: Patient = {
-      resourceType: "Patient",
+    const newPractitioner: Practitioner = {
+      resourceType: "Practitioner",
       identifier: [{ system: "RUT", value: rut }],
       name: [
         {
@@ -60,14 +62,14 @@ export default function PatientCreateComponent({
       telecom: [{ system: "phone", value: data.numeroTelefonico }],
       photo: [{ url: data.photo }],
     };
-    postPatient(newPatient);
+    postPractitioner(newPractitioner);
   };
 
   return (
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Añadir Nuevo Paciente
+          Añadir Nuevo Profesional
           <IconButton
             aria-label="close"
             onClick={handleClose}
@@ -82,10 +84,10 @@ export default function PatientCreateComponent({
         </DialogTitle>
         <DialogContent>
           <Container className={styles.container}>
-            <PatientFormComponent
+            <PractitionerFormComponent
               formId="pacienteForm"
               submitForm={onSubmitForm}
-            ></PatientFormComponent>
+            ></PractitionerFormComponent>
           </Container>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>

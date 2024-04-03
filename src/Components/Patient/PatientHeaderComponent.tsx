@@ -1,7 +1,7 @@
 import { Patient } from "fhir/r4";
 import { useState } from "react";
-import PatientService from "../../Services/PatientService";
 import styles from "./PatientHeaderComponent.module.css";
+import PersonUtil from "../../Services/Utils/PersonUtils";
 
 export default function PatientHeaderComponent({
   patient,
@@ -10,8 +10,8 @@ export default function PatientHeaderComponent({
   patient: Patient;
   onOptionSelect: (nuevaOpcion: string) => void;
 }) {
-  const [selectedOption, setSelectedOption] = useState<String>("Overview");
-  const name = new PatientService().parsePatientName(patient);
+  const [selectedOption, setSelectedOption] = useState<string>("Overview");
+  const name = PersonUtil.getPersonNameAsString(patient);
   const avatar = patient.photo?.[0]?.url || "/avatar.JPG";
 
   const handleOptionSelect = (option: string) => {

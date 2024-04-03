@@ -1,16 +1,17 @@
 import Client, { SearchParams } from "fhir-kit-client";
-import { Bundle, OperationOutcome, FhirResource, CodeableConcept } from "fhir/r4";
+import FhirType from "./Utils/Fhirtypes";
 
-type FhirType =
-  | "FhirResource"
-  | "Patient"
-  | "Questionnaire"
-  | "QuestionnaireResponse"
-  | "Observation"
-  | "Encounter"
-  | "Condition"
-  | "MedicationStatement";
+import {
+  Bundle,
+  OperationOutcome,
+  FhirResource,
+  CodeableConcept,
+} from "fhir/r4";
 
+/**
+ * Represents a service for interacting with FHIR resources.
+ * @template T - The type of FHIR resource.
+ */
 export default class FhirResourceService<T extends FhirResource> {
   public resourceTypeName: string;
 
@@ -22,6 +23,10 @@ export default class FhirResourceService<T extends FhirResource> {
   public hasNextPage: boolean = false;
   public hasPrevPage: boolean = false;
 
+  /**
+   * Creates an instance of ResourceService.
+   * @param {FhirType} type - The FHIR resource type.
+   */
   public constructor(type: FhirType) {
     this.apiUrl =
       import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
@@ -30,6 +35,13 @@ export default class FhirResourceService<T extends FhirResource> {
     this.resourceTypeName = type;
   }
 
+  /**
+   * Handles the result of a FHIR operation.
+   * @private
+   * @template T - The type of the result.
+   * @param {Promise<T>} result - The result of the FHIR operation.
+   * @returns {Promise<Result<T>>} - The handled result.
+   */
   private handleResult<T>(result: Promise<T>): Promise<Result<T>> {
     return result
       .then((data: T) => {
@@ -45,6 +57,11 @@ export default class FhirResourceService<T extends FhirResource> {
       });
   }
 
+  /**
+   * Sets the flags indicating whether there is a next or previous page of resources.
+   * @private
+   * @param {Bundle} response - The FHIR bundle response.
+   */
   private setNewPages(response: Bundle) {
     this.hasNextPage = !!response.link?.find((link) => link.relation === "next")
       ?.url;
@@ -53,6 +70,11 @@ export default class FhirResourceService<T extends FhirResource> {
     )?.url;
   }
 
+  /**
+   * Retrieves a FHIR resource by its ID.
+   * @param {string} id - The ID of the resource.
+   * @returns {Promise<Result<T>>} - The result of the operation.
+   */
   public async getById(id: string): Promise<Result<T>> {
     return this.handleResult<T>(
       this.fhirClient.read({
@@ -62,10 +84,17 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
-  
+  /**
+   * Retrieves the history of a FHIR resource by its ID.
+   * @param {string} id - The ID of the resource.
+   * @returns {Promise<Result<T[]>>} - The result of the operation.
+   */
   public async getHistoryById(id: string): Promise<Result<T[]>> {
     const result = await this.handleResult<Bundle>(
-      this.fhirClient.history({resourceType: this.resourceTypeName, id: id}) as Promise<Bundle>
+      this.fhirClient.history({
+        resourceType: this.resourceTypeName,
+        id: id,
+      }) as Promise<Bundle>
     );
 
     if (result.success) {
@@ -77,6 +106,11 @@ export default class FhirResourceService<T extends FhirResource> {
     }
   }
 
+  /**
+   * Creates a new FHIR resource.
+   * @param {T} newResource - The new resource to create.
+   * @returns {Promise<Result<T>>} - The result of the operation.
+   */
   public async postResource(newResource: T): Promise<Result<T>> {
     return this.handleResult<T>(
       this.fhirClient.create({
@@ -86,38 +120,56 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
-  private bundleAction(objeto: any) : "POST" | "PUT" | "DELETE" | "GET" | "PATCH"
-  {
+  /**
+   * Determines the action to perform on a resource in a bundle.
+   * @private
+   * @param {any} objeto - The resource object.
+   * @returns {"POST" | "PUT" | "DELETE" | "GET" | "PATCH"} - The action to perform.
+   */
+  private bundleAction(
+    objeto: any
+  ): "POST" | "PUT" | "DELETE" | "GET" | "PATCH" {
     // Verificar que "id" y "resourceType" tengan valores
-    const idResourceTypeLlenos = objeto.id !== undefined && objeto.resourceType !== undefined;
-  
+    const idResourceTypeLlenos =
+      objeto.id !== undefined && objeto.resourceType !== undefined;
+
     // Verificar que el resto de los atributos estén vacíos o indefinidos
     const restoAtributosVaciosOIndefinidos = Object.keys(objeto).every(
-      key => key === 'id' || key === 'resourceType' || objeto[key] === null || objeto[key] === undefined || objeto[key] === ''
+      (key) =>
+        key === "id" ||
+        key === "resourceType" ||
+        objeto[key] === null ||
+        objeto[key] === undefined ||
+        objeto[key] === ""
     );
-  
+
     // Devolver true si "id" y "resourceType" tienen valores y el resto está vacío o indefinido
-    if(idResourceTypeLlenos && restoAtributosVaciosOIndefinidos)
+    if (idResourceTypeLlenos && restoAtributosVaciosOIndefinidos)
       return "DELETE";
-    else if(objeto.id) return "PUT";
+    else if (objeto.id) return "PUT";
     else return "POST";
   }
-  private resourceUrl(resource: FhirResource, method: "POST" | "PUT" | "DELETE" | "GET" | "PATCH") : string
-  {
-    return method === "POST" ? resource.resourceType : `${resource.resourceType}/${resource.id}`
-  }
-  
+
   /**
-   * 
-   * @param newResources Arreglo del recurso,
-   *  este se encarga de enviarlo como un bundle.
-   * 
-   * Condiciones:
-   * 
-   * sólo @id y @resourceType elimina el recurso,
-   * si tiene @id actualiza el recurso,
-   * en caso de que el @id no existe, lo añade.
-   * @returns 
+   * Generates the URL for a resource based on the method.
+   * @private
+   * @param {Resource} resource - The FHIR resource.
+   * @param {"POST" | "PUT" | "DELETE" | "GET" | "PATCH"} method - The HTTP method.
+   * @returns {string} - The resource URL.
+   */
+  private resourceUrl(
+    resource: FhirResource,
+    method: "POST" | "PUT" | "DELETE" | "GET" | "PATCH"
+  ): string {
+    return method === "POST"
+      ? resource.resourceType
+      : `${resource.resourceType}/${resource.id}`;
+  }
+
+  /**
+   * Sends an array of resources as a bundle.
+   * @param {T[]} newResources - The array of resources to send.
+   * @returns {Promise<Result<T>>} - The result of the operation.
    */
   public async sendArray(newResources: T[]): Promise<Result<T>> {
     const result = await this.handleResult(
@@ -127,8 +179,11 @@ export default class FhirResourceService<T extends FhirResource> {
           type: "transaction",
           entry: newResources.map((resource) => {
             const method = this.bundleAction(resource); //TODO: verificar aquí para los casos de actualizar y eliminar
-            const request = { method: method, url: this.resourceUrl(resource, method)}
-            return {resource, request}
+            const request = {
+              method: method,
+              url: this.resourceUrl(resource, method),
+            };
+            return { resource, request };
           }),
         },
       })
@@ -141,6 +196,11 @@ export default class FhirResourceService<T extends FhirResource> {
     }
   }
 
+  /**
+   * Updates an existing FHIR resource.
+   * @param {T} newResource - The updated resource.
+   * @returns {Promise<Result<T>>} - The result of the operation.
+   */
   public async updateResource(newResource: T): Promise<Result<T>> {
     return this.handleResult<T>(
       this.fhirClient.update({
@@ -151,13 +211,22 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
+  /**
+   * Sends a FHIR resource. If the resource has an ID, it updates the resource; otherwise, it creates a new resource.
+   * @param {T} newResource - The resource to send.
+   * @returns {Promise<Result<T>>} - The result of the operation.
+   */
   public async sendResource(newResource: T): Promise<Result<T>> {
     return newResource.id
       ? this.updateResource(newResource)
       : this.postResource(newResource);
   }
 
-  //TODO: Verificar el count para posibles recursos donde pueden ser muchos y no he aplicado el NextPage o PrevPage
+  /**
+   * Retrieves a list of FHIR resources.
+   * @param {SearchParams} [params] - The search parameters.
+   * @returns {Promise<Result<T[]>>} - The result of the operation.
+   */
   public async getResources(params?: SearchParams): Promise<Result<T[]>> {
     const result = await this.handleResult<Bundle>(
       this.fhirClient.search({
@@ -182,9 +251,15 @@ export default class FhirResourceService<T extends FhirResource> {
     }
   }
 
+  /**
+   * Retrieves the next or previous page of resources.
+   * @param {"next" | "prev"} direction - The direction of the page to retrieve.
+   * @returns {Promise<Result<T[]>>} - The result of the operation.
+   */
   public async getNewResources(
     direction: "next" | "prev"
   ): Promise<Result<T[]>> {
+    console.log(this._resourceBundle);
     const response = await this.handleResult<Bundle>(
       direction === "next"
         ? (this.fhirClient.nextPage({
@@ -204,15 +279,26 @@ export default class FhirResourceService<T extends FhirResource> {
     return { success: true, data: resources };
   }
 
+  /**
+   * Parses the operation outcome to extract the error message.
+   * @private
+   * @param {OperationOutcome} operation - The operation outcome.
+   * @returns {string} - The error message.
+   */
   private parseOperationOutcome(operation: OperationOutcome): string {
     return operation.issue[0]?.diagnostics || "Unknown error";
   }
 
-  public getCodingBySystem(code: CodeableConcept, system: string)
-  {
-    var coding = code.coding;
-    if(!coding || coding.length === 0) return null;
-    const section = coding.find(e => e.system === system) || null;
+  /**
+   * Retrieves the coding section of a CodeableConcept by system.
+   * @param {CodeableConcept} code - The CodeableConcept.
+   * @param {string} system - The coding system.
+   * @returns {CodeableConcept | null} - The coding section or null if not found.
+   */
+  public getCodingBySystem(code: CodeableConcept, system: string) {
+    const coding = code.coding;
+    if (!coding || coding.length === 0) return null;
+    const section = coding.find((e) => e.system === system) || null;
     return section;
   }
 }

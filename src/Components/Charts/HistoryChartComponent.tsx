@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Line } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
 
@@ -13,7 +13,7 @@ import {
   Legend,
   ChartOptions,
 } from "chart.js";
-import { Grid } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 
 ChartJS.register(
   CategoryScale,
@@ -33,11 +33,15 @@ interface HistoryChartComponentProps {
 const HistoryChartComponent: React.FC<HistoryChartComponentProps> = ({
   data,
 }) => {
+  const chartRef = useRef<any>(null);
+
   const labels = data.map((entry) => {
     const time = new Date(entry.value);
+    console.log("time", entry.value);
     return time.toLocaleTimeString("en-US", {
       month: "short",
       day: "numeric",
+      hour: "numeric",
       minute: "numeric",
       second: "numeric",
     });
@@ -79,11 +83,26 @@ const HistoryChartComponent: React.FC<HistoryChartComponentProps> = ({
     },
   };
 
+  const resetChart = () => {
+    if (chartRef.current) {
+      chartRef.current.resetZoom(); // Reset zoom
+    }
+  };
+
   console.log(data);
   return (
-    <Grid sx={{ backgroundColor: "rgba(228,233,242, 0.5)" }}>
-      <Line data={{ labels, datasets: [dataset] }} options={options} />
-    </Grid>
+    <div>
+      <Grid sx={{ backgroundColor: "rgba(228,233,242, 0.5)" }}>
+        <Line
+          ref={chartRef}
+          data={{ labels, datasets: [dataset] }}
+          options={options}
+        />
+      </Grid>
+      <Button variant="outlined" onClick={resetChart}>
+        Reset
+      </Button>
+    </div>
   );
 };
 

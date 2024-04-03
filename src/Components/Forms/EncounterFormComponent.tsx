@@ -1,9 +1,6 @@
 import { DevTool } from "@hookform/devtools";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import AutoCompleteComponent from "../AutoCompleteComponents/AutoCompleteComponent";
-//Datos default de practicante
-localStorage.setItem("userRol", "Admin");
-localStorage.setItem("id", "204");
 
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import dayjs, { Dayjs } from "dayjs";

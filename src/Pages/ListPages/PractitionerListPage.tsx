@@ -10,6 +10,7 @@ import PersonUtil from "../../Services/Utils/PersonUtils";
 import FhirResourceService from "../../Services/FhirService";
 import PractitionerCreateComponent from "../../Components/Practitioner/PractitionerCreateComponent";
 import { SearchParams } from "fhir-kit-client";
+import { checkAdminRol } from "../../RolUser";
 
 const fhirService = new FhirResourceService<Practitioner>("Practitioner");
 
@@ -42,6 +43,7 @@ export default function PractitionerListPage() {
     setSearchParam(search);
     return search;
   };
+  if (checkAdminRol()) return <h1>SIN PERMISO</h1>;
 
   return (
     <div>

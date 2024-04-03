@@ -47,8 +47,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-localStorage.setItem("userRol", "Admin");
-localStorage.setItem("id", "204");
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>

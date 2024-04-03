@@ -6,10 +6,10 @@ import dayjs, { Dayjs } from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Observation, ValueSetExpansionContains } from "fhir/r4";
-import AutocompleteFromServerComponent from "../AutoCompleteComponents/AutocompleteFromServerComponent";
 
 import { category, interpretation } from "./ObservationsUtils";
 import ObservationUtils from "../../Services/Utils/ObservationUtils";
+import AutoCompleteFromLHCComponentComponent from "../AutoCompleteComponents/AutoCompleteFromLHCComponent";
 
 // Interfaz para los datos del formulario
 export interface ObservationFormData {
@@ -84,12 +84,12 @@ export default function ObservationFormComponent({
             name="code"
             control={control}
             defaultValue={observation ? observation.code?.coding?.[0] : {}}
-            render={({ field: { onChange, value } }) => (
-              <AutocompleteFromServerComponent
-                name="loinct"
+            render={({ field: { onChange } }) => (
+              <AutoCompleteFromLHCComponentComponent
+                label="loinct"
                 table="loinc-items"
                 onChange={onChange}
-                value={value}
+                defaultResource={observation.code.coding?.[0]}
                 readOnly={!!observation.code?.coding || false || readOnly}
                 textFieldProps={{
                   ...register("code", {

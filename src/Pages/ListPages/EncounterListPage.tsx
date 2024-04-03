@@ -13,6 +13,8 @@ import EncounterUtils from "../../Services/Utils/EncounterUtils";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
+import "dayjs/locale/es";
+
 import EncounterCreateComponent from "../../Components/Encounter/EncounterCreateComponent";
 
 const fhirService = new FhirResourceService<Encounter>("Encounter");
@@ -117,7 +119,7 @@ export default function PatientListPage() {
           }}
         >
           <div style={{ display: "flex", gap: "10px" }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
               <DatePicker
                 label="Fecha inicio"
                 value={startDate}

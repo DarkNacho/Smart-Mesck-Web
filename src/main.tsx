@@ -10,7 +10,6 @@ import EncounterListPage from "./Pages/ListPages/EncounterListPage.tsx";
 import EncounterPatientPage from "./Pages/ListPages/EncounterPatientPage.tsx";
 import ObservationPage from "./Pages/ObservationPage.tsx";
 import PatientListPage from "./Pages/ListPages/PatientListPage.tsx";
-import Encounter2ListPage from "./Pages/ListPages/Encounter2ListPage.tsx";
 import PractitionerListPage from "./Pages/ListPages/PractitionerListPage.tsx";
 
 const router = createBrowserRouter([
@@ -46,12 +45,10 @@ const router = createBrowserRouter([
     path: "/Practitioner",
     element: <PractitionerListPage></PractitionerListPage>,
   },
-  {
-    path: "/Encounter2",
-    element: <Encounter2ListPage></Encounter2ListPage>,
-  },
 ]);
 
+localStorage.setItem("userRol", "Admin");
+localStorage.setItem("id", "204");
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>

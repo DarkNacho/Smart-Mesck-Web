@@ -6,7 +6,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Observation, ValueSetExpansionContains } from "fhir/r4";
-import AutocompleteFromServerComponent from "../AutoCompleteComponets/AutocompleteFromServerComponent";
+import AutocompleteFromServerComponent from "../AutoCompleteComponents/AutocompleteFromServerComponent";
 
 import { category, interpretation } from "./ObservationsUtils";
 import ObservationUtils from "../../Services/Utils/ObservationUtils";
@@ -32,7 +32,7 @@ export default function ObservationFormComponent({
   patientId,
   submitForm,
   observation,
-  readOnly = true,
+  readOnly = false,
 }: {
   formId: string;
   patientId: string;

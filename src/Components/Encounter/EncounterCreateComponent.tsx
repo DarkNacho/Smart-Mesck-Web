@@ -15,11 +15,11 @@ import { Close } from "@mui/icons-material";
 import styles from "./EncounterCreateComponent.module.css";
 import { Encounter } from "fhir/r4";
 
-import PersonUtil from "../../Services/Utils/PersonUtils";
-
-import { EncounterFormData } from "../Forms/EncounterFormComponent";
-import ResourceService from "../../Services/FhirService";
+import EncounterFormComponent, {
+  EncounterFormData,
+} from "../Forms/EncounterFormComponent";
 import HandleResult from "../HandleResult";
+import FhirResourceService from "../../Services/FhirService";
 
 export default function EncounterCreateComponent({
   onOpen,
@@ -38,9 +38,14 @@ export default function EncounterCreateComponent({
     onOpen(false);
   };
 
+  const practitionerId = localStorage.getItem("id");
+
   const postEncounter = async (newEncounter: Encounter) => {
     HandleResult.handleOperation(
-      () => new ResourceService("Encounter").postResource(newEncounter),
+      () =>
+        new FhirResourceService<Encounter>("Encounter").postResource(
+          newEncounter
+        ),
       "Encuentro guardado de forma exitosa",
       "Enviando..."
     );
@@ -53,12 +58,15 @@ export default function EncounterCreateComponent({
 
     const newEncounter: Encounter = {
       resourceType: "Encounter",
-      subject: { reference: `Patient/${data.patient.id}` },
+      subject: {
+        reference: `Patient/${data.patient.id}`,
+        display: data.patient.display,
+      },
       participant: [
         {
           individual: {
             reference: `Practitioner/${data.practitioner.id}`,
-            display: PersonUtil.parsePersonName(data.patient),
+            display: data.practitioner.display,
           },
         },
       ],
@@ -72,8 +80,8 @@ export default function EncounterCreateComponent({
         system: "http://terminology.hl7.org/CodeSystem/v3-ActCode",
       },
     };
-    alert(JSON.stringify(newEncounter, null, 2));
-    //postEncounter(newEncounter);
+    //alert(JSON.stringify(newEncounter, null, 2));
+    postEncounter(newEncounter);
   };
 
   return (
@@ -95,14 +103,12 @@ export default function EncounterCreateComponent({
         </DialogTitle>
         <DialogContent>
           <Container className={styles.container}>
-            <h1>
-              EncounterFormComponent quitado por problemas en su implementación
-            </h1>
-            {/*<EncounterFormComponent
+            <EncounterFormComponent
               formId="encounterForm"
-              patientId={patientId}
               submitForm={onSubmitForm}
-          ></EncounterFormComponent>*/}
+              practitionerId={practitionerId!}
+              patientId={patientId}
+            ></EncounterFormComponent>
           </Container>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>

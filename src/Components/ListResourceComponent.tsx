@@ -12,19 +12,20 @@ import styles from "./ListResourceComponent.module.css";
 
 import FhirService from "../Services/FhirService";
 import HandleResult from "./HandleResult";
+import { SearchParams } from "fhir-kit-client";
 
-interface ListResourceProps {
-  searchParam?: any;
-  getDisplay: (value: FhirResource) => string;
-  fhirService: FhirService<FhirResource>;
+interface ListResourceProps<T extends FhirResource> {
+  searchParam?: SearchParams;
+  getDisplay: (value: T) => string;
+  fhirService: FhirService<T>;
 }
 
-export default function ListResourceComponent({
+export default function ListResourceComponent<T extends FhirResource>({
   searchParam,
   getDisplay,
   fhirService,
-}: ListResourceProps) {
-  const [resources, setResources] = useState<FhirResource[]>([]);
+}: ListResourceProps<T>) {
+  const [resources, setResources] = useState<T[]>([]);
 
   const navigate = useNavigate();
 

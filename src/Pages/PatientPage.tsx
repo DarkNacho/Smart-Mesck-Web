@@ -5,9 +5,9 @@ import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent
 
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 import PatientOverviewComponent from "../Components/Patient/PatientOverviewComponent";
-import PatientEncounterList from "../Components/Patient/PatientEncounterList";
 import FhirResourceService from "../Services/FhirService";
 import HandleResult from "../Components/HandleResult";
+import PatientEncounterListComponent from "../Components/Patient/PatientEncounterListComponent";
 
 const fhirService = new FhirResourceService("Patient");
 
@@ -51,7 +51,9 @@ export default function PatientPage() {
       break;
     case "Encounters":
       componentToRender = (
-        <PatientEncounterList patientID={patientID!}></PatientEncounterList>
+        <PatientEncounterListComponent
+          patientId={patientID!}
+        ></PatientEncounterListComponent>
       );
       break;
     default:

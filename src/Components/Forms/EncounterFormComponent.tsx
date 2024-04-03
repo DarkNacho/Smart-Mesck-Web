@@ -1,6 +1,11 @@
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { TextField, Grid, MenuItem } from "@mui/material";
+import { DevTool } from "@hookform/devtools";
+import PersonUtil from "../../Services/Utils/PersonUtils";
+import AutoCompleteComponent from "../AutoCompleteComponents/AutoCompleteComponent";
+//Datos default de practicante
+localStorage.setItem("userRol", "Admin");
+localStorage.setItem("id", "204");
 
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DatePicker,
@@ -8,182 +13,199 @@ import {
   TimePicker,
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { MenuItem, TextField } from "@mui/material";
 import { Patient, Practitioner } from "fhir/r4";
-import AutocompleteFromFhirComponent from "../AutoCompleteComponets/AutocompleteFromFhirComponent";
-import PersonUtil from "../../Services/Utils/PersonUtils";
+import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
-// Interfaz para los datos del formulario
 export interface EncounterFormData {
-  patientId: string;
-  patient: Patient;
-  practitioner: Practitioner;
+  practitioner: {
+    id: string;
+    display: string;
+  };
+  patient: {
+    id: string;
+    display: string;
+  };
   day: Dayjs;
   start: Dayjs;
   end: Dayjs;
   type: string;
 }
 
-const userRol = localStorage.getItem("userRol");
-const practitionerId = localStorage.getItem("id");
+const encounterType = [
+  { value: "UKN", label: "No especificado" },
+  { value: "A", label: "Ambulatorio" },
+  { value: "otro1", label: "adsada" },
+  { value: "other", label: "Otro" },
+];
 
 export default function EncounterFormComponent({
   formId,
-  patientId,
   submitForm,
+  practitionerId,
+  patientId,
+  readOnly = false,
 }: {
   formId: string;
-  patientId?: string;
   submitForm: SubmitHandler<EncounterFormData>;
+  practitionerId: string;
+  patientId?: string;
+  readOnly?: boolean;
 }) {
   const {
+    handleSubmit,
     control,
     register,
-    trigger,
-    handleSubmit,
     formState: { errors },
   } = useForm<EncounterFormData>();
 
-  const encounterType = [
-    { value: "UKN", label: "No especificado" },
-    { value: "A", label: "Ambulatorio" },
-    { value: "otro1", label: "adsada" },
-    { value: "other", label: "Otro" },
-  ];
+  const roleUser = loadUserRoleFromLocalStorage();
 
   return (
-    <form id={formId} onSubmit={handleSubmit(submitForm)}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <Controller
-            control={control}
-            name="patient"
-            render={({ field: { onChange, value } }) => (
-              <AutocompleteFromFhirComponent<Patient>
-                label="Seleccione Paciente"
-                onChange={onChange}
-                getDispay={PersonUtil.parsePersonName}
-                resourceType={"Patient"}
-                searchParam="name"
-                defaultResourceId={patientId}
-                readOnly={!!patientId}
-                defaultParams={
-                  userRol === "Practitioner"
-                    ? { "general-practitioner": `${practitionerId}` }
-                    : {}
+    <>
+      <form id={formId} onSubmit={handleSubmit(submitForm)}>
+        <Controller
+          name="practitioner"
+          control={control}
+          rules={{
+            required: "Es necesario seleccionar un Profesional",
+          }}
+          render={({ field }) => (
+            <AutoCompleteComponent<Practitioner>
+              resourceType={"Practitioner"}
+              label={"Selecciona Profesional"}
+              getDisplay={PersonUtil.getPersonNameAsString}
+              searchParam={"name"}
+              defaultResourceId={practitionerId}
+              onChange={(selectedObject) => {
+                if (selectedObject) {
+                  field.onChange({
+                    id: selectedObject.id,
+                    display: PersonUtil.getPersonNameAsString(selectedObject),
+                  });
+                } else {
+                  field.onChange(null);
                 }
-                textFieldProps={{
-                  ...register("patient", {
-                    required: "paciente requerido",
-                  }),
-                  error: Boolean(errors.patient),
-                  helperText: errors.patient && errors.patient.message,
-                  onBlur: () => trigger("patient"),
-                }}
-              ></AutocompleteFromFhirComponent>
-            )}
-          ></Controller>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Controller
-            control={control}
-            name="practitioner"
-            render={({ field: { onChange, value } }) => (
-              <AutocompleteFromFhirComponent<Practitioner>
-                label="Seleccione Profesional"
+              }}
+              readOnly={readOnly || !(roleUser === "Admin")}
+              textFieldProps={{
+                error: Boolean(errors.practitioner),
+                helperText: errors.practitioner && errors.practitioner.message,
+              }}
+            />
+          )}
+        />
+        <Controller
+          name="patient"
+          control={control}
+          rules={{
+            required: "Es necesario seleccionar un Paciente",
+          }}
+          render={({ field }) => (
+            <AutoCompleteComponent<Patient>
+              resourceType={"Patient"}
+              label={"Selecciona Paciente"}
+              getDisplay={PersonUtil.getPersonNameAsString}
+              searchParam={"name"}
+              defaultResourceId={patientId}
+              defaultParams={
+                roleUser === "Practitioner"
+                  ? { "general-practitioner": practitionerId }
+                  : {}
+              }
+              onChange={(selectedObject) => {
+                if (selectedObject) {
+                  field.onChange({
+                    id: selectedObject.id,
+                    display: PersonUtil.getPersonNameAsString(selectedObject),
+                  });
+                } else {
+                  field.onChange(null);
+                }
+              }}
+              readOnly={readOnly || Boolean(patientId)}
+              textFieldProps={{
+                error: Boolean(errors.practitioner),
+                helperText: errors.practitioner && errors.practitioner.message,
+              }}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="day"
+          defaultValue={dayjs()}
+          render={({ field }) => (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Fecha inicio test"
+                onChange={field.onChange}
+                value={field.value}
+                inputRef={field.ref}
+                sx={{ width: "100%" }}
+                readOnly={readOnly}
+              ></DatePicker>
+            </LocalizationProvider>
+          )}
+        ></Controller>
+
+        <Controller
+          control={control}
+          name="start"
+          defaultValue={dayjs()}
+          render={({ field: { onChange, value, ref } }) => (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <TimePicker
+                label="start"
                 onChange={onChange}
-                getDispay={PersonUtil.parsePersonName}
-                resourceType={"Practitioner"}
-                searchParam="name"
-                defaultResourceId={localStorage.getItem("id")!}
-                readOnly={userRol === "Practitioner"}
-                textFieldProps={{
-                  ...register("practitioner", {
-                    required: "profesional requerido",
-                  }),
-                  error: Boolean(errors.practitioner),
-                  helperText:
-                    errors.practitioner && errors.practitioner.message,
-                  onBlur: () => trigger("practitioner"),
-                }}
-              ></AutocompleteFromFhirComponent>
-            )}
-          ></Controller>
-        </Grid>
-        <Grid item xs={12} sm={2.8}>
-          <Controller
-            control={control}
-            name="day"
-            defaultValue={dayjs()}
-            render={({ field: { onChange, value, ref } }) => (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Fecha inicio test"
-                  onChange={onChange}
-                  value={value}
-                  inputRef={ref}
-                  sx={{ width: "100%" }}
-                ></DatePicker>
-              </LocalizationProvider>
-            )}
-          ></Controller>
-        </Grid>
-        <Grid item xs={12} sm={2.6}>
-          <Controller
-            control={control}
-            name="start"
-            defaultValue={dayjs()}
-            render={({ field: { onChange, value, ref } }) => (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <TimePicker
-                  label="start"
-                  onChange={onChange}
-                  value={value}
-                  inputRef={ref}
-                  sx={{ width: "100%" }}
-                ></TimePicker>
-              </LocalizationProvider>
-            )}
-          ></Controller>
-        </Grid>
-        <Grid item xs={12} sm={2.6}>
-          <Controller
-            control={control}
-            defaultValue={dayjs().add(30, "minutes")}
-            name="end"
-            render={({ field: { onChange, value, ref } }) => (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <TimePicker
-                  label="end"
-                  onChange={onChange}
-                  value={value}
-                  inputRef={ref}
-                  sx={{ width: "100%" }}
-                ></TimePicker>
-              </LocalizationProvider>
-            )}
-          ></Controller>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <TextField
-            select
-            label="Tipo"
-            defaultValue="A"
-            {...register("type", {
-              required: "Tipo de consulta requerida",
-            })}
-            fullWidth
-            error={Boolean(errors.type)}
-            helperText={errors.type && errors.type.message}
-            onBlur={() => trigger("type")}
-          >
-            {encounterType.map((item) => (
-              <MenuItem key={item.value} value={item.value}>
-                {item.label}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-      </Grid>
-    </form>
+                value={value}
+                inputRef={ref}
+                sx={{ width: "100%" }}
+                readOnly={readOnly}
+              ></TimePicker>
+            </LocalizationProvider>
+          )}
+        ></Controller>
+
+        <Controller
+          control={control}
+          defaultValue={dayjs().add(30, "minutes")}
+          name="end"
+          render={({ field: { onChange, value, ref } }) => (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <TimePicker
+                label="end"
+                onChange={onChange}
+                value={value}
+                inputRef={ref}
+                sx={{ width: "100%" }}
+                readOnly={readOnly}
+              ></TimePicker>
+            </LocalizationProvider>
+          )}
+        ></Controller>
+        <TextField
+          select
+          label="Tipo"
+          defaultValue="A"
+          {...register("type", {
+            required: "Tipo de consulta requerida",
+          })}
+          fullWidth
+          error={Boolean(errors.type)}
+          helperText={errors.type && errors.type.message}
+          inputProps={{ readOnly: readOnly }}
+        >
+          {encounterType.map((item) => (
+            <MenuItem key={item.value} value={item.value}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </TextField>
+        <button type="submit">test</button>
+      </form>
+      <DevTool control={control} />
+    </>
   );
 }

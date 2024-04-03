@@ -18,7 +18,6 @@ import ObservationFormComponent, {
   ObservationFormData,
 } from "../Forms/ObservationFormComponent";
 import dayjs from "dayjs";
-import { checkPatientRol } from "../../RolUser";
 import HandleResult from "../HandleResult";
 
 export default function ObservationCreateComponent({
@@ -39,9 +38,9 @@ export default function ObservationCreateComponent({
       valueString: data.valueString,
 
       subject: { reference: `Patient/${data.subject}` },
-      //encounter: { reference: `Encounter/${data.encounter}` },
+      encounter: { reference: `Encounter/${data.encounter}` },
       performer: [{ reference: `Practitioner/${data.performer}` }],
-      category: [{ coding: data.category }], //TODO: cardinalidad a muchos, por lo que debería cambiarlo a lista en vez de sólo un item
+      category: [{ coding: data.category }], //TODO: cardinality a muchos, por lo que debería cambiarlo a lista en vez de sólo un item
       code: { coding: [data.code] },
       interpretation: [{ coding: data.interpretation }],
       issued: dayjs(data.issued).toISOString(),

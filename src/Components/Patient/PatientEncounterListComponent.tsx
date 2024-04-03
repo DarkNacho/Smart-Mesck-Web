@@ -1,13 +1,12 @@
 import { useState } from "react";
 
 import { IconButton } from "@mui/material";
-import styles from "./ListPage.module.css";
+import styles from "./PatientEncounterListComponent.module.css";
 
 import { Add, Search } from "@mui/icons-material";
 import ListResourceComponent from "../../Components/ListResourceComponent";
 import { Encounter } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
-import { loadUserRoleFromLocalStorage, RolUser } from "../../RolUser";
 import { SearchParams } from "fhir-kit-client";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -18,38 +17,23 @@ import EncounterCreateComponent from "../../Components/Encounter/EncounterCreate
 const fhirService = new FhirResourceService<Encounter>("Encounter");
 
 function getDisplay(resource: Encounter): string {
-  const roleUser = loadUserRoleFromLocalStorage();
   return `ID: ${resource.id}
-  \n${
-    roleUser === "Practitioner"
-      ? `Paciente: ${EncounterUtils.getSubjectDisplayOrID(resource.subject!)}`
-      : `Profesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`
-  }
+  \nProfesional: ${EncounterUtils.getPrimaryPractitioner(resource)}
   \n${EncounterUtils.getFormatPeriod(resource.period!)}`;
 }
 
-function getSearchPatientOrPractitioner(
-  roleUser: RolUser,
-  id: string
-): SearchParams {
-  if (roleUser === "Practitioner") return { participant: id };
-
-  if (roleUser === "Patient") return { subject: id };
-
-  return {};
-}
-
-export default function PatientListPage() {
-  const userRole = loadUserRoleFromLocalStorage();
-  const userId = localStorage.getItem("id") || undefined;
-
+export default function PatientEncounterListComponent({
+  patientId,
+}: {
+  patientId: string;
+}) {
   const [openDialog, setOpenDialog] = useState(false);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
-  const [searchParams, setSearchParams] = useState<SearchParams>(
-    getSearchPatientOrPractitioner(userRole!, userId!)
-  );
+  const [searchParams, setSearchParams] = useState<SearchParams>({
+    subject: patientId,
+  });
 
   //const [userRole, setUserRole] = useState<RolUser>();
   const handleIsOpen = (isOpen: boolean) => {
@@ -63,21 +47,13 @@ export default function PatientListPage() {
       date.push(`lt${endDate.add(1, "day").startOf("day").toISOString()}`);
 
     const search: SearchParams = {
+      subject: patientId,
       date: date,
     };
 
-    //! WARNING: quizás Practitioner/${id}
-    if (userRole === "Practitioner") {
-      setSearchParams({
-        participant: `${localStorage.getItem("id")}`,
-        ...search,
-      });
-    } else {
-      setSearchParams(search);
-    }
+    setSearchParams(search);
   };
 
-  if (!userRole) return <h1>Loading...</h1>; //!Por el momento sólo por si acaso
   return (
     <div>
       <div className={styles.content}>
@@ -103,7 +79,7 @@ export default function PatientListPage() {
               <Add />
             </IconButton>
             <EncounterCreateComponent
-              patientId={userRole === "Patient" ? userId : undefined}
+              patientId={patientId}
               isOpen={openDialog}
               onOpen={handleIsOpen}
             ></EncounterCreateComponent>

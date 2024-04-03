@@ -19,7 +19,9 @@ export default class EncounterUtils {
    * @returns The formatted period as a string.
    */
   public static getFormatPeriod(period: Period): string {
-    if (!period || !period.start) return "N/A";
+    if(!period) return "N/A"//throw new Error("Period is required.");
+
+    if (!period.start) return "N/A";
 
     const startDate = new Date(period.start);
 
@@ -45,15 +47,10 @@ export default class EncounterUtils {
    * @returns The display name or ID of the subject as a string.
    */
   public static getSubjectDisplayOrID(subject: Reference): string {
-    if (!subject) return "N/A";
+    if (!subject) return "N/A";//throw new Error("Subject is required.");
     if (subject.display) return subject.display;
 
-    if (subject.reference) {
-      // Extracting the ID from the reference (e.g., "Patient/123")
-      const id = subject.reference.split("/")[1];
-      return id ? id : subject.reference;
-    }
-    return "N/A"
+    return this.getSubjectID(subject);
   }
 
   /**
@@ -62,13 +59,13 @@ export default class EncounterUtils {
    * @returns The ID of the subject as a string.
    */
   public static getSubjectID(subject: Reference): string {
-    if (!subject) return "N/A";
-    if (subject.reference) {
-      // Extracting the ID from the reference (e.g., "Patient/123")
-      const id = subject.reference.split("/")[1];
-      return id ? id : subject.reference;
-    }
-    return "N/A"
+    if (!subject) return "N/A";//throw new Error("Subject is required.");
+    if(!subject.reference) return "N/A";
+    
+    // Extracting the ID from the reference (e.g., "Patient/123")
+    const id = subject.reference.split("/")[1];
+    return id ? id : subject.reference;
+    
   }
 
   /**
@@ -77,7 +74,7 @@ export default class EncounterUtils {
    * @returns The display name or ID of the primary practitioner as a string.
    */
   public static getPrimaryPractitioner(encounter: Encounter): string {
-    if (!encounter) return "N/A";
+    if (!encounter) return "N/A" //throw new Error("Encounter is required.");
 
     const participants = encounter.participant || [];
 

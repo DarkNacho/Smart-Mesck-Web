@@ -11,7 +11,7 @@ export default function PatientHeaderComponent({
   onOptionSelect: (nuevaOpcion: string) => void;
 }) {
   const [selectedOption, setSelectedOption] = useState<string>("Overview");
-  const name = PersonUtil.parsePersonName(patient);
+  const name = PersonUtil.getPersonNameAsString(patient);
   const avatar = patient.photo?.[0]?.url || "/avatar.JPG";
 
   const handleOptionSelect = (option: string) => {
@@ -52,8 +52,9 @@ export default function PatientHeaderComponent({
           <div className={styles.location}>
             <div className={styles["tabs-group"]}>
               <div
-                className={`${styles.item5} ${selectedOption === "Overview" ? styles.active : ""
-                  }`}
+                className={`${styles.item5} ${
+                  selectedOption === "Overview" ? styles.active : ""
+                }`}
                 onClick={() => handleOptionSelect("Overview")}
               >
                 <div className={styles.title}>
@@ -61,8 +62,9 @@ export default function PatientHeaderComponent({
                 </div>
               </div>
               <div
-                className={`${styles.item5} ${selectedOption === "Formularios" ? styles.active : ""
-                  }`}
+                className={`${styles.item5} ${
+                  selectedOption === "Formularios" ? styles.active : ""
+                }`}
                 onClick={() => handleOptionSelect("Formularios")}
               >
                 <div className={styles.title}>
@@ -70,8 +72,9 @@ export default function PatientHeaderComponent({
                 </div>
               </div>
               <div
-                className={`${styles.item5} ${selectedOption === "Encounters" ? styles.active : ""
-                  }`}
+                className={`${styles.item5} ${
+                  selectedOption === "Encounters" ? styles.active : ""
+                }`}
                 onClick={() => handleOptionSelect("Encounters")}
               >
                 <div className={styles.title}>

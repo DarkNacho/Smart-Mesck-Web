@@ -2,7 +2,6 @@ import PersonUtil from "../../Services/Utils/PersonUtils";
 import styles from "./PatientGeneralWidgetComponent.module.css";
 import { Patient } from "fhir/r4";
 
-
 export default function PatientGeneralWidgetComponent({
   patient,
   edit = false,
@@ -30,12 +29,20 @@ export default function PatientGeneralWidgetComponent({
           </div>
           <div className={styles.item}>
             <div className={styles.text1}>E-Mail</div>
-            <div className={styles.text2}>Sin Registro</div>
+            <div className={styles.text2}>
+              {PersonUtil.getContactPointFirstOrDefaultAsString(
+                patient,
+                "email"
+              )}
+            </div>
           </div>
           <div className={styles.item}>
             <div className={styles.text1}>Número Telefónico</div>
             <div className={styles.text2}>
-              {PersonUtil.obtenerPrimerNumeroTelefono(patient)}
+              {PersonUtil.getContactPointFirstOrDefaultAsString(
+                patient,
+                "phone"
+              )}
             </div>
           </div>
         </ul>

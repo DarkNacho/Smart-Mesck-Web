@@ -6,36 +6,34 @@ import FhirType from "../../Services/Utils/Fhirtypes";
 import { FhirResource } from "fhir/r4";
 import { SearchParams } from "fhir-kit-client";
 
-interface AutocompleteFromFhirComponentProps<T extends FhirResource> {
+interface AutoCompleteComponentProps<T extends FhirResource> {
   resourceType: FhirType;
   label: string;
+  getDisplay: (value: T) => string;
   onChange: (value: T | null) => void;
-  getDispay: (value: T) => string;
   defaultResourceId?: string;
-  value?: T;
   textFieldProps?: TextFieldProps;
   readOnly?: boolean;
   searchParam: string;
   defaultParams?: SearchParams;
 }
 
-export default function AutocompleteFromFhirComponent<T extends FhirResource>({
+export default function AutoCompleteComponent<T extends FhirResource>({
   resourceType,
   label,
-  onChange,
-  value,
   textFieldProps,
   readOnly,
   defaultResourceId,
-  getDispay,
+  getDisplay,
   searchParam,
   defaultParams,
-}: AutocompleteFromFhirComponentProps<T>) {
+  onChange,
+}: AutoCompleteComponentProps<T>) {
   const [dataSet, setDataSet] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [defaultResource, setDefaultResource] = useState<T | null>(null);
+  const [defaultResource, setDefaultResource] = useState<T>();
 
-  const fhirService = new FhirResourceService(resourceType);
+  const fhirService = new FhirResourceService<T>(resourceType);
 
   const fetchData = async (searchTerm: string) => {
     setLoading(true);
@@ -50,7 +48,12 @@ export default function AutocompleteFromFhirComponent<T extends FhirResource>({
 
       if (!result.success) throw new Error(result.error);
 
-      setDataSet(result.data as T[]);
+      if (
+        defaultResource &&
+        !dataSet.find((option) => option.id === defaultResource.id)
+      )
+        result.data.push(defaultResource);
+      setDataSet(result.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -65,37 +68,43 @@ export default function AutocompleteFromFhirComponent<T extends FhirResource>({
 
       if (!result.success) throw new Error(result.error);
 
-      setDefaultResource(result.data as T);
-      onChange(result.data as T);
+      setDefaultResource(result.data);
+      onChange(result.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    fetchData("");
-    fetchDefaultResource();
+    const fetchDataAndDefaultResource = async () => {
+      await fetchDefaultResource();
+      fetchData("");
+    };
+
+    fetchDataAndDefaultResource();
   }, []);
 
-  useEffect(() => {
-    // Actualiza el valor solo si defaultResource tiene un valor
-    if (defaultResource) {
-      onChange(defaultResource);
-    }
-  }, [defaultResource]);
+  if (defaultResourceId && !defaultResource) return <div>Loading...</div>;
 
   return (
     <Autocomplete
+      id={`${resourceType}-${label}-Autocomplete`}
+      defaultValue={defaultResource}
       options={dataSet}
       loading={loading}
-      getOptionLabel={(option) => getDispay(option)}
-      onChange={(_, newValue) => setDefaultResource(newValue)}
-      onInputChange={(_, value) => fetchData(value)}
-      value={value || defaultResource}
+      getOptionLabel={(option) => getDisplay(option)}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       readOnly={readOnly}
+      onChange={(_, newValue) => onChange(newValue)}
+      renderOption={(props, option) => (
+        <li {...props} key={option.id}>
+          {getDisplay(option)}
+        </li>
+      )}
       renderInput={(params) => (
         <TextField
           {...params}
+          fullWidth
           label={label}
           variant="outlined"
           {...textFieldProps}

@@ -5,31 +5,32 @@ import styles from "./ListPage.module.css";
 
 import { Add, Search } from "@mui/icons-material";
 import ListResourceComponent from "../../Components/ListResourceComponent";
-import { FhirResource, Patient } from "fhir/r4";
+import { Practitioner } from "fhir/r4";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import FhirResourceService from "../../Services/FhirService";
 import PractitionerCreateComponent from "../../Components/Practitioner/PractitionerCreateComponent";
+import { SearchParams } from "fhir-kit-client";
 
-const fhirService = new FhirResourceService("Practitioner");
+const fhirService = new FhirResourceService<Practitioner>("Practitioner");
 
-function getDisplay(resource: FhirResource): string {
-  return `ID: ${resource.id}\nName: ${PersonUtil.parsePersonName(
+function getDisplay(resource: Practitioner): string {
+  return `ID: ${resource.id}\nName: ${PersonUtil.getPersonNameAsString(
     resource
-  )}\nGender: ${(resource as Patient).gender || "N/A"}`;
+  )}\nGender: ${resource.gender || "N/A"}`;
 }
 
 export default function PractitionerListPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("1");
-  const [searchParam, setSeachParam] = useState({ _count: 5 });
+  const [searchParam, setSearchParam] = useState<SearchParams>({});
 
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
   };
 
   const handleSearch = async () => {
-    let search;
+    let search: SearchParams = {};
     switch (searchType) {
       case "0":
         search = { identifier: searchTerm };
@@ -38,8 +39,7 @@ export default function PractitionerListPage() {
         search = { name: searchTerm };
         break;
     }
-    search = { ...searchParam, ...search };
-    setSeachParam(search);
+    setSearchParam(search);
     return search;
   };
 
@@ -97,7 +97,7 @@ export default function PractitionerListPage() {
             select
             value={searchType}
             variant="standard"
-            label="Modo de Busqueda"
+            label="Modo de Búsqueda"
             onChange={(event) => setSearchType(event.target.value)}
             sx={{ m: 1, minWidth: 120 }}
           >

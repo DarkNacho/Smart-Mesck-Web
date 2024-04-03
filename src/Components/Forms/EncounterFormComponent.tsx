@@ -125,8 +125,8 @@ export default function EncounterFormComponent({
               }}
               readOnly={readOnly || Boolean(patientId)}
               textFieldProps={{
-                error: Boolean(errors.practitioner),
-                helperText: errors.practitioner && errors.practitioner.message,
+                error: Boolean(errors.patient),
+                helperText: errors.patient && errors.patient.message,
               }}
             />
           )}

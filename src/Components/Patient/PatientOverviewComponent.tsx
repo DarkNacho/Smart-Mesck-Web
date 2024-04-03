@@ -89,6 +89,7 @@ export default function PatientOverviewComponent({
             title={"Condiciones"}
             icon={"/inercial.svg"}
             resourceType="Condition"
+            patientId={patient.id!}
           ></InfoListComponent>
         </div>
         <div style={{ flex: 1 }}>
@@ -97,6 +98,7 @@ export default function PatientOverviewComponent({
             title={"Medicamentos"}
             icon={"/medication.svg"}
             resourceType=""
+            patientId={patient.id!}
           ></InfoListComponent>
         </div>
       </div>

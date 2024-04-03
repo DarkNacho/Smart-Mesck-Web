@@ -1,8 +1,9 @@
 import { DevTool } from "@hookform/devtools";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { TextField } from "@mui/material";
+import { MenuItem, TextField } from "@mui/material";
 import {
   Condition,
+  Encounter,
   Patient,
   Practitioner,
   ValueSetExpansionContains,
@@ -10,7 +11,14 @@ import {
 import AutocompleteFromServerComponent from "../AutoCompleteComponents/AutocompleteFromServerComponent";
 import AutoCompleteComponent from "../AutoCompleteComponents/AutoCompleteComponent";
 import PersonUtil from "../../Services/Utils/PersonUtils";
+import EncounterUtils from "../../Services/Utils/EncounterUtils";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
+
+function getEncounterDisplay(resource: Encounter): string {
+  return `Profesional: ${EncounterUtils.getPrimaryPractitioner(
+    resource
+  )} -- ${EncounterUtils.getFormatPeriod(resource.period!)}`;
+}
 
 // Interfaz para los datos del formulario
 export interface ConditionFormData {
@@ -22,22 +30,38 @@ export interface ConditionFormData {
     id: string;
     display: string;
   };
+  encounter: {
+    id: string;
+    display: string;
+  };
   encounterId: string;
   code: ValueSetExpansionContains;
   note: string; // https://hl7.org/fhir/datatypes.html#Annotation
+  clinicalStatus: string;
 }
+
+const clinicalStatus = [
+  { value: "active", label: "Activo" },
+  { value: "recurrence", label: "Reaparición" },
+  { value: "relapse", label: "Recaída" },
+  { value: "inactive", label: "Inactivo" },
+  { value: "remission", label: "Remisión" },
+  { value: "resolved", label: "Resuelto" },
+];
 
 export default function ConditionFormComponent({
   formId,
   submitForm,
   practitionerId,
   patientId,
+  encounterId,
   readOnly = false,
 }: {
   formId: string;
   submitForm: SubmitHandler<ConditionFormData>;
   practitionerId: string;
   patientId?: string;
+  encounterId?: string;
   readOnly?: boolean;
 }) {
   const {
@@ -101,7 +125,7 @@ export default function ConditionFormComponent({
               defaultResourceId={patientId}
               defaultParams={
                 roleUser === "Practitioner"
-                  ? { "general-practitioner": practitionerId }
+                  ? { "general-practitioner": practitionerId! }
                   : {}
               }
               onChange={(selectedObject) => {
@@ -145,6 +169,40 @@ export default function ConditionFormComponent({
             />
           )}
         />
+        <Controller
+          name="encounter"
+          control={control}
+          rules={{
+            required: "Es necesario seleccionar un Paciente",
+          }}
+          render={({ field }) => (
+            <AutoCompleteComponent<Encounter>
+              resourceType={"Encounter"}
+              label={"Selecciona Encuentro"}
+              getDisplay={getEncounterDisplay}
+              defaultResourceId={encounterId}
+              defaultParams={{ subject: patientId!, _count: 99999 }}
+              searchParam={""}
+              onChange={(selectedObject) => {
+                if (selectedObject) {
+                  field.onChange({
+                    id: selectedObject.id,
+                    display: getEncounterDisplay(selectedObject),
+                  });
+                } else {
+                  field.onChange(null);
+                }
+              }}
+              readOnly={
+                readOnly || Boolean(encounterId) || roleUser === "Patient"
+              }
+              textFieldProps={{
+                error: Boolean(errors.encounter),
+                helperText: errors.encounter && errors.encounter.message,
+              }}
+            />
+          )}
+        />
         <TextField
           multiline
           fullWidth
@@ -157,6 +215,24 @@ export default function ConditionFormComponent({
           onBlur={() => trigger("note")}
           inputProps={{ readOnly: readOnly }}
         ></TextField>
+        <TextField
+          select
+          label="Estado"
+          defaultValue="active"
+          {...register("clinicalStatus", {
+            required: "Estado clínico requerido",
+          })}
+          fullWidth
+          error={Boolean(errors.clinicalStatus)}
+          helperText={errors.clinicalStatus && errors.clinicalStatus.message}
+          inputProps={{ readOnly: readOnly }}
+        >
+          {clinicalStatus.map((item) => (
+            <MenuItem key={item.value} value={item.value}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </TextField>
       </form>
       <DevTool control={control} />
     </>

@@ -27,6 +27,7 @@ export default function ObservationPage() {
 
   const [observationData, setObservationData] = useState<Observation[]>();
   const [name, setName] = useState("");
+  const id = localStorage.getItem("id");
 
   const fetchData = async () => {
     const result = await observationService.getHistoryById(observationID!);
@@ -55,7 +56,7 @@ export default function ObservationPage() {
       subject: { reference: `Patient/${data.subject}` },
       //encounter: { reference: `Encounter/${data.encounter}` },
       performer: [{ reference: `Practitioner/${data.performer}` }],
-      category: [{ coding: data.category }], //TODO: cardinalidad a muchos, por lo que debería cambiarlo a lista en vez de sólo un item
+      category: [{ coding: data.category }], //TODO: cardinality a muchos, por lo que debería cambiarlo a lista en vez de sólo un item
       code: { coding: [data.code] },
       interpretation: [{ coding: data.interpretation }],
       issued: dayjs(data.issued).toISOString(),
@@ -97,10 +98,11 @@ export default function ObservationPage() {
             <div>
               <ObservationFormComponent
                 formId="form"
-                observation={observationData?.[0]!}
+                observation={observationData?.[0] || undefined}
                 patientId={patientID!}
                 submitForm={onSubmitForm}
                 readOnly={checkPatientRol()}
+                practitionerId={id!}
               ></ObservationFormComponent>
               {!checkPatientRol() && (
                 <Button

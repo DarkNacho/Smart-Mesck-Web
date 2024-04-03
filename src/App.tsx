@@ -1,6 +1,6 @@
 import ConditionFormComponent, {
   ConditionFormData,
-} from "./Components/Forms/ConditionFormCmmponent";
+} from "./Components/Forms/ConditionFormComponent";
 import { SubmitHandler } from "react-hook-form";
 import { FhirResource, Patient, ValueSetExpansionContains } from "fhir/r4";
 import MultipleAutoCompleteComponent from "./Components/AutoCompleteComponents/MultipleAutoCompleteComponent";

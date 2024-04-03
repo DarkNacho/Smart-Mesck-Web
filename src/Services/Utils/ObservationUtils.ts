@@ -5,6 +5,7 @@ export default class ObservationUtils {
     private constructor() {}
 
     public static getValue(observation: Observation) {
+        if(!observation) return "";
         if (observation.valueQuantity) {
             return `${observation.valueQuantity.value}${
                 observation.valueQuantity.code

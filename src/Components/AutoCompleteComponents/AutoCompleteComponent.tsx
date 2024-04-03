@@ -40,11 +40,10 @@ export default function AutoCompleteComponent<T extends FhirResource>({
     try {
       const stringJson = `{"${searchParam}": "${searchTerm}"}`;
       const param = JSON.parse(stringJson);
+      const finalParams =
+        searchParam.length > 1 ? { ...defaultParams, ...param } : defaultParams;
 
-      const result = await fhirService.getResources({
-        ...defaultParams,
-        ...param,
-      });
+      const result = await fhirService.getResources(finalParams);
 
       if (!result.success) throw new Error(result.error);
 

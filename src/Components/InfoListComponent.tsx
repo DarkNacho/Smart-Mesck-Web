@@ -4,9 +4,9 @@ import { IconButton } from "@mui/material";
 
 import { Add } from "@mui/icons-material";
 import { useState } from "react";
-import PatientCreateComponent from "./Patient/PatientCreateComponent";
 import ObservationCreateComponent from "./Observation/ObservationCreateComponent";
 import { isAdminOrPractitioner } from "../RolUser";
+import ConditionCreateComponent from "./Condition/ConditionCreateComponent";
 
 export interface InfoListData {
   id?: string;
@@ -38,10 +38,11 @@ export default function InfoListComponent({
   return (
     <>
       <div>
-        <PatientCreateComponent
-          isOpen={resourceType === "ds" ? openDialog : false}
+        <ConditionCreateComponent
           onOpen={handleIsOpen}
-        ></PatientCreateComponent>
+          isOpen={resourceType === "Condition" ? openDialog : false}
+          patientId={patientId!}
+        ></ConditionCreateComponent>
         <ObservationCreateComponent
           onOpen={handleIsOpen}
           isOpen={resourceType === "Observation" ? openDialog : false}

@@ -11,17 +11,17 @@ import {
 
 import { Close } from "@mui/icons-material";
 
-import styles from "./ObservationCreateComponent.module.css";
-import { Observation } from "fhir/r4";
-import ObservationService from "../../Services/ObservationService";
-import ObservationFormComponent, {
-  ObservationFormData,
-} from "../Forms/ObservationFormComponent";
-import dayjs from "dayjs";
+import styles from "./ConditionCreateComponent.module.css";
+
 import HandleResult from "../HandleResult";
 import { isAdminOrPractitioner } from "../../RolUser";
+import ConditionFormComponent, {
+  ConditionFormData,
+} from "../Forms/ConditionFormComponent";
+import { Condition } from "fhir/r4";
+import ConditionService from "../../Services/ConditionService";
 
-export default function ObservationCreateComponent({
+export default function ConditionCreateComponent({
   patientId,
   onOpen,
   isOpen,
@@ -38,10 +38,18 @@ export default function ObservationCreateComponent({
     ? localStorage.getItem("id") || undefined
     : undefined;
 
-  const onSubmitForm: SubmitHandler<ObservationFormData> = (data) => {
-    const newObservation: Observation = {
-      valueString: data.valueString,
-
+  const onSubmitForm: SubmitHandler<ConditionFormData> = (data) => {
+    const newCondition: Condition = {
+      resourceType: "Condition",
+      code: {
+        coding: [
+          {
+            code: data.code.code,
+            system: data.code.system,
+            display: data.code.display,
+          },
+        ],
+      },
       subject: {
         reference: `Patient/${data.subject.id}`,
         display: data.subject.display,
@@ -50,30 +58,29 @@ export default function ObservationCreateComponent({
         reference: `Encounter/${data.encounter.id}`,
         display: data.encounter.display,
       },
-      performer: [
-        {
-          reference: `Practitioner/${data.performer.id}`,
-          display: data.performer.display,
-        },
-      ],
-      category: [{ coding: data.category }], //TODO: cardinality a muchos, por lo que debería cambiarlo a lista en vez de sólo un item
-      code: { coding: [data.code] },
-      interpretation: [{ coding: data.interpretation }],
-      issued: dayjs(data.issued).toISOString(),
-      note: [{ text: data.note }],
+      recorder: {
+        //! WARNING: quizás pueda cambiar a asserter o tener ambos
+        reference: `Practitioner/${data.performer.id}`,
+        display: data.performer.display,
+      },
 
-      resourceType: "Observation",
-      status: "unknown",
+      note: [{ text: data.note }],
+      clinicalStatus: {
+        coding: [
+          {
+            code: data.clinicalStatus,
+            system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
+          },
+        ],
+      },
     };
-    //alert(JSON.stringify(newObservation))
-    console.log(newObservation);
-    sendObservation(newObservation);
+    sendCondition(newCondition);
   };
 
-  const sendObservation = async (newObservation: Observation) => {
+  const sendCondition = async (newCondition: Condition) => {
     HandleResult.handleOperation(
-      () => new ObservationService().sendResource(newObservation),
-      "Observación guardada de forma exitosa",
+      () => new ConditionService().sendResource(newCondition),
+      "Condición guardada de forma exitosa",
       "Enviando..."
     );
   };
@@ -82,7 +89,7 @@ export default function ObservationCreateComponent({
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Crear nuevo encuentro
+          Condición
           <IconButton
             aria-label="close"
             onClick={handleClose}
@@ -97,20 +104,24 @@ export default function ObservationCreateComponent({
         </DialogTitle>
         <DialogContent>
           <Container className={styles.container}>
-            <ObservationFormComponent
-              formId="form"
+            <ConditionFormComponent
+              formId="conditionForm"
               patientId={patientId}
-              practitionerId={practitionerId}
+              practitionerId={practitionerId!}
               submitForm={onSubmitForm}
-              readOnly={false}
-            ></ObservationFormComponent>
+            ></ConditionFormComponent>
           </Container>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>
           <Button onClick={handleClose} variant="contained" color="error">
             Cancelar
           </Button>
-          <Button type="submit" variant="contained" color="primary" form="form">
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            form="conditionForm"
+          >
             Enviar
           </Button>
         </DialogActions>

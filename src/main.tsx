@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 import PatientPage from "./Pages/PatientPage.tsx";
 import HeaderComponent from "./Components/HeaderComponent.tsx";
 import EncounterListPage from "./Pages/ListPages/EncounterListPage.tsx";
-import EncounterPatientPage from "./Pages/ListPages/EncounterPatientPage.tsx";
+import EncounterPatientPage from "./Pages/EncounterPatientPage.tsx";
 import ObservationPage from "./Pages/ObservationPage.tsx";
 import PatientListPage from "./Pages/ListPages/PatientListPage.tsx";
 import PractitionerListPage from "./Pages/ListPages/PractitionerListPage.tsx";
@@ -40,6 +40,10 @@ const router = createBrowserRouter([
   {
     path: "/Encounter",
     element: <EncounterListPage></EncounterListPage>,
+  },
+  {
+    path: "/Encounter/:encounterID",
+    element: <EncounterPatientPage></EncounterPatientPage>,
   },
   {
     path: "/Practitioner",

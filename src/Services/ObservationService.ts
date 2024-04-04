@@ -13,5 +13,4 @@ export default class ObservationService extends FhirResourceService<Observation>
       "has-member": `QuestionnaireResponse/${QuestionnaireResponseId}`,
     });
   }
-
 }

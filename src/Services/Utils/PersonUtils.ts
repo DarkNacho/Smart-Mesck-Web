@@ -24,7 +24,8 @@ export default class PersonUtil {
         : "";
       const familyName = resource.name[0].family ? resource.name[0].family : "";
       name = `${givenNames} ${familyName}`;
-    } else if (// eslint-disable-next-line no-dupe-else-if
+    } else if (
+      // eslint-disable-next-line no-dupe-else-if
       resource.name &&
       resource.name[0] &&
       resource.name[0].use === "official"
@@ -69,7 +70,7 @@ export default class PersonUtil {
    */
   static getContactPointFirstOrDefaultAsString(
     recurso: FhirResourceType,
-    system: 'phone' | 'fax' | 'email' | 'pager' | 'url' | 'sms' | 'other'
+    system: "phone" | "fax" | "email" | "pager" | "url" | "sms" | "other"
   ): string {
     if (recurso && recurso.telecom && Array.isArray(recurso.telecom)) {
       const contactPoint = recurso.telecom.find(
@@ -95,5 +96,33 @@ export default class PersonUtil {
       // If there are no identifiers, return the ID of the resource
       return resource.id || "";
     }
+  }
+
+  /**
+   * Retrieves the marital status of a patient.
+   *
+   * @param resource - The patient resource.
+   * @returns The marital status of the patient, or "N/A" if not available.
+   */
+  static getMaritalStatus(resource: Patient): string {
+    if (
+      resource &&
+      resource.maritalStatus &&
+      resource.maritalStatus.coding &&
+      resource.maritalStatus.coding.length > 0
+    ) {
+      return (
+        resource.maritalStatus.coding[0].display ||
+        resource.maritalStatus.coding[0].code ||
+        "das"
+      );
+    } else if (
+      resource &&
+      resource.maritalStatus &&
+      resource.maritalStatus.text
+    ) {
+      return resource.maritalStatus.text;
+    }
+    return "N/A";
   }
 }

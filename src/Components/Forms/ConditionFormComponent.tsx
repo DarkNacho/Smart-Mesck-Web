@@ -8,11 +8,11 @@ import {
   Practitioner,
   ValueSetExpansionContains,
 } from "fhir/r4";
-import AutocompleteFromServerComponent from "../AutoCompleteComponents/AutocompleteFromServerComponent";
 import AutoCompleteComponent from "../AutoCompleteComponents/AutoCompleteComponent";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
+import AutoCompleteFromLHCComponentComponent from "../AutoCompleteComponents/AutoCompleteFromLHCComponent";
 
 function getEncounterDisplay(resource: Encounter): string {
   return `Profesional: ${EncounterUtils.getPrimaryPractitioner(
@@ -151,13 +151,13 @@ export default function ConditionFormComponent({
           name="code"
           control={control}
           defaultValue={condition ? condition.code?.coding?.[0] : {}}
-          render={({ field }) => (
-            <AutocompleteFromServerComponent
-              name="loinct"
+          render={({ field: { onChange } }) => (
+            <AutoCompleteFromLHCComponentComponent
+              label="loinc"
               table="hpo"
-              onChange={field.onChange}
-              value={field.value}
-              readOnly={!!condition.code?.coding || false || readOnly}
+              onChange={onChange}
+              defaultResource={condition?.code?.coding?.[0]}
+              readOnly={!!condition?.code?.coding || false || readOnly}
               textFieldProps={{
                 ...register("code", {
                   required: "Código requerido",

@@ -12,7 +12,7 @@ export function loadUserRoleFromLocalStorage() {
   return undefined; // Si es "Patient", devolvemos undefined
 }
 
-export function checkPractitionarRol(): boolean {
+export function checkPractitionerRol(): boolean {
   return loadUserRoleFromLocalStorage() === "Practitioner";
 }
 

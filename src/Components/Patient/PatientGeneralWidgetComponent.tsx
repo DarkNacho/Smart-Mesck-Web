@@ -67,7 +67,9 @@ export default function PatientGeneralWidgetComponent({
           </div>
           <div className={styles.item}>
             <div className={styles.text1}>Estado Civil</div>
-            <div className={styles.text2}>Sin Registro</div>
+            <div className={styles.text2}>
+              {PersonUtil.getMaritalStatus(patient)}
+            </div>
           </div>
         </ul>
       </div>

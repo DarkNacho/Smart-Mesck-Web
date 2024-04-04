@@ -1,15 +1,15 @@
-import ObservationService from "../../Services/ObservationService";
+import ObservationService from "../Services/ObservationService";
 import InfoListComponent, {
   InfoListData,
-} from "../../Components/InfoListComponent";
+} from "../Components/InfoListComponent";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import ConditionService from "../../Services/ConditionService";
-import PatientQuestionnaireComponent from "../../Components/Patient/PatientQuestionnaireComponent";
+import ConditionService from "../Services/ConditionService";
+import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 
-import ObservationUtil from "../../Services/Utils/ObservationUtils";
-import ConditionUtils from "../../Services/Utils/ConditionUtils";
+import ObservationUtil from "../Services/Utils/ObservationUtils";
+import ConditionUtils from "../Services/Utils/ConditionUtils";
 
 const observationService = new ObservationService();
 const conditionService = new ConditionService();

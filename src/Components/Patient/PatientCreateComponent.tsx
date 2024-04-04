@@ -57,7 +57,18 @@ export default function PatientCreateComponent({
       ],
       birthDate: data.fechaNacimiento,
       gender: data.genero as "male" | "female" | "other" | "unknown",
-      telecom: [{ system: "phone", value: data.numeroTelefonico }],
+      telecom: [
+        { system: "phone", value: data.numeroTelefonico },
+        { system: "email", value: data.email },
+      ],
+      maritalStatus: {
+        coding: [
+          {
+            code: data.maritalStatus,
+            system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+          },
+        ],
+      },
       photo: [{ url: data.photo }],
     };
     postPatient(newPatient);

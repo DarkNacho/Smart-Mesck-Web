@@ -10,17 +10,16 @@ import {
 } from "@mui/material";
 
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 import { Close } from "@mui/icons-material";
 
 import styles from "./EncounterCreateComponent.module.css";
 import { Encounter } from "fhir/r4";
 
-import EncounterService from "../../Services/EncounterService";
-
 import EncounterFormComponent, {
   EncounterFormData,
 } from "../Forms/EncounterFormComponent";
+import HandleResult from "../HandleResult";
+import FhirResourceService from "../../Services/FhirService";
 
 export default function EncounterCreateComponent({
   onOpen,
@@ -29,7 +28,7 @@ export default function EncounterCreateComponent({
 }: {
   onOpen: (isOpen: boolean) => void;
   isOpen: boolean;
-  patientId: string;
+  patientId?: string;
 }) {
   useEffect(() => {
     onOpen(isOpen);
@@ -39,27 +38,17 @@ export default function EncounterCreateComponent({
     onOpen(false);
   };
 
-  const postEncounter = async (newEncounter: Encounter) => {
-    const response = await toast.promise(
-      new EncounterService().postResource(newEncounter),
-      {
-        loading: "Enviado...",
-        success: (result) => {
-          if (result.success) {
-            return "Encuentro guardado de forma exitosa";
-          } else {
-            throw Error(result.error);
-          }
-        },
-        error: (result) => result.toString(),
-      }
-    );
+  const practitionerId = localStorage.getItem("id");
 
-    if (response.success) {
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
+  const postEncounter = async (newEncounter: Encounter) => {
+    HandleResult.handleOperation(
+      () =>
+        new FhirResourceService<Encounter>("Encounter").postResource(
+          newEncounter
+        ),
+      "Encuentro guardado de forma exitosa",
+      "Enviando..."
+    );
   };
 
   // Función que se ejecuta al enviar el formulario
@@ -69,12 +58,15 @@ export default function EncounterCreateComponent({
 
     const newEncounter: Encounter = {
       resourceType: "Encounter",
-      subject: { reference: `Patient/${data.patientId}` },
+      subject: {
+        reference: `Patient/${data.patient.id}`,
+        display: data.patient.display,
+      },
       participant: [
         {
           individual: {
-            reference: `Practitioner/${data.profesionalId}`,
-            display: "prueba nacho",
+            reference: `Practitioner/${data.practitioner.id}`,
+            display: data.practitioner.display,
           },
         },
       ],
@@ -88,6 +80,7 @@ export default function EncounterCreateComponent({
         system: "http://terminology.hl7.org/CodeSystem/v3-ActCode",
       },
     };
+    //alert(JSON.stringify(newEncounter, null, 2));
     postEncounter(newEncounter);
   };
 
@@ -112,8 +105,9 @@ export default function EncounterCreateComponent({
           <Container className={styles.container}>
             <EncounterFormComponent
               formId="encounterForm"
-              patientId={patientId}
               submitForm={onSubmitForm}
+              practitionerId={practitionerId!}
+              patientId={patientId}
             ></EncounterFormComponent>
           </Container>
         </DialogContent>

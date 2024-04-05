@@ -1,34 +1,10 @@
 import { Condition } from "fhir/r4";
-import FhirResourceService from "./FhirService";
+import ResourceService from "./FhirService";
 import { SearchParams } from "fhir-kit-client";
-import { InfoListData } from "../Components/InfoListComponent";
 
-export default class ConditionService extends FhirResourceService<Condition> {
+export default class ConditionService extends ResourceService<Condition> {
   constructor() {
     super("Condition");
-  }
-
-  public extractConditionName(conditions: Condition[]): InfoListData[] {
-    return conditions.map((condition) => {
-      const id = condition.id;
-      const name =
-        condition.code?.coding?.[0]?.display ||
-        condition.code?.text ||
-        (condition.code?.coding?.[0]?.system &&
-        condition.code?.coding?.[0]?.code
-          ? `${condition.code.coding[0].system} - ${condition.code.coding[0].code}`
-          : "Unknown Name");
-
-      const value =
-        condition.clinicalStatus?.coding?.[0]?.display ||
-        condition.clinicalStatus?.text ||
-        (condition.clinicalStatus?.coding?.[0]?.system &&
-        condition.clinicalStatus?.coding?.[0]?.code
-          ? `${condition.clinicalStatus.coding[0].code}`
-          : "Unknown Name");
-
-      return { id, name, value };
-    });
   }
 
   private async getAllConditions(
@@ -52,13 +28,13 @@ export default class ConditionService extends FhirResourceService<Condition> {
   }
 
   //ve que tenga una referencia a un QuestionnaireResponse en evidence
-  public async getConditonsWithQuestionnaireResponse(
+  public async getConditionsWithQuestionnaireResponse(
     subjectID: string,
     questionnaireResponseID: string
   ): Promise<Result<Condition[]>> {
     const result = await this.getAllConditions({ subject: subjectID });
     if (!result.success) return result;
-    var conditions = result.data.filter((item) =>
+    const conditions = result.data.filter((item) =>
       item.evidence?.some((evidence) =>
         evidence.detail?.some(
           (detail) =>

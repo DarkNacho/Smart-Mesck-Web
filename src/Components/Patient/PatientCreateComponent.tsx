@@ -9,7 +9,6 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 import { Close } from "@mui/icons-material";
 
 import styles from "./PatientCreateComponent.module.css";
@@ -18,6 +17,7 @@ import FhirResourceService from "../../Services/FhirService";
 import PatientFormComponent, {
   PatientFormData,
 } from "../Forms/PatientFormComponent";
+import HandleResult from "../HandleResult";
 export default function PatientCreateComponent({
   onOpen,
   isOpen,
@@ -34,26 +34,11 @@ export default function PatientCreateComponent({
   };
 
   const postPatient = async (newPatient: Patient) => {
-    const response = await toast.promise(
-      new FhirResourceService('Patient').postResource(newPatient),
-      {
-        loading: "Enviado Paciente",
-        success: (result) => {
-          if (result.success) {
-            return "Paciente enviado de forma exitosa";
-          } else {
-            throw Error(result.error);
-          }
-        },
-        error: (result) => result.toString(),
-      }
+    HandleResult.handleOperation(
+      () => new FhirResourceService("Patient").postResource(newPatient),
+      "Paciente Guardado con éxito",
+      "Enviando..."
     );
-
-    if (response.success) {
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
   };
 
   // Función que se ejecuta al enviar el formulario
@@ -72,7 +57,18 @@ export default function PatientCreateComponent({
       ],
       birthDate: data.fechaNacimiento,
       gender: data.genero as "male" | "female" | "other" | "unknown",
-      telecom: [{ system: "phone", value: data.numeroTelefonico }],
+      telecom: [
+        { system: "phone", value: data.countryCode + data.numeroTelefonico },
+        { system: "email", value: data.email },
+      ],
+      maritalStatus: {
+        coding: [
+          {
+            code: data.maritalStatus,
+            system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+          },
+        ],
+      },
       photo: [{ url: data.photo }],
     };
     postPatient(newPatient);

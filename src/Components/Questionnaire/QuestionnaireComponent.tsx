@@ -9,14 +9,19 @@ import {
 import { useEffect, useRef } from "react";
 
 import Button from "@mui/material/Button";
-import QuestionnaireResponseService from "../../Services/QuestionnaireResponseService";
+
 import FhirResourceService from "../../Services/FhirService";
 import ObservationService from "../../Services/ObservationService";
 import ConditionService from "../../Services/ConditionService";
+import { isAdminOrPractitioner } from "../../RolUser";
+import ObservationUtils from "../../Services/Utils/ObservationUtils";
+import HandleResult from "../HandleResult";
 //import "./QuestionnaireComponent.css";
 
 const fhirService = new FhirResourceService("FhirResource");
-const questionnaireResponseService = new QuestionnaireResponseService();
+const questionnaireResponseService = new FhirResourceService(
+  "QuestionnaireResponse"
+);
 const observationService = new ObservationService();
 const conditionService = new ConditionService();
 
@@ -82,7 +87,7 @@ export default function QuestionnaireComponent({
         originalObservation.extension?.some(
           (ext: any) =>
             ext.url ===
-            "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
+              "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
             ext.valueString === newValueString
         )
       );
@@ -124,13 +129,13 @@ export default function QuestionnaireComponent({
         newObservation.extension?.some(
           (ext: any) =>
             ext.url ===
-            "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
+              "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId" &&
             ext.valueString ===
-            observation.extension?.find(
-              (origExt: any) =>
-                origExt.url ===
-                "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId"
-            )?.valueString
+              observation.extension?.find(
+                (origExt: any) =>
+                  origExt.url ===
+                  "http://hl7.org/fhir/StructureDefinition/observation-questionnaireLinkId"
+              )?.valueString
         )
       );
 
@@ -148,10 +153,11 @@ export default function QuestionnaireComponent({
 
   const getConditions = async (): Promise<Condition[]> => {
     if (!questionnaireResponse.id) return [];
-    const result = await conditionService.getConditonsWithQuestionnaireResponse(
-      subjectId!,
-      questionnaireResponse.id!
-    );
+    const result =
+      await conditionService.getConditionsWithQuestionnaireResponse(
+        subjectId!,
+        questionnaireResponse.id!
+      );
     return result.success ? result.data : [];
   };
 
@@ -237,11 +243,11 @@ export default function QuestionnaireComponent({
   };
 
   const sendResources = async (resources: FhirResource[]) => {
-    fhirService
-      .sendArray(resources)
-      .then((res) =>
-        res.success ? console.log("Observaciones enviadas") : res.error
-      );
+    HandleResult.handleOperation(
+      () => fhirService.sendArray(resources),
+      "Formulario Guardado Exitosamente",
+      "Enviado..."
+    );
   };
 
   /* TODO: descomentar, solo esta comentado para compilar
@@ -283,7 +289,7 @@ export default function QuestionnaireComponent({
       if (coding && coding.code) {
         if (coding.code === "OBS") res.push(item);
         else if (coding.code === "CON")
-          res.push(observationService.convertirObservacionACondicion(item));
+          res.push(ObservationUtils.ObservationToCondition(item));
       }
 
       //if(coding && coding.code === "OBS")  res.push(item);
@@ -312,7 +318,7 @@ export default function QuestionnaireComponent({
 
     sendQuestionnaireResponse(qr).then((res) => {
       if (res.success) {
-        questionnaireResponse = res.data;
+        questionnaireResponse = res.data as QuestionnaireResponse;
         const responsesObservation = responseAsObservations(qr);
 
         const updatedResource = generateUpdateResources(
@@ -323,14 +329,12 @@ export default function QuestionnaireComponent({
         //const finalObservation = getFinalObservation(updatedObservation)
         //const conditions = observationAsConditions(updatedObservation);
 
-        const final = getFinalArray(updatedResource);
+        const final = getFinalArray(updatedResource); //Convierte a su tipo indicado (Observation | Condition)
         console.log("bla final: ", final);
-        //console.log("conditions final: ", conditions);
-        //console.log("obsevation final:", finalObservation);
-        //sendResources(finalObservation);
-        //sendResources(conditions)
+
         sendResources(final); //TODO: Problema al querer eliminar, y conditions genera duplicado al querer actualizar
-      } else console.error(res.error);
+      } //  ! Si en el questionario un elemento que e respondio y se guardó. Luego si lo dejo vacio. Este no cambia en Conditions pero si luego lo vuelvo a editar este cambia.
+      else console.error(res.error);
     });
 
     /*
@@ -354,23 +358,25 @@ export default function QuestionnaireComponent({
   return (
     <div>
       <div ref={formContainerRef}></div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={postData}
-          sx={{ marginLeft: "auto" }}
+      {isAdminOrPractitioner() && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
-          Guardar
-        </Button>
-        <Button onClick={() => test()}>TEST</Button>
-      </div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={postData}
+            sx={{ marginLeft: "auto" }}
+          >
+            Guardar
+          </Button>
+          <Button onClick={() => test()}>TEST</Button>
+        </div>
+      )}
     </div>
   );
 }

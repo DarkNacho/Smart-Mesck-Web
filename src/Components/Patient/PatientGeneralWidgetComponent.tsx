@@ -1,7 +1,6 @@
-import PersonUtil from "../../Services/Utils/PersonUtil";
+import PersonUtil from "../../Services/Utils/PersonUtils";
 import styles from "./PatientGeneralWidgetComponent.module.css";
 import { Patient } from "fhir/r4";
-
 
 export default function PatientGeneralWidgetComponent({
   patient,
@@ -30,12 +29,20 @@ export default function PatientGeneralWidgetComponent({
           </div>
           <div className={styles.item}>
             <div className={styles.text1}>E-Mail</div>
-            <div className={styles.text2}>Sin Registro</div>
+            <div className={styles.text2}>
+              {PersonUtil.getContactPointFirstOrDefaultAsString(
+                patient,
+                "email"
+              )}
+            </div>
           </div>
           <div className={styles.item}>
             <div className={styles.text1}>Número Telefónico</div>
             <div className={styles.text2}>
-              {PersonUtil.obtenerPrimerNumeroTelefono(patient)}
+              {PersonUtil.getContactPointFirstOrDefaultAsString(
+                patient,
+                "phone"
+              )}
             </div>
           </div>
         </ul>
@@ -44,14 +51,12 @@ export default function PatientGeneralWidgetComponent({
         <ul className={styles["text-wrapper"]}>
           <div className={styles.item}>
             <div className={styles.text1}>Fecha de Nacimiento</div>
+            <div className={styles.text2}>{patient.birthDate || "N/A"}</div>
+          </div>
+          <div className={styles.item}>
+            <div className={styles.text1}>Edad</div>
             <div className={styles.text2}>
-              {" "}
-              {patient.birthDate && (
-                <>
-                  {patient.birthDate} •{" "}
-                  {PersonUtil.calcularEdad(patient.birthDate)} y.o.
-                </>
-              )}{" "}
+              {PersonUtil.calcularEdad(patient.birthDate!)}
             </div>
           </div>
           <div className={styles.item}>
@@ -60,7 +65,9 @@ export default function PatientGeneralWidgetComponent({
           </div>
           <div className={styles.item}>
             <div className={styles.text1}>Estado Civil</div>
-            <div className={styles.text2}>Sin Registro</div>
+            <div className={styles.text2}>
+              {PersonUtil.getMaritalStatus(patient)}
+            </div>
           </div>
         </ul>
       </div>

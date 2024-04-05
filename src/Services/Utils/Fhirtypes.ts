@@ -7,6 +7,7 @@ type FhirType =
   | "Encounter"
   | "Condition"
   | "MedicationStatement"
-  | "Practitioner";
+  | "Practitioner"
+  | "ValueSet";
 
 export default FhirType;

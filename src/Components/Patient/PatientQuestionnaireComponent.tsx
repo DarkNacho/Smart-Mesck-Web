@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Questionnaire, QuestionnaireResponse } from "fhir/r4";
-import QuestionnaireResponseService from "../../Services/QuestionnaireResponseService";
 import QuestionnaireComponent from "../Questionnaire/QuestionnaireComponent";
 import QuestionnaireListComponent from "../Questionnaire/QuestionnaireListDialogComponent";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import QuestionnaireService from "../../Services/QuestionnaireService";
+import { isAdminOrPractitioner } from "../../RolUser";
+import FhirResourceService from "../../Services/FhirService";
 
-const questionnaireResponseService = new QuestionnaireResponseService();
-const questionnaireService = new QuestionnaireService();
+const questionnaireResponseService = new FhirResourceService(
+  "QuestionnaireResponse"
+);
+const questionnaireService = new FhirResourceService("Questionnaire");
 
 export default function PatientQuestionnaireComponent({
   patientID,
@@ -34,22 +36,23 @@ export default function PatientQuestionnaireComponent({
 
   const fetchQuestionnaireResponses = async () => {
     try {
-      var responseBundle = await questionnaireResponseService.getResources({
+      const responseBundle = await questionnaireResponseService.getResources({
         subject: patientID,
         encounter: encounterID!,
       });
       if (!responseBundle.success) throw Error(responseBundle.error);
 
       console.log(responseBundle.data);
-      setQuestionnaireResponses(responseBundle.data);
+      setQuestionnaireResponses(responseBundle.data as QuestionnaireResponse[]);
       const updatedQuestionnaires: Record<string, Questionnaire> = {};
 
-      for (const quetionnaireResponse of responseBundle.data) {
+      for (const quetionnaireResponse of responseBundle.data as QuestionnaireResponse[]) {
         const quesR_id = quetionnaireResponse.questionnaire;
         if (!quesR_id) continue;
 
         const res = await questionnaireService.getById(quesR_id);
-        if (res.success) updatedQuestionnaires[quesR_id] = res.data;
+        if (res.success)
+          updatedQuestionnaires[quesR_id] = res.data as Questionnaire;
       }
       setQuestionnaires(updatedQuestionnaires);
     } catch {
@@ -66,12 +69,13 @@ export default function PatientQuestionnaireComponent({
 
   return (
     <div>
-      <div>
-        <QuestionnaireListComponent
-          onQuestionnaireSelect={handleQuesSelect}
-        ></QuestionnaireListComponent>
-      </div>
-      <h1>Lista de cuestionarios:</h1>
+      {isAdminOrPractitioner() && (
+        <div>
+          <QuestionnaireListComponent
+            onQuestionnaireSelect={handleQuesSelect}
+          ></QuestionnaireListComponent>
+        </div>
+      )}
       <div>
         {newQuestionnaires.length > 0 && (
           <Accordion sx={{ backgroundColor: "transparent" }}>
@@ -80,7 +84,10 @@ export default function PatientQuestionnaireComponent({
               aria-controls="panel1-content-new"
               id="panel1-header-new"
             >
-              Nuevos formularios
+              <h1 style={{ textDecoration: "underline" }}>
+                {" "}
+                Nuevos Formularios:
+              </h1>
             </AccordionSummary>
             <AccordionDetails>
               {newQuestionnaires.map((newQues, index) => (
@@ -104,7 +111,9 @@ export default function PatientQuestionnaireComponent({
               aria-controls="panel1-content-old"
               id="panel1-header-old"
             >
-              <h1>Formularios cargados del paciente</h1>
+              <h1 style={{ textDecoration: "underline" }}>
+                Formularios cargados del paciente:
+              </h1>
             </AccordionSummary>
             <AccordionDetails>
               {Object.keys(questionnaires).length > 0 && (

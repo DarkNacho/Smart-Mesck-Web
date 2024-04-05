@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Patient } from "fhir/r4";
-import toast from "react-hot-toast";
 import PatientHeaderComponent from "../Components/Patient/PatientHeaderComponent";
 
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
 import PatientOverviewComponent from "../Components/Patient/PatientOverviewComponent";
-import PatientEncounterList from "../Components/Patient/PatientEncounterList";
 import FhirResourceService from "../Services/FhirService";
+import HandleResult from "../Components/HandleResult";
+import PatientEncounterListComponent from "../Components/Patient/PatientEncounterListComponent";
 
-const fhirService = new FhirResourceService('Patient')
-
+const fhirService = new FhirResourceService<Patient>("Patient");
 
 export default function PatientPage() {
   const { patientID } = useParams();
@@ -22,28 +21,13 @@ export default function PatientPage() {
     setSelectedOption(option);
   };
 
-
-
-
   const fetchPatient = async () => {
-    const response = await toast.promise(fhirService.getById(patientID!), {
-      loading: "Cargando Paciente",
-      success: (result) => {
-        if (result.success) {
-          return "Paciente cargado exitosamente";
-        } else {
-          throw Error(result.error);
-        }
-      },
-      error: (result) => result.toString(),
-    });
-
-    if (response.success) {
-      setPatient(response.data as Patient);
-      console.log(response.data);
-    } else {
-      console.error(response.error);
-    }
+    HandleResult.handleOperation(
+      () => fhirService.getById(patientID!),
+      "Paciente cargado exitosamente",
+      "Obteniendo...",
+      setPatient
+    );
   };
 
   useEffect(() => {
@@ -54,8 +38,8 @@ export default function PatientPage() {
 
   switch (selectedOption) {
     case "Overview":
-      componentToRender = (
-        patient.id && <PatientOverviewComponent patient={patient}></PatientOverviewComponent>
+      componentToRender = patient.id && (
+        <PatientOverviewComponent patient={patient}></PatientOverviewComponent>
       );
       break;
     case "Formularios":
@@ -66,7 +50,11 @@ export default function PatientPage() {
       );
       break;
     case "Encounters":
-      componentToRender = (<PatientEncounterList patientID={patientID!}></PatientEncounterList>)
+      componentToRender = (
+        <PatientEncounterListComponent
+          patientId={patientID!}
+        ></PatientEncounterListComponent>
+      );
       break;
     default:
   }

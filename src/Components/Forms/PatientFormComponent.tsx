@@ -1,5 +1,13 @@
-import { useForm, SubmitHandler } from "react-hook-form";
+import React from "react";
+import { DevTool } from "@hookform/devtools";
+import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
 import { TextField, Grid, MenuItem } from "@mui/material";
+import {
+  generoOptions,
+  countryCodes,
+  maritalOptions,
+  contactTypes,
+} from "./Terminology";
 
 // Función para validar el Rut
 const validarRut = (rut: string) => {
@@ -23,25 +31,6 @@ const validarRut = (rut: string) => {
   return dv === dvEsperado;
 };
 
-// Opciones para el campo de género
-const generoOptions = [
-  { value: "unknown", label: "No especificado" },
-  { value: "male", label: "Masculino" },
-  { value: "female", label: "Femenino" },
-  { value: "other", label: "Otro" },
-];
-
-const maritalOptions = [
-  { value: "A", label: "Annulled" },
-  { value: "D", label: "Divorced" },
-  { value: "I", label: "Interlocutory" },
-  { value: "L", label: "Legally Separated" },
-  { value: "M", label: "Married" },
-  { value: "C", label: "Common Law" },
-  { value: "S", label: "Never Married" },
-  { value: "UNK", label: "unknown" },
-];
-
 // Interfaz para los datos del formulario
 export interface PatientFormData {
   nombre: string;
@@ -51,10 +40,19 @@ export interface PatientFormData {
   fechaNacimiento: string;
   genero: string;
   rut: string;
+  countryCode: string;
   numeroTelefonico: string;
   email: string;
   photo: string;
   maritalStatus: string;
+  contact: {
+    nombre: string;
+    segundoNombre: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    numeroTelefonico: string;
+    contactType: string;
+  }[];
 }
 
 export default function PatientFormComponent({
@@ -66,152 +64,254 @@ export default function PatientFormComponent({
 }) {
   const {
     register,
-    trigger,
+    control,
     handleSubmit,
     formState: { errors },
-  } = useForm<PatientFormData>();
+  } = useForm<PatientFormData>({
+    defaultValues: {
+      contact: [
+        {
+          nombre: "",
+          segundoNombre: "",
+          apellidoPaterno: "",
+          apellidoMaterno: "",
+          numeroTelefonico: "",
+          contactType: "N",
+        },
+      ],
+    },
+    mode: "onBlur",
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "contact",
+  });
 
   return (
-    <form id={formId} onSubmit={handleSubmit(submitForm)}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Nombre"
-            {...register("nombre", {
-              required: "El Nombre es necesario",
-            })}
-            fullWidth
-            error={Boolean(errors.nombre)}
-            helperText={errors.nombre && errors.nombre.message}
-            onBlur={() => trigger("nombre")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Segundo Nombre"
-            {...register("segundoNombre")}
-            fullWidth
-            onBlur={() => trigger("segundoNombre")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Apellido Paterno"
-            {...register("apellidoPaterno", {
-              required: "El Apellido Paterno es necesario",
-            })}
-            fullWidth
-            error={Boolean(errors.apellidoPaterno)}
-            helperText={
-              errors.apellidoPaterno && errors.apellidoPaterno.message
+    <>
+      <form id={formId} onSubmit={handleSubmit(submitForm)}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Nombre"
+              {...register("nombre", {
+                required: "El Nombre es necesario",
+              })}
+              fullWidth
+              error={Boolean(errors.nombre)}
+              helperText={errors.nombre && errors.nombre.message}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Segundo Nombre"
+              {...register("segundoNombre")}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Apellido Paterno"
+              {...register("apellidoPaterno", {
+                required: "El Apellido Paterno es necesario",
+              })}
+              fullWidth
+              error={Boolean(errors.apellidoPaterno)}
+              helperText={
+                errors.apellidoPaterno && errors.apellidoPaterno.message
+              }
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Apellido Materno"
+              {...register("apellidoMaterno")}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Fecha de Nacimiento"
+              type="date"
+              {...register("fechaNacimiento", {
+                required: "La Fecha de Nacimiento es necesaria",
+              })}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+              error={Boolean(errors.fechaNacimiento)}
+              helperText={
+                errors.fechaNacimiento && errors.fechaNacimiento.message
+              }
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              select
+              label="Género"
+              defaultValue="unknown"
+              {...register("genero", {
+                required: "El Género es necesario",
+              })}
+              fullWidth
+              error={Boolean(errors.genero)}
+              helperText={errors.genero && errors.genero.message}
+            >
+              {generoOptions.map((option) => (
+                <MenuItem key={option.code} value={option.code}>
+                  {option.display}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Rut"
+              {...register("rut", {
+                required: "El Rut es necesario",
+                validate: (value) => validarRut(value) || "Rut inválido",
+              })}
+              fullWidth
+              error={Boolean(errors.rut)}
+              helperText={errors.rut && errors.rut.message}
+            />
+          </Grid>
+          <Grid item xs={12} sm={1.5}>
+            <TextField
+              select
+              fullWidth
+              label="Código"
+              defaultValue="+56"
+              {...register("countryCode", {
+                required: "Código de país requerido",
+              })}
+              error={Boolean(errors.countryCode)}
+              helperText={errors.countryCode && errors.countryCode.message}
+            >
+              {countryCodes.map((option) => (
+                <MenuItem key={option.code} value={option.code}>
+                  {option.display}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={4.5}>
+            <TextField
+              label="Número Telefónico"
+              type="number"
+              {...register("numeroTelefonico", {
+                required: "Número telefónico requerido",
+                pattern: {
+                  value: /^[0-9]+$/i,
+                  message: "Número telefónico inválido",
+                },
+              })}
+              error={Boolean(errors.numeroTelefonico)}
+              helperText={
+                errors.numeroTelefonico && errors.numeroTelefonico.message
+              }
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              type="email"
+              label="Email"
+              {...register("email", {
+                required: "Correo electrónico requerido",
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Correo electrónico inválido",
+                },
+              })}
+              error={Boolean(errors.email)}
+              helperText={errors.email && errors.email.message}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              select
+              label="Estado Civil"
+              defaultValue="S"
+              {...register("maritalStatus")}
+              fullWidth
+              error={Boolean(errors.genero)}
+              helperText={errors.genero && errors.genero.message}
+            >
+              {maritalOptions.map((option) => (
+                <MenuItem key={option.code} value={option.code}>
+                  {option.display}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <TextField label="Foto" {...register("photo")} fullWidth />
+          </Grid>
+          {/* Contactos de emergencia */}
+          <Grid item xs={12} sm={12}>
+            <h1>Contactos:</h1>
+          </Grid>
+          {fields.map((field, index) => (
+            <React.Fragment key={field.id}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Nombre"
+                  {...register(`contact.${index}.nombre`, {
+                    required: "El Nombre de contacto es requerido",
+                  })}
+                  fullWidth
+                  error={Boolean(errors.contact?.[index]?.nombre)}
+                  helperText={
+                    errors.contact?.[index]?.nombre &&
+                    errors.contact?.[index]?.nombre?.message
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  label="Relación"
+                  defaultValue="N"
+                  {...register(`contact.${index}.contactType`)}
+                  fullWidth
+                  error={Boolean(errors.contact?.[index]?.contactType)}
+                  helperText={
+                    errors.contact?.[index]?.contactType &&
+                    errors.contact?.[index]?.contactType?.message
+                  }
+                >
+                  {contactTypes.map((option) => (
+                    <MenuItem key={option.code} value={option.code}>
+                      {option.display}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <button type="button" onClick={() => remove(index)}>
+                Delete
+              </button>
+            </React.Fragment>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              append({
+                nombre: "",
+                segundoNombre: "",
+                apellidoPaterno: "",
+                apellidoMaterno: "",
+                numeroTelefonico: "",
+                contactType: "N",
+              })
             }
-            onBlur={() => trigger("apellidoPaterno")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Apellido Materno"
-            {...register("apellidoMaterno")}
-            fullWidth
-            onBlur={() => trigger("apellidoMaterno")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Fecha de Nacimiento"
-            type="date"
-            {...register("fechaNacimiento", {
-              required: "La Fecha de Nacimiento es necesaria",
-            })}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-            error={Boolean(errors.fechaNacimiento)}
-            helperText={
-              errors.fechaNacimiento && errors.fechaNacimiento.message
-            }
-            onBlur={() => trigger("fechaNacimiento")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            select
-            label="Género"
-            defaultValue="unknown"
-            {...register("genero", {
-              required: "El Género es necesario",
-            })}
-            fullWidth
-            error={Boolean(errors.genero)}
-            helperText={errors.genero && errors.genero.message}
-            onBlur={() => trigger("genero")}
           >
-            {generoOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
+            Agregar
+          </button>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Rut"
-            {...register("rut", {
-              required: "El Rut es necesario",
-              validate: (value) => validarRut(value) || "Rut inválido",
-            })}
-            fullWidth
-            error={Boolean(errors.rut)}
-            helperText={errors.rut && errors.rut.message}
-            onBlur={() => trigger("rut")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Número Telefónico"
-            {...register("numeroTelefonico")}
-            fullWidth
-            onBlur={() => trigger("numeroTelefonico")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            type="email"
-            label="Email"
-            {...register("email", {
-              required: "Correo electronico requerido",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Correo electrónico inválido",
-              },
-            })}
-            error={Boolean(errors.email)}
-            helperText={errors.email && errors.email.message}
-            fullWidth
-            onBlur={() => trigger("email")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            select
-            label="Estado Civil"
-            defaultValue="S"
-            {...register("maritalStatus")}
-            fullWidth
-            error={Boolean(errors.genero)}
-            helperText={errors.genero && errors.genero.message}
-            onBlur={() => trigger("maritalStatus")}
-          >
-            {maritalOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={12}>
-          <TextField label="Foto" {...register("photo")} fullWidth />
-        </Grid>
-      </Grid>
-    </form>
+      </form>
+      <DevTool control={control} />
+    </>
   );
 }

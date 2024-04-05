@@ -1,5 +1,6 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TextField, Grid, MenuItem } from "@mui/material";
+import { generoOptions } from "./Terminology";
 
 // Función para validar el Rut
 const validarRut = (rut: string) => {
@@ -22,14 +23,6 @@ const validarRut = (rut: string) => {
   // Verificar si el dígito verificador es correcto
   return dv === dvEsperado;
 };
-
-// Opciones para el campo de género
-const generoOptions = [
-  { value: "unknown", label: "No especificado" },
-  { value: "male", label: "Masculino" },
-  { value: "female", label: "Femenino" },
-  { value: "other", label: "Otro" },
-];
 
 // Interfaz para los datos del formulario
 export interface PractitionerFormData {
@@ -134,8 +127,8 @@ export default function PractitionerFormComponent({
             onBlur={() => trigger("genero")}
           >
             {generoOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
+              <MenuItem key={option.code} value={option.code}>
+                {option.display}
               </MenuItem>
             ))}
           </TextField>
@@ -166,7 +159,7 @@ export default function PractitionerFormComponent({
             type="email"
             label="Email"
             {...register("email", {
-              required: "Correo electronico requerido",
+              required: "Correo electrónico requerido",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                 message: "Correo electrónico inválido",

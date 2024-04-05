@@ -14,6 +14,8 @@ import { MenuItem, TextField } from "@mui/material";
 import { Patient, Practitioner } from "fhir/r4";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
+import { encounterType } from "./Terminology";
+
 export interface EncounterFormData {
   practitioner: {
     id: string;
@@ -28,13 +30,6 @@ export interface EncounterFormData {
   end: Dayjs;
   type: string;
 }
-
-const encounterType = [
-  { value: "UKN", label: "No especificado" },
-  { value: "A", label: "Ambulatorio" },
-  { value: "otro1", label: "adsada" },
-  { value: "other", label: "Otro" },
-];
 
 export default function EncounterFormComponent({
   formId,
@@ -195,8 +190,8 @@ export default function EncounterFormComponent({
           inputProps={{ readOnly: readOnly }}
         >
           {encounterType.map((item) => (
-            <MenuItem key={item.value} value={item.value}>
-              {item.label}
+            <MenuItem key={item.code} value={item.code}>
+              {item.display}
             </MenuItem>
           ))}
         </TextField>

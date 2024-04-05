@@ -1,18 +1,14 @@
 import { DevTool } from "@hookform/devtools";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { MenuItem, TextField } from "@mui/material";
-import {
-  Condition,
-  Encounter,
-  Patient,
-  Practitioner,
-  ValueSetExpansionContains,
-} from "fhir/r4";
+import { Condition, Encounter, Patient, Practitioner, Coding } from "fhir/r4";
 import AutoCompleteComponent from "../AutoCompleteComponents/AutoCompleteComponent";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 import AutoCompleteFromLHCComponentComponent from "../AutoCompleteComponents/AutoCompleteFromLHCComponent";
+
+import { clinicalStatus } from "./Terminology";
 
 function getEncounterDisplay(resource: Encounter): string {
   return `Profesional: ${EncounterUtils.getPrimaryPractitioner(
@@ -35,19 +31,10 @@ export interface ConditionFormData {
     display: string;
   };
   encounterId: string;
-  code: ValueSetExpansionContains;
+  code: Coding;
   note: string; // https://hl7.org/fhir/datatypes.html#Annotation
   clinicalStatus: string;
 }
-
-const clinicalStatus = [
-  { value: "active", label: "Activo" },
-  { value: "recurrence", label: "Reaparición" },
-  { value: "relapse", label: "Recaída" },
-  { value: "inactive", label: "Inactivo" },
-  { value: "remission", label: "Remisión" },
-  { value: "resolved", label: "Resuelto" },
-];
 
 export default function ConditionFormComponent({
   formId,
@@ -228,8 +215,8 @@ export default function ConditionFormComponent({
           inputProps={{ readOnly: readOnly }}
         >
           {clinicalStatus.map((item) => (
-            <MenuItem key={item.value} value={item.value}>
-              {item.label}
+            <MenuItem key={item.code} value={item.code}>
+              {item.display}
             </MenuItem>
           ))}
         </TextField>

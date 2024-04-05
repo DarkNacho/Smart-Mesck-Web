@@ -62,7 +62,9 @@ export default function AutoCompleteFromLHCComponentComponent({
       defaultValue={defaultResource}
       options={dataSet}
       loading={loading}
-      getOptionLabel={(option) => `${option.code} - ${option.display}`}
+      getOptionLabel={(option) =>
+        `${option.code} - ${option.display || option.system}`
+      }
       isOptionEqualToValue={(option, value) => option.code === value.code}
       onInputChange={(_, newInputValue) => fetchData(newInputValue)}
       readOnly={readOnly}

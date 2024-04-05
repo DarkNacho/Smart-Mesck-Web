@@ -51,14 +51,12 @@ export default function PatientGeneralWidgetComponent({
         <ul className={styles["text-wrapper"]}>
           <div className={styles.item}>
             <div className={styles.text1}>Fecha de Nacimiento</div>
+            <div className={styles.text2}>{patient.birthDate || "N/A"}</div>
+          </div>
+          <div className={styles.item}>
+            <div className={styles.text1}>Edad</div>
             <div className={styles.text2}>
-              {" "}
-              {patient.birthDate && (
-                <>
-                  {patient.birthDate} •{" "}
-                  {PersonUtil.calcularEdad(patient.birthDate)} y.o.
-                </>
-              )}{" "}
+              {PersonUtil.calcularEdad(patient.birthDate!)}
             </div>
           </div>
           <div className={styles.item}>

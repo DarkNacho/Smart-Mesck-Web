@@ -29,7 +29,7 @@ export default class FhirResourceService<T extends FhirResource> {
    */
   public constructor(type: FhirType) {
     this.apiUrl =
-      import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4";
+      import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4"; //TODO: Forzar a que el env esté o si no enviar error.
     this.fhirClient = new Client({ baseUrl: this.apiUrl });
     this._resourceBundle = {} as Bundle;
     this.resourceTypeName = type;

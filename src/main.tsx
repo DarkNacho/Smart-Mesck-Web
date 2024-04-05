@@ -5,7 +5,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { Toaster } from "react-hot-toast";
 import PatientPage from "./Pages/PatientPage.tsx";
-import HeaderComponent from "./Components/HeaderComponent.tsx";
 import EncounterListPage from "./Pages/ListPages/EncounterListPage.tsx";
 import EncounterPatientPage from "./Pages/EncounterPatientPage.tsx";
 import ObservationPage from "./Pages/ObservationPage.tsx";
@@ -15,7 +14,6 @@ import PractitionerListPage from "./Pages/ListPages/PractitionerListPage.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App></App>,
   },
   {
     path: "/Patient",
@@ -54,8 +52,8 @@ const router = createBrowserRouter([
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
+    <App></App>
     <Toaster></Toaster>
-    <HeaderComponent></HeaderComponent>
     <RouterProvider router={router}></RouterProvider>
   </div>
 );

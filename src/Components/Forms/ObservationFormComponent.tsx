@@ -55,7 +55,6 @@ export default function ObservationFormComponent({
   submitForm,
   observation,
   practitionerId,
-  encounterId,
   readOnly = false,
 }: {
   formId: string;
@@ -63,7 +62,6 @@ export default function ObservationFormComponent({
   submitForm: SubmitHandler<ObservationFormData>;
   observation?: Observation;
   practitionerId?: string;
-  encounterId?: string;
   readOnly?: boolean;
 }) {
   const {
@@ -75,7 +73,7 @@ export default function ObservationFormComponent({
   } = useForm<ObservationFormData>();
 
   const roleUser = loadUserRoleFromLocalStorage();
-
+  const encounterId = ObservationUtils.getEncounterId(observation!);
   return (
     <>
       <form id={formId} onSubmit={handleSubmit(submitForm)}>
@@ -194,6 +192,7 @@ export default function ObservationFormComponent({
               id="Autocomplete-category"
               multiple
               options={category}
+              defaultValue={observation?.category?.[0].coding || []}
               getOptionLabel={(option) =>
                 option.display || option.code || "UNKNOWN"
               }
@@ -227,6 +226,7 @@ export default function ObservationFormComponent({
               id="Autocomplete-interpretacion"
               multiple
               options={interpretation}
+              defaultValue={observation?.interpretation?.[0].coding || []}
               getOptionLabel={(option) =>
                 option.display || option.code || "UNKNOWN"
               }

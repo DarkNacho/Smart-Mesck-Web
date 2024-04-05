@@ -89,7 +89,7 @@ export default function PatientListPage() {
             <PatientCreateComponent
               isOpen={openDialog}
               onOpen={handleIsOpen}
-            ></PatientCreateComponent>{" "}
+            ></PatientCreateComponent>
           </div>
         </div>
         <form

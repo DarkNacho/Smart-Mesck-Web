@@ -7,7 +7,11 @@ import { Add, Search } from "@mui/icons-material";
 import ListResourceComponent from "../../Components/ListResourceComponent";
 import { Encounter } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
-import { loadUserRoleFromLocalStorage, RolUser } from "../../RolUser";
+import {
+  isAdminOrPractitioner,
+  loadUserRoleFromLocalStorage,
+  RolUser,
+} from "../../RolUser";
 import { SearchParams } from "fhir-kit-client";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -91,25 +95,27 @@ export default function PatientListPage() {
           }}
         >
           <h1>Lista de Encuentros</h1>
-          <div>
-            <IconButton
-              onClick={() => setOpenDialog(true)}
-              color="primary"
-              aria-label="add"
-              sx={{
-                marginLeft: "auto",
-                backgroundColor: "white",
-                "&:hover": { backgroundColor: "#1b2455" },
-              }}
-            >
-              <Add />
-            </IconButton>
-            <EncounterCreateComponent
-              patientId={userRole === "Patient" ? userId : undefined}
-              isOpen={openDialog}
-              onOpen={handleIsOpen}
-            ></EncounterCreateComponent>
-          </div>
+          {isAdminOrPractitioner() && (
+            <div>
+              <IconButton
+                onClick={() => setOpenDialog(true)}
+                color="primary"
+                aria-label="add"
+                sx={{
+                  marginLeft: "auto",
+                  backgroundColor: "white",
+                  "&:hover": { backgroundColor: "#1b2455" },
+                }}
+              >
+                <Add />
+              </IconButton>
+              <EncounterCreateComponent
+                patientId={userRole === "Patient" ? userId : undefined}
+                isOpen={openDialog}
+                onOpen={handleIsOpen}
+              ></EncounterCreateComponent>
+            </div>
+          )}
         </div>
         <form
           className={styles.searchContainer}

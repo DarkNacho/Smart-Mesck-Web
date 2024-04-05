@@ -13,6 +13,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
 import EncounterCreateComponent from "../../Components/Encounter/EncounterCreateComponent";
+import { isAdminOrPractitioner } from "../../RolUser";
 
 const fhirService = new FhirResourceService<Encounter>("Encounter");
 
@@ -65,25 +66,27 @@ export default function PatientEncounterListComponent({
           }}
         >
           <h1>Lista de Encuentros</h1>
-          <div>
-            <IconButton
-              onClick={() => setOpenDialog(true)}
-              color="primary"
-              aria-label="add"
-              sx={{
-                marginLeft: "auto",
-                backgroundColor: "white",
-                "&:hover": { backgroundColor: "#1b2455" },
-              }}
-            >
-              <Add />
-            </IconButton>
-            <EncounterCreateComponent
-              patientId={patientId}
-              isOpen={openDialog}
-              onOpen={handleIsOpen}
-            ></EncounterCreateComponent>
-          </div>
+          {isAdminOrPractitioner() && (
+            <div>
+              <IconButton
+                onClick={() => setOpenDialog(true)}
+                color="primary"
+                aria-label="add"
+                sx={{
+                  marginLeft: "auto",
+                  backgroundColor: "white",
+                  "&:hover": { backgroundColor: "#1b2455" },
+                }}
+              >
+                <Add />
+              </IconButton>
+              <EncounterCreateComponent
+                patientId={patientId}
+                isOpen={openDialog}
+                onOpen={handleIsOpen}
+              ></EncounterCreateComponent>
+            </div>
+          )}
         </div>
         <form
           className={styles.searchContainer}

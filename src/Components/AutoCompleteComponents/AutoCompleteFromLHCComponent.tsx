@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
-import { ValueSet, ValueSetExpansionContains } from "fhir/r4";
+import { ValueSet, Coding } from "fhir/r4";
 
 interface AutoCompleteFromLHCComponentProps {
   label: string;
-  onChange: (value: ValueSetExpansionContains | null) => void;
+  onChange: (value: Coding | null) => void;
   table: string;
-  defaultResource?: ValueSetExpansionContains;
+  defaultResource?: Coding;
   textFieldProps?: TextFieldProps;
   readOnly?: boolean;
 }
@@ -20,9 +20,7 @@ export default function AutoCompleteFromLHCComponentComponent({
   readOnly,
   onChange,
 }: AutoCompleteFromLHCComponentProps) {
-  const [dataSet, setDataSet] = useState<ValueSetExpansionContains[]>(
-    [] as ValueSetExpansionContains[]
-  );
+  const [dataSet, setDataSet] = useState<Coding[]>([] as Coding[]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchData = async (searchTerm: string) => {
@@ -62,7 +60,9 @@ export default function AutoCompleteFromLHCComponentComponent({
       defaultValue={defaultResource}
       options={dataSet}
       loading={loading}
-      getOptionLabel={(option) => `${option.code} - ${option.display}`}
+      getOptionLabel={(option) =>
+        `${option.code} - ${option.display || option.system}`
+      }
       isOptionEqualToValue={(option, value) => option.code === value.code}
       onInputChange={(_, newInputValue) => fetchData(newInputValue)}
       readOnly={readOnly}

@@ -17,9 +17,9 @@ import ObservationService from "../../Services/ObservationService";
 import ObservationFormComponent, {
   ObservationFormData,
 } from "../Forms/ObservationFormComponent";
-import dayjs from "dayjs";
 import HandleResult from "../HandleResult";
 import { isAdminOrPractitioner } from "../../RolUser";
+import ObservationUtils from "../../Services/Utils/ObservationUtils";
 
 export default function ObservationCreateComponent({
   patientId,
@@ -39,33 +39,8 @@ export default function ObservationCreateComponent({
     : undefined;
 
   const onSubmitForm: SubmitHandler<ObservationFormData> = (data) => {
-    const newObservation: Observation = {
-      valueString: data.valueString,
-
-      subject: {
-        reference: `Patient/${data.subject.id}`,
-        display: data.subject.display,
-      },
-      encounter: {
-        reference: `Encounter/${data.encounter.id}`,
-        display: data.encounter.display,
-      },
-      performer: [
-        {
-          reference: `Practitioner/${data.performer.id}`,
-          display: data.performer.display,
-        },
-      ],
-      category: [{ coding: data.category }], //TODO: cardinality a muchos, por lo que debería cambiarlo a lista en vez de sólo un item
-      code: { coding: [data.code] },
-      interpretation: [{ coding: data.interpretation }],
-      issued: dayjs(data.issued).toISOString(),
-      note: [{ text: data.note }],
-
-      resourceType: "Observation",
-      status: "unknown",
-    };
-    //alert(JSON.stringify(newObservation))
+    const newObservation =
+      ObservationUtils.ObservationFormDataToObservation(data);
     console.log(newObservation);
     sendObservation(newObservation);
   };

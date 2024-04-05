@@ -58,7 +58,7 @@ export default function PatientCreateComponent({
       birthDate: data.fechaNacimiento,
       gender: data.genero as "male" | "female" | "other" | "unknown",
       telecom: [
-        { system: "phone", value: data.numeroTelefonico },
+        { system: "phone", value: data.countryCode + data.numeroTelefonico },
         { system: "email", value: data.email },
       ],
       maritalStatus: {

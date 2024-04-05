@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
-import { ValueSet, ValueSetExpansionContains } from "fhir/r4";
+import { ValueSet, Coding } from "fhir/r4";
 
 interface MultipleFromLHCAutoCompleteComponentProps {
   label: string;
-  onChange: (value: ValueSetExpansionContains[] | null) => void;
+  onChange: (value: Coding[] | null) => void;
   table: string;
   textFieldProps?: TextFieldProps;
   readOnly?: boolean;
@@ -18,13 +18,11 @@ export default function MultipleFromLHCAutoCompleteComponent({
   readOnly,
   onChange,
 }: MultipleFromLHCAutoCompleteComponentProps) {
-  const [dataSet, setDataSet] = useState<ValueSetExpansionContains[]>(
-    [] as ValueSetExpansionContains[]
-  );
+  const [dataSet, setDataSet] = useState<Coding[]>([] as Coding[]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedResources, setSelectedResources] = useState<
-    ValueSetExpansionContains[]
-  >([] as ValueSetExpansionContains[]);
+  const [selectedResources, setSelectedResources] = useState<Coding[]>(
+    [] as Coding[]
+  );
 
   const fetchData = async (searchTerm: string) => {
     setLoading(true);

@@ -1,9 +1,9 @@
 import { Observation, Condition } from "fhir/r4";
 import { InfoListData } from "../../Components/InfoListComponent";
+import { ObservationFormData } from "../../Components/Forms/ObservationFormComponent";
+import dayjs from "dayjs";
 
 export default class ObservationUtils {
-  private constructor() {}
-
   public static getValue(observation: Observation) {
     if (!observation) return "";
     if (observation.valueQuantity) {
@@ -114,5 +114,56 @@ export default class ObservationUtils {
       onsetString: ObservationUtils.getValue(observation),
     };
     return condition;
+  }
+
+  public static getFirstPerformerId(
+    observation: Observation
+  ): string | undefined {
+    if (observation.performer && observation.performer.length > 0) {
+      const reference = observation.performer[0].reference;
+      return reference?.split("/")[1];
+    }
+    return undefined;
+  }
+
+  public static getEncounterId(observation: Observation): string | undefined {
+    if (!observation) return undefined;
+
+    if (observation.encounter?.reference?.length ?? 0 > 0) {
+      const reference = observation.encounter?.reference;
+      return reference?.split("/")[1];
+    }
+    return undefined;
+  }
+
+  public static ObservationFormDataToObservation(
+    data: ObservationFormData
+  ): Observation {
+    return {
+      ...data,
+      valueString: data.valueString,
+      subject: {
+        reference: `Patient/${data.subject.id}`,
+        display: data.subject.display,
+      },
+      encounter: {
+        reference: `Encounter/${data.encounter.id}`,
+        display: data.encounter.display,
+      },
+      performer: [
+        {
+          reference: `Practitioner/${data.performer.id}`,
+          display: data.performer.display,
+        },
+      ],
+      category: [{ coding: data.category }], //TODO: cardinality a muchos, por lo que debería cambiarlo a lista en vez de sólo un item
+      code: { coding: [data.code] },
+      interpretation: [{ coding: data.interpretation }],
+      issued: dayjs(data.issued).toISOString(),
+      note: [{ text: data.note }],
+
+      resourceType: "Observation",
+      status: "unknown",
+    } as Observation;
   }
 }

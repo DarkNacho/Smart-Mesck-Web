@@ -4,15 +4,9 @@ import { TextField, Autocomplete } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import {
-  Observation,
-  Patient,
-  Practitioner,
-  Encounter,
-  ValueSetExpansionContains,
-} from "fhir/r4";
+import { Observation, Patient, Practitioner, Encounter, Coding } from "fhir/r4";
 
-import { category, interpretation } from "./ObservationsUtils";
+import { category, interpretation } from "./Terminology";
 import ObservationUtils from "../../Services/Utils/ObservationUtils";
 import AutoCompleteFromLHCComponentComponent from "../AutoCompleteComponents/AutoCompleteFromLHCComponent";
 import AutoCompleteComponent from "../AutoCompleteComponents/AutoCompleteComponent";
@@ -41,9 +35,9 @@ export interface ObservationFormData {
     display: string;
   };
 
-  code: ValueSetExpansionContains;
-  category: ValueSetExpansionContains[]; // https://hl7.org/fhir/valueset-observation-category.html
-  interpretation: ValueSetExpansionContains[]; // https://hl7.org/fhir/valueset-observation-interpretation.html
+  code: Coding;
+  category: Coding[]; // https://hl7.org/fhir/valueset-observation-category.html
+  interpretation: Coding[]; // https://hl7.org/fhir/valueset-observation-interpretation.html
   note: string; // https://hl7.org/fhir/datatypes.html#Annotation
   issued: Dayjs;
   valueString: string;
@@ -55,7 +49,6 @@ export default function ObservationFormComponent({
   submitForm,
   observation,
   practitionerId,
-  encounterId,
   readOnly = false,
 }: {
   formId: string;
@@ -63,7 +56,6 @@ export default function ObservationFormComponent({
   submitForm: SubmitHandler<ObservationFormData>;
   observation?: Observation;
   practitionerId?: string;
-  encounterId?: string;
   readOnly?: boolean;
 }) {
   const {
@@ -75,7 +67,7 @@ export default function ObservationFormComponent({
   } = useForm<ObservationFormData>();
 
   const roleUser = loadUserRoleFromLocalStorage();
-
+  const encounterId = ObservationUtils.getEncounterId(observation!);
   return (
     <>
       <form id={formId} onSubmit={handleSubmit(submitForm)}>
@@ -194,6 +186,7 @@ export default function ObservationFormComponent({
               id="Autocomplete-category"
               multiple
               options={category}
+              defaultValue={observation?.category?.[0].coding || []}
               getOptionLabel={(option) =>
                 option.display || option.code || "UNKNOWN"
               }
@@ -227,6 +220,7 @@ export default function ObservationFormComponent({
               id="Autocomplete-interpretacion"
               multiple
               options={interpretation}
+              defaultValue={observation?.interpretation?.[0].coding || []}
               getOptionLabel={(option) =>
                 option.display || option.code || "UNKNOWN"
               }

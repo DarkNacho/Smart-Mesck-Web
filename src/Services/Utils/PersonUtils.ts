@@ -50,6 +50,7 @@ export default class PersonUtil {
    * @returns The calculated age.
    */
   static calcularEdad(fechaNacimiento: string): number {
+    if (!fechaNacimiento) return 0;
     const hoy = new Date();
     const fechaNac = new Date(fechaNacimiento);
     let edad = hoy.getFullYear() - fechaNac.getFullYear();

@@ -1,8 +1,8 @@
 import { Button } from "@mui/material";
-import styles from "./HeaderComponent.module.css";
+import styles from "./HeaderPatientComponent.module.css";
 import { useState } from "react";
 
-export default function HeaderComponent() {
+export default function HeaderPatientComponent() {
   const [selectedTab, setSelectedTab] = useState<string>(
     localStorage.getItem("selectedTab") || "Patient"
   );
@@ -11,6 +11,7 @@ export default function HeaderComponent() {
     setSelectedTab(tab);
     localStorage.setItem("selectedTab", tab);
   };
+  const patientId = localStorage.getItem("id");
 
   const sxStyleActive = {
     fontSize: "18px",
@@ -39,10 +40,11 @@ export default function HeaderComponent() {
   };
 
   const tabs = {
-    Patient: "Pacientes",
-    Encounter: "Encuentros",
-    Practitioner: "Profesionales",
-    op4: "Opción4",
+    [`Patient/${patientId}`]: "Mi perfil",
+    Encounter: "Mis Consultas",
+    MyPractitioner: "Mis Profesionales",
+    Practitioner: "Todos Los Profesionales",
+    op4: "Otro",
   };
 
   return (

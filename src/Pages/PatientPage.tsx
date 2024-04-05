@@ -9,7 +9,7 @@ import FhirResourceService from "../Services/FhirService";
 import HandleResult from "../Components/HandleResult";
 import PatientEncounterListComponent from "../Components/Patient/PatientEncounterListComponent";
 
-const fhirService = new FhirResourceService("Patient");
+const fhirService = new FhirResourceService<Patient>("Patient");
 
 export default function PatientPage() {
   const { patientID } = useParams();

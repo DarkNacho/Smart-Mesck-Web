@@ -10,6 +10,7 @@ import EncounterPatientPage from "./Pages/EncounterPatientPage.tsx";
 import ObservationPage from "./Pages/ObservationPage.tsx";
 import PatientListPage from "./Pages/ListPages/PatientListPage.tsx";
 import PractitionerListPage from "./Pages/ListPages/PractitionerListPage.tsx";
+import PatientMyPractitionerListPage from "./Pages/ListPages/PatientMyPractitionerListPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/Patient",
     element: <PatientListPage></PatientListPage>,
+  },
+  {
+    path: "/MyPractitioner",
+    element: <PatientMyPractitionerListPage></PatientMyPractitionerListPage>,
   },
   {
     path: "/Patient/:patientID",

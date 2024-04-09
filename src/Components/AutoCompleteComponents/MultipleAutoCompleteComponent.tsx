@@ -5,7 +5,7 @@ import FhirResourceService from "../../Services/FhirService";
 import FhirType from "../../Services/Utils/Fhirtypes";
 import { FhirResource } from "fhir/r4";
 import { SearchParams } from "fhir-kit-client";
-
+import { useDebounce } from "use-debounce";
 interface MultipleAutoCompleteComponentProps<T extends FhirResource> {
   resourceType: FhirType;
   label: string;
@@ -30,10 +30,12 @@ export default function MultipleAutoCompleteComponent<T extends FhirResource>({
   const [dataSet, setDataSet] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 1000);
 
   const fhirService = new FhirResourceService<T>(resourceType);
 
-  const fetchData = async (searchTerm: string) => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const stringJson = `{"${searchParam}": "${searchTerm}"}`;
@@ -59,9 +61,15 @@ export default function MultipleAutoCompleteComponent<T extends FhirResource>({
   };
 
   useEffect(() => {
-    fetchData("");
+    fetchData();
     //fetchDataAndDefaultResource();
   }, [selectedResources]);
+
+  useEffect(() => {
+    if (debouncedSearchTerm !== undefined && debouncedSearchTerm !== "") {
+      fetchData();
+    }
+  }, [debouncedSearchTerm]);
 
   //if (defaultResourceId && !defaultResource) return <div>Loading...</div>;
 
@@ -74,7 +82,8 @@ export default function MultipleAutoCompleteComponent<T extends FhirResource>({
       loading={loading}
       getOptionLabel={(option) => getDisplay(option)}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      onInputChange={(_, newInputValue) => fetchData(newInputValue)}
+      onInputChange={(_, newInputValue) => setSearchTerm(newInputValue)}
+      //onInputChange={(_, newInputValue) => fetchData(newInputValue)}
       readOnly={readOnly}
       onChange={(_, newValue) => {
         setSelectedResources(newValue);

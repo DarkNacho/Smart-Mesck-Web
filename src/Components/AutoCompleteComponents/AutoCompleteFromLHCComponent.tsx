@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import { ValueSet, Coding } from "fhir/r4";
+import { useDebounce } from "use-debounce";
 
 interface AutoCompleteFromLHCComponentProps {
   label: string;
@@ -21,9 +22,11 @@ export default function AutoCompleteFromLHCComponentComponent({
   onChange,
 }: AutoCompleteFromLHCComponentProps) {
   const [dataSet, setDataSet] = useState<Coding[]>([] as Coding[]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 1000);
 
-  const fetchData = async (searchTerm: string) => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const response = await fetch(
@@ -47,13 +50,19 @@ export default function AutoCompleteFromLHCComponentComponent({
   };
 
   useEffect(() => {
-    fetchData("");
-    //fetchDataAndDefaultResource();
+    fetchData();
   }, []);
+
+  useEffect(() => {
+    if (debouncedSearchTerm !== undefined && debouncedSearchTerm !== "") {
+      fetchData();
+    }
+    //fetchDataAndDefaultResource();
+  }, [debouncedSearchTerm]);
 
   //if (defaultResourceId && !defaultResource) return <div>Loading...</div>;
 
-  console.log("defaul:", defaultResource);
+  console.log("default:", defaultResource);
   return (
     <Autocomplete
       id={`${label}-Autocomplete`}
@@ -64,7 +73,8 @@ export default function AutoCompleteFromLHCComponentComponent({
         `${option.code} - ${option.display || option.system}`
       }
       isOptionEqualToValue={(option, value) => option.code === value.code}
-      onInputChange={(_, newInputValue) => fetchData(newInputValue)}
+      //onInputChange={(_, newInputValue) => fetchData(newInputValue)}
+      onInputChange={(_, newInputValue) => setSearchTerm(newInputValue)}
       readOnly={readOnly}
       onChange={(_, newValue) => {
         onChange(newValue);

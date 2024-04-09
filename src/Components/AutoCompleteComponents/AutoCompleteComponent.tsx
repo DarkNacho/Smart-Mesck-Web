@@ -5,6 +5,7 @@ import FhirResourceService from "../../Services/FhirService";
 import FhirType from "../../Services/Utils/Fhirtypes";
 import { FhirResource } from "fhir/r4";
 import { SearchParams } from "fhir-kit-client";
+import { useDebounce } from "use-debounce";
 
 interface AutoCompleteComponentProps<T extends FhirResource> {
   resourceType: FhirType;
@@ -30,12 +31,14 @@ export default function AutoCompleteComponent<T extends FhirResource>({
   onChange,
 }: AutoCompleteComponentProps<T>) {
   const [dataSet, setDataSet] = useState<T[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [defaultResource, setDefaultResource] = useState<T>();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 1000);
 
   const fhirService = new FhirResourceService<T>(resourceType);
 
-  const fetchData = async (searchTerm: string) => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const stringJson = `{"${searchParam}": "${searchTerm}"}`;
@@ -77,11 +80,17 @@ export default function AutoCompleteComponent<T extends FhirResource>({
   useEffect(() => {
     const fetchDataAndDefaultResource = async () => {
       await fetchDefaultResource();
-      fetchData("");
+      fetchData();
     };
 
     fetchDataAndDefaultResource();
   }, []);
+
+  useEffect(() => {
+    if (debouncedSearchTerm !== undefined && debouncedSearchTerm !== "") {
+      fetchData();
+    }
+  }, [debouncedSearchTerm]);
 
   if (defaultResourceId && !defaultResource) return <div>Loading...</div>;
 
@@ -93,7 +102,8 @@ export default function AutoCompleteComponent<T extends FhirResource>({
       loading={loading}
       getOptionLabel={(option) => getDisplay(option)}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      onInputChange={(_, newInputValue) => fetchData(newInputValue)}
+      //onInputChange={(_, newInputValue) => fetchData(newInputValue)}
+      onInputChange={(_, newInputValue) => setSearchTerm(newInputValue)}
       readOnly={readOnly}
       onChange={(_, newValue) => onChange(newValue)}
       renderOption={(props, option) => (

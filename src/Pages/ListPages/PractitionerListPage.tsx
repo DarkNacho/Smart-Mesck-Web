@@ -1,16 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { TextField, IconButton, InputAdornment, MenuItem } from "@mui/material";
+import {
+  TextField,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  Autocomplete,
+} from "@mui/material";
 import styles from "./ListPage.module.css";
 
 import { Add, Search } from "@mui/icons-material";
 import ListResourceComponent from "../../Components/ListResourceComponent";
-import { Practitioner } from "fhir/r4";
+import { Coding, Practitioner, ValueSet } from "fhir/r4";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import FhirResourceService from "../../Services/FhirService";
 import PractitionerCreateComponent from "../../Components/Practitioner/PractitionerCreateComponent";
 import { SearchParams } from "fhir-kit-client";
 import { isAdminOrPractitioner } from "../../RolUser";
+import ValueSetUtils from "../../Services/Utils/ValueSetUtils";
 
 const fhirService = new FhirResourceService<Practitioner>("Practitioner");
 
@@ -26,6 +33,46 @@ export default function PractitionerListPage() {
   const [searchType, setSearchType] = useState("1");
   const [searchParam, setSearchParam] = useState<SearchParams>({});
 
+  let specialty: Coding | undefined;
+  //const [specialty, setSpecialty] = useState<Coding>();
+  const [specialtyOptions, setSpecialtyOptions] = useState<Coding[]>([]);
+  const [loadingSpecialty, setLoadingSpecialty] = useState<boolean>(true);
+
+  //const [role, setRole] = useState<Coding>();
+  let role: Coding | undefined;
+  const [roleOptions, setRoleOptions] = useState<Coding[]>([]);
+  const [loadingRole, setLoadingRole] = useState<boolean>(true);
+
+  const fetchSpecialty = async () => {
+    try {
+      const response = await new FhirResourceService<ValueSet>(
+        "ValueSet"
+      ).getById("257");
+      if (!response.success) throw new Error(response.error);
+      setSpecialtyOptions(
+        ValueSetUtils.convertValueSetToCodingArray(response.data)
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingSpecialty(false);
+    }
+  };
+
+  const fetchRole = async () => {
+    try {
+      const response = await new FhirResourceService<ValueSet>(
+        "ValueSet"
+      ).getById("232");
+      if (!response.success) throw new Error(response.error);
+      setRoleOptions(ValueSetUtils.convertValueSetToCodingArray(response.data));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingRole(false);
+    }
+  };
+
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
   };
@@ -40,10 +87,18 @@ export default function PractitionerListPage() {
         search = { name: searchTerm };
         break;
     }
+    if (role && role.code)
+      search["_has:PractitionerRole:practitioner:role"] = role.code;
+    if (specialty && specialty.code)
+      search["_has:PractitionerRole:practitioner:specialty"] = specialty.code;
     setSearchParam(search);
     return search;
   };
 
+  useEffect(() => {
+    fetchSpecialty();
+    fetchRole();
+  }, []);
   return (
     <div>
       <div className={styles.content}>
@@ -110,6 +165,61 @@ export default function PractitionerListPage() {
             <MenuItem value="0">Rut</MenuItem>
             <MenuItem value="1">Nombre</MenuItem>
           </TextField>
+
+          <Autocomplete
+            id="Autocomplete-role"
+            options={roleOptions}
+            loading={loadingRole}
+            getOptionLabel={(option) =>
+              option.display || option.code || "UNKNOWN"
+            }
+            isOptionEqualToValue={(option, value) => option.code === value.code}
+            onChange={(_, newValue) => {
+              role = newValue!;
+              //setRole(newValue!);
+              handleSearch();
+            }}
+            renderOption={(props, option) => (
+              <li {...props} key={option.code}>
+                {option.display}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                label="Roles"
+                variant="outlined"
+              />
+            )}
+          />
+          <Autocomplete
+            id="Autocomplete-specialty"
+            options={specialtyOptions}
+            loading={loadingSpecialty}
+            getOptionLabel={(option) =>
+              option.display || option.code || "UNKNOWN"
+            }
+            isOptionEqualToValue={(option, value) => option.code === value.code}
+            onChange={(_, newValue) => {
+              specialty = newValue!;
+              //setSpecialty(newValue!);
+              handleSearch();
+            }}
+            renderOption={(props, option) => (
+              <li {...props} key={option.code}>
+                {option.display}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                label="Especialidad"
+                variant="outlined"
+              />
+            )}
+          />
         </form>
         <div>
           <ListResourceComponent

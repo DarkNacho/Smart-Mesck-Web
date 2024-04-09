@@ -1,35 +1,15 @@
 import React from "react";
 import { DevTool } from "@hookform/devtools";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
-import { TextField, Grid, MenuItem } from "@mui/material";
+import { TextField, Grid, MenuItem, IconButton } from "@mui/material";
 import {
   generoOptions,
   countryCodes,
   maritalOptions,
   contactTypes,
 } from "./Terminology";
-
-// Función para validar el Rut
-const validarRut = (rut: string) => {
-  // Eliminar puntos y guiones del RUT y convertir la letra a mayúscula
-  rut = rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
-
-  // Extraer dígito verificador y número
-  const dv = rut.slice(-1);
-  let rutNumerico = parseInt(rut.slice(0, -1), 10);
-
-  // Calcular dígito verificador esperado
-  let m = 0;
-  let s = 1;
-  for (; rutNumerico; rutNumerico = Math.floor(rutNumerico / 10)) {
-    s = (s + (rutNumerico % 10) * (9 - (m++ % 6))) % 11;
-  }
-
-  const dvEsperado = (s ? s - 1 : "K").toString();
-
-  // Verificar si el dígito verificador es correcto
-  return dv === dvEsperado;
-};
+import PersonUtil from "../../Services/Utils/PersonUtils";
+import { Add, Remove } from "@mui/icons-material";
 
 // Interfaz para los datos del formulario
 export interface PatientFormData {
@@ -50,8 +30,10 @@ export interface PatientFormData {
     segundoNombre: string;
     apellidoPaterno: string;
     apellidoMaterno: string;
-    numeroTelefonico: string;
     contactType: string;
+    email: string;
+    countryCode: string;
+    numeroTelefonico: string;
   }[];
 }
 
@@ -75,8 +57,10 @@ export default function PatientFormComponent({
           segundoNombre: "",
           apellidoPaterno: "",
           apellidoMaterno: "",
-          numeroTelefonico: "",
           contactType: "N",
+          email: "",
+          countryCode: "+56",
+          numeroTelefonico: "",
         },
       ],
     },
@@ -169,7 +153,8 @@ export default function PatientFormComponent({
               label="Rut"
               {...register("rut", {
                 required: "El Rut es necesario",
-                validate: (value) => validarRut(value) || "Rut inválido",
+                validate: (value) =>
+                  PersonUtil.RutValidation(value) || "Rut inválido",
               })}
               fullWidth
               error={Boolean(errors.rut)}
@@ -253,6 +238,7 @@ export default function PatientFormComponent({
           <Grid item xs={12} sm={12}>
             <h1>Contactos:</h1>
           </Grid>
+
           {fields.map((field, index) => (
             <React.Fragment key={field.id}>
               <Grid item xs={12} sm={6}>
@@ -269,7 +255,7 @@ export default function PatientFormComponent({
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   select
                   label="Relación"
@@ -289,13 +275,76 @@ export default function PatientFormComponent({
                   ))}
                 </TextField>
               </Grid>
-              <button type="button" onClick={() => remove(index)}>
-                Delete
-              </button>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  type="email"
+                  label="Email"
+                  {...register(`contact.${index}.email`, {
+                    required: "Correo electrónico requerido",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Correo electrónico inválido",
+                    },
+                  })}
+                  error={Boolean(errors.contact?.[index]?.email)}
+                  helperText={
+                    errors.contact?.[index]?.email &&
+                    errors.contact?.[index]?.email?.message
+                  }
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} sm={1.5}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Código"
+                  defaultValue="+56"
+                  {...register(`contact.${index}.countryCode`, {
+                    required: "Código de país requerido",
+                  })}
+                  error={Boolean(errors.contact?.[index]?.countryCode)}
+                  helperText={
+                    errors.contact?.[index]?.countryCode &&
+                    errors.contact?.[index]?.countryCode?.message
+                  }
+                >
+                  {countryCodes.map((option) => (
+                    <MenuItem key={option.code} value={option.code}>
+                      {option.display}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={4.5}>
+                <TextField
+                  label="Número Telefónico"
+                  type="number"
+                  {...register(`contact.${index}.numeroTelefonico`, {
+                    required: "Número telefónico requerido",
+                    pattern: {
+                      value: /^[0-9]+$/i,
+                      message: "Número telefónico inválido",
+                    },
+                  })}
+                  error={Boolean(errors.contact?.[index]?.numeroTelefonico)}
+                  helperText={
+                    errors.contact?.[index]?.numeroTelefonico &&
+                    errors.contact?.[index]?.numeroTelefonico?.message
+                  }
+                  fullWidth
+                />
+              </Grid>
+              <IconButton
+                onClick={() => remove(index)}
+                color="primary"
+                aria-label="remove"
+              >
+                <Remove />
+              </IconButton>
             </React.Fragment>
           ))}
-          <button
-            type="button"
+          <IconButton
             onClick={() =>
               append({
                 nombre: "",
@@ -304,11 +353,15 @@ export default function PatientFormComponent({
                 apellidoMaterno: "",
                 numeroTelefonico: "",
                 contactType: "N",
+                email: "",
+                countryCode: "+56",
               })
             }
+            color="primary"
+            aria-label="add"
           >
-            Agregar
-          </button>
+            <Add />
+          </IconButton>
         </Grid>
       </form>
       <DevTool control={control} />

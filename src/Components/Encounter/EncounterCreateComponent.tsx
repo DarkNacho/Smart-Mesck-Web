@@ -41,7 +41,7 @@ export default function EncounterCreateComponent({
   const practitionerId = localStorage.getItem("id");
 
   const postEncounter = async (newEncounter: Encounter) => {
-    HandleResult.handleOperation(
+    const response = await HandleResult.handleOperation(
       () =>
         new FhirResourceService<Encounter>("Encounter").postResource(
           newEncounter
@@ -49,6 +49,7 @@ export default function EncounterCreateComponent({
       "Encuentro guardado de forma exitosa",
       "Enviando..."
     );
+    if (response.success) handleClose();
   };
 
   // Función que se ejecuta al enviar el formulario

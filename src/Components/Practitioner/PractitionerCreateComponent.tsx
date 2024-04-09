@@ -38,7 +38,7 @@ export default function PatientCreateComponent({
     newPractitioner: Practitioner,
     newPractitionerRole: PractitionerRole
   ) => {
-    HandleResult.handleOperation(
+    const response = await HandleResult.handleOperation(
       () =>
         new FhirResourceService("Practitioner")
           .postResource(newPractitioner)
@@ -57,6 +57,7 @@ export default function PatientCreateComponent({
       "Profesional Guardado exitosamente",
       "Enviando..."
     );
+    if (response.success) handleClose();
   };
 
   // Función que se ejecuta al enviar el formulario

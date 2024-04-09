@@ -34,11 +34,12 @@ export default function PatientCreateComponent({
   };
 
   const postPatient = async (newPatient: Patient) => {
-    HandleResult.handleOperation(
+    const response = await HandleResult.handleOperation(
       () => new FhirResourceService("Patient").postResource(newPatient),
       "Paciente Guardado con éxito",
       "Enviando..."
     );
+    if (response.success) handleClose();
   };
 
   // Función que se ejecuta al enviar el formulario

@@ -46,11 +46,12 @@ export default function ObservationCreateComponent({
   };
 
   const sendObservation = async (newObservation: Observation) => {
-    HandleResult.handleOperation(
+    const response = await HandleResult.handleOperation(
       () => new ObservationService().sendResource(newObservation),
       "Observación guardada de forma exitosa",
       "Enviando..."
     );
+    if (response.success) handleClose();
   };
 
   return (

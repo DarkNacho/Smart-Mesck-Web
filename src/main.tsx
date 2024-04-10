@@ -11,6 +11,7 @@ import ObservationPage from "./Pages/ObservationPage.tsx";
 import PatientListPage from "./Pages/ListPages/PatientListPage.tsx";
 import PractitionerListPage from "./Pages/ListPages/PractitionerListPage.tsx";
 import PatientMyPractitionerListPage from "./Pages/ListPages/PatientMyPractitionerListPage.tsx";
+import NavBarComponent from "./Components/NavBar/NavBarComponent.tsx";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
+    <NavBarComponent></NavBarComponent>
     <App></App>
     <Toaster></Toaster>
     <RouterProvider router={router}></RouterProvider>

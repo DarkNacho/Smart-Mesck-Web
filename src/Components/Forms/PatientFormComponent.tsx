@@ -1,7 +1,18 @@
 import React from "react";
 import { DevTool } from "@hookform/devtools";
-import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
-import { TextField, Grid, MenuItem, IconButton } from "@mui/material";
+import {
+  useForm,
+  SubmitHandler,
+  useFieldArray,
+  Controller,
+} from "react-hook-form";
+import {
+  TextField,
+  Grid,
+  MenuItem,
+  IconButton,
+  Autocomplete,
+} from "@mui/material";
 import {
   generoOptions,
   countryCodes,
@@ -10,6 +21,7 @@ import {
 } from "./Terminology";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import { Add, Remove } from "@mui/icons-material";
+import { Coding } from "fhir/r4";
 
 // Interfaz para los datos del formulario
 export interface PatientFormData {
@@ -24,7 +36,7 @@ export interface PatientFormData {
   numeroTelefonico: string;
   email: string;
   photo: string;
-  maritalStatus: string;
+  maritalStatus: Coding;
   contact: {
     nombre: string;
     segundoNombre: string;
@@ -215,21 +227,38 @@ export default function PatientFormComponent({
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              label="Estado Civil"
-              defaultValue="S"
-              {...register("maritalStatus")}
-              fullWidth
-              error={Boolean(errors.genero)}
-              helperText={errors.genero && errors.genero.message}
-            >
-              {maritalOptions.map((option) => (
-                <MenuItem key={option.code} value={option.code}>
-                  {option.display}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Controller
+              name="maritalStatus"
+              control={control}
+              defaultValue={maritalOptions[0]}
+              render={({ field }) => (
+                <Autocomplete
+                  id="Autocomplete-marital"
+                  options={maritalOptions}
+                  defaultValue={maritalOptions[0]}
+                  getOptionLabel={(option) =>
+                    option.display || option.code || "unk"
+                  }
+                  isOptionEqualToValue={(option, value) =>
+                    option.code === value.code
+                  }
+                  onChange={(_, newValue) => field.onChange(newValue)}
+                  renderOption={(props, option) => (
+                    <li {...props} key={option.code}>
+                      {option.display}
+                    </li>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      label="Estado Civil"
+                      variant="outlined"
+                    />
+                  )}
+                />
+              )}
+            />
           </Grid>
           <Grid item xs={12} sm={12}>
             <TextField label="Foto" {...register("photo")} fullWidth />

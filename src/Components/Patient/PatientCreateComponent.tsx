@@ -63,12 +63,7 @@ export default function PatientCreateComponent({
         { system: "email", value: data.email },
       ],
       maritalStatus: {
-        coding: [
-          {
-            code: data.maritalStatus,
-            system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
-          },
-        ],
+        coding: [data.maritalStatus],
       },
       photo: [{ url: data.photo }],
     };

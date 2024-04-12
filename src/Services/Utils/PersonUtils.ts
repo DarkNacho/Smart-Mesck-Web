@@ -152,4 +152,22 @@ export default class PersonUtil {
     // Verificar si el dígito verificador es correcto
     return dv === dvEsperado;
   };
+
+  /**
+   * Retrieves the gender of a person.
+   *
+   * @param resource - The FHIR resource representing a person.
+   * @returns The gender of the person, or "N/A" if not available.
+   */
+  static getGender(resource: FhirResourceType): string {
+    if (resource.gender === undefined) return "N/A";
+
+    const genderMap: Record<string, string> = {
+      male: "masculino",
+      female: "femenino",
+      other: "otro",
+      unknown: "desconocido",
+    };
+    return genderMap[resource.gender] || "N/A";
+  }
 }

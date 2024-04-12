@@ -21,7 +21,7 @@ export default function PatientGeneralWidgetComponent({
         {edit && <b className={styles.text}>Edit</b>}
       </div>
       <Grid container spacing={2} justifyContent="space-around" padding="10px">
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={2}>
           <Typography variant="h6">
             ID: {PersonUtil.getFirstIdentifierOrId(patient)}
           </Typography>
@@ -32,7 +32,7 @@ export default function PatientGeneralWidgetComponent({
             {PersonUtil.getContactPointFirstOrDefaultAsString(patient, "email")}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={4}>
           <Typography variant="h6">
             Número Telefónico:{" "}
             {PersonUtil.getContactPointFirstOrDefaultAsString(patient, "phone")}
@@ -49,7 +49,9 @@ export default function PatientGeneralWidgetComponent({
           </Typography>
         </Grid>
         <Grid item xs={12} sm={2}>
-          <Typography variant="h6">Sexo: {patient.gender}</Typography>
+          <Typography variant="h6">
+            Sexo: {PersonUtil.getGender(patient)}
+          </Typography>
         </Grid>
         <Grid item xs={12} sm={2}>
           <Typography variant="h6">

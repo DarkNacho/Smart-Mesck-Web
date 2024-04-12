@@ -97,7 +97,7 @@ export default function PatientOverviewComponent({
             data={medication}
             title={"Medicamentos"}
             icon={"/medication.svg"}
-            resourceType="Medication"
+            resourceType="MedicationStatement"
             patientId={patient.id!}
           ></InfoListComponent>
         </div>

@@ -1,4 +1,5 @@
 import { MedicationStatement } from "fhir/r4";
+import { MedicationFormData } from "../../Components/Forms/MedicationFormComponent";
 
 export default class MedicationUtils {
   public static extractMedicationInfo(
@@ -17,5 +18,35 @@ export default class MedicationUtils {
 
       return { name, value };
     });
+  }
+
+  public static MedicationFormDataToMedicationStatement(
+    data: MedicationFormData
+  ) {
+    const medicationStatement: MedicationStatement = {
+      resourceType: "MedicationStatement",
+      status: "active",
+      medicationCodeableConcept: {
+        coding: [data.medication],
+      },
+      subject: {
+        reference: `Patient/${data.subject.id}`,
+        display: data.subject.display,
+      },
+      context: {
+        reference: `Encounter/${data.encounter.id}`,
+        display: data.encounter.display,
+      },
+      informationSource: {
+        reference: `Practitioner/${data.performer.id}`,
+        display: data.performer.display,
+      },
+      effectivePeriod: {
+        start: data.startDate.toISOString(),
+        end: data.endDate.toISOString(),
+      },
+    };
+
+    return medicationStatement;
   }
 }

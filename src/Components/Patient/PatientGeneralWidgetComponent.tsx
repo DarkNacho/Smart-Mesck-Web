@@ -20,19 +20,19 @@ export default function PatientGeneralWidgetComponent({
         <b className={styles.title1}>Antecedentes Personales</b>
         {edit && <b className={styles.text}>Edit</b>}
       </div>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={4}>
+      <Grid container spacing={2} justifyContent="space-around" padding="10px">
+        <Grid item xs={12} sm={3}>
           <Typography variant="h6">
             ID: {PersonUtil.getFirstIdentifierOrId(patient)}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Typography variant="h6">
             E-Mail:{" "}
             {PersonUtil.getContactPointFirstOrDefaultAsString(patient, "email")}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Typography variant="h6">
             Número Telefónico:{" "}
             {PersonUtil.getContactPointFirstOrDefaultAsString(patient, "phone")}

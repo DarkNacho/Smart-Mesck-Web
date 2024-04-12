@@ -1,7 +1,6 @@
 import LoginPage from "./LoginPage.tsx";
 import { useState } from "react";
 import { loadUserRoleFromLocalStorage } from "./RolUser.ts";
-import HeaderPatientComponent from "./Components/Header/HeaderPatientComponent.tsx";
 import NavBarComponent from "./Components/NavBar/NavBarComponent.tsx";
 
 function App() {
@@ -13,18 +12,10 @@ function App() {
     setUserRol(_userRol);
   };
 
-  const renderHeaderComponent = (_userRol: string) => {
-    if (_userRol === "Admin" || _userRol === "Practitioner")
-      return <NavBarComponent />;
-    if (_userRol === "Patient") return <HeaderPatientComponent />;
-
-    return <> </>;
-  };
-
   return (
     <div>
       {userRol ? (
-        renderHeaderComponent(userRol)
+        <NavBarComponent></NavBarComponent>
       ) : (
         <LoginPage onLogin={handleLogin} />
       )}

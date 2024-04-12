@@ -14,25 +14,64 @@ import logo from "../../assets/smart-mesck-logo.png";
 import backgroundImageSmartMesck from "../../assets/background-smart-mesck.png";
 import { Close, Menu } from "@mui/icons-material";
 import { useState } from "react";
+import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
-const navigationItems = [
+const navigationAdminItems = [
   {
     value: "Pacientes",
     to: "/Patient",
   },
   {
-    value: "Mis médicos",
-    to: "/MyPractitioner",
+    value: "Profesionales",
+    to: "/Practitioner",
   },
   {
     value: "Encuentros",
     to: "/Encounter",
   },
+];
+
+const navigationPractitionerItems = [
   {
-    value: "Médicos",
+    value: "Mis Pacientes",
+    to: "/Patient",
+  },
+  {
+    value: "Mis Encuentros",
+    to: "/Encounter",
+  },
+];
+
+const navigationPatientItems = [
+  {
+    value: "Mi Perfil",
+    to: `/Patient/${localStorage.getItem("id")!}`,
+  },
+  {
+    value: "Mis Encuentros",
+    to: "/Encounter",
+  },
+  {
+    value: "Mis Profesionales",
+    to: "/MyPractitioner",
+  },
+  {
+    value: "Todos los  Profesionales",
     to: "/Practitioner",
   },
 ];
+
+const getNavigationItems = () => {
+  const role = loadUserRoleFromLocalStorage();
+  if (role === "Admin") {
+    return navigationAdminItems;
+  } else if (role === "Practitioner") {
+    return navigationPractitionerItems;
+  } else if (role === "Patient") {
+    return navigationPatientItems;
+  }
+  return [];
+};
 
 export default function NavBarComponent() {
   const [open, setOpen] = useState(false);
@@ -47,7 +86,12 @@ export default function NavBarComponent() {
     setOpen(false);
   };
 
-  const mappedNavigationItems = navigationItems.map((item) => {
+  const handleLogOut = () => {
+    localStorage.clear();
+    window.location.href = "/";
+  };
+
+  const mappedNavigationItems = getNavigationItems().map((item) => {
     return (
       <Button
         key={item.to}
@@ -74,6 +118,9 @@ export default function NavBarComponent() {
           <Hidden smDown>
             <Box>{mappedNavigationItems}</Box>
             <Box marginLeft="auto">Usuario aquí</Box>
+            <Button variant="contained" onClick={handleLogOut}>
+              Cerrar Sesión
+            </Button>
           </Hidden>
           <Hidden smUp>
             <Box marginLeft="auto">
@@ -117,6 +164,9 @@ export default function NavBarComponent() {
                 <h1>Usuario aquí</h1>
                 <h1>extra 1</h1>
                 <h1>extra 2</h1>
+                <Button variant="contained" onClick={handleLogOut}>
+                  Cerrar Sesión
+                </Button>
               </Box>
             </Dialog>
           </Hidden>

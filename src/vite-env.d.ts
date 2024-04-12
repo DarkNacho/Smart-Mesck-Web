@@ -3,6 +3,10 @@
 // Define a Result type
 type Result<T> = { success: true; data: T } | { success: false; error: string };
 
+declare module "*.jpg";
+declare module "*.png";
+declare module "*.jpeg";
+declare module "*.svg";
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
 }

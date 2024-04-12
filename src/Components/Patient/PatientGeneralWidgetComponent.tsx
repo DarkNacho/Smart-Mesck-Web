@@ -1,3 +1,4 @@
+import { Grid, Typography } from "@mui/material";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import styles from "./PatientGeneralWidgetComponent.module.css";
 import { Patient } from "fhir/r4";
@@ -19,58 +20,45 @@ export default function PatientGeneralWidgetComponent({
         <b className={styles.title1}>Antecedentes Personales</b>
         {edit && <b className={styles.text}>Edit</b>}
       </div>
-      <div className={styles.table}>
-        <ul className={styles["text-wrapper"]}>
-          <div className={styles.item}>
-            <div className={styles.text1}>ID</div>
-            <div className={styles.text2}>
-              {PersonUtil.getFirstIdentifierOrId(patient)}
-            </div>
-          </div>
-          <div className={styles.item}>
-            <div className={styles.text1}>E-Mail</div>
-            <div className={styles.text2}>
-              {PersonUtil.getContactPointFirstOrDefaultAsString(
-                patient,
-                "email"
-              )}
-            </div>
-          </div>
-          <div className={styles.item}>
-            <div className={styles.text1}>Número Telefónico</div>
-            <div className={styles.text2}>
-              {PersonUtil.getContactPointFirstOrDefaultAsString(
-                patient,
-                "phone"
-              )}
-            </div>
-          </div>
-        </ul>
-      </div>
-      <div className={styles.table}>
-        <ul className={styles["text-wrapper"]}>
-          <div className={styles.item}>
-            <div className={styles.text1}>Fecha de Nacimiento</div>
-            <div className={styles.text2}>{patient.birthDate || "N/A"}</div>
-          </div>
-          <div className={styles.item}>
-            <div className={styles.text1}>Edad</div>
-            <div className={styles.text2}>
-              {PersonUtil.calcularEdad(patient.birthDate!)}
-            </div>
-          </div>
-          <div className={styles.item}>
-            <div className={styles.text1}>Sexo</div>
-            <div className={styles.text2}>{patient.gender}</div>
-          </div>
-          <div className={styles.item}>
-            <div className={styles.text1}>Estado Civil</div>
-            <div className={styles.text2}>
-              {PersonUtil.getMaritalStatus(patient)}
-            </div>
-          </div>
-        </ul>
-      </div>
+      <Grid container spacing={2} justifyContent="space-around" padding="10px">
+        <Grid item xs={12} sm={2}>
+          <Typography variant="h6">
+            ID: {PersonUtil.getFirstIdentifierOrId(patient)}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Typography variant="h6">
+            E-Mail:{" "}
+            {PersonUtil.getContactPointFirstOrDefaultAsString(patient, "email")}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Typography variant="h6">
+            Número Telefónico:{" "}
+            {PersonUtil.getContactPointFirstOrDefaultAsString(patient, "phone")}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Typography variant="h6">
+            Fecha Nacimiento: {patient.birthDate || "N/A"}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={2}>
+          <Typography variant="h6">
+            Edad: {PersonUtil.calcularEdad(patient.birthDate!)}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={2}>
+          <Typography variant="h6">
+            Sexo: {PersonUtil.getGender(patient)}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={2}>
+          <Typography variant="h6">
+            Estado Civil: {PersonUtil.getMaritalStatus(patient)}
+          </Typography>
+        </Grid>
+      </Grid>
     </div>
   );
 }

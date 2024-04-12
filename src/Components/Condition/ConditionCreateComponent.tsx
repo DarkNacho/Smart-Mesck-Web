@@ -78,11 +78,12 @@ export default function ConditionCreateComponent({
   };
 
   const sendCondition = async (newCondition: Condition) => {
-    HandleResult.handleOperation(
+    const response = await HandleResult.handleOperation(
       () => new ConditionService().sendResource(newCondition),
       "Condición guardada de forma exitosa",
       "Enviando..."
     );
+    if (response.success) handleClose();
   };
 
   return (

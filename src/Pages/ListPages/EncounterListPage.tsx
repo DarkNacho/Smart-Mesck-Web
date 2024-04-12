@@ -25,12 +25,23 @@ const fhirService = new FhirResourceService<Encounter>("Encounter");
 
 function getDisplay(resource: Encounter): string {
   const roleUser = loadUserRoleFromLocalStorage();
+  let display = "";
+
+  if (roleUser === "Admin")
+    display = `Paciente: ${EncounterUtils.getSubjectDisplayOrID(
+      resource.subject!
+    )}
+    \nProfesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`;
+
+  if (roleUser == "Patient")
+    display = `Profesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`;
+  if (roleUser == "Practitioner")
+    display = `Paciente: ${EncounterUtils.getSubjectDisplayOrID(
+      resource.subject!
+    )}`;
+
   return `ID: ${resource.id}
-  \n${
-    roleUser === "Practitioner"
-      ? `Paciente: ${EncounterUtils.getSubjectDisplayOrID(resource.subject!)}`
-      : `Profesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`
-  }
+  \n${display}
   \n${EncounterUtils.getFormatPeriod(resource.period!)}`;
 }
 

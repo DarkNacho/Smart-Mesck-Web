@@ -7,6 +7,7 @@ import { useState } from "react";
 import ObservationCreateComponent from "./Observation/ObservationCreateComponent";
 import { isAdminOrPractitioner } from "../RolUser";
 import ConditionCreateComponent from "./Condition/ConditionCreateComponent";
+import MedicationCreateComponent from "./Medication/MedicationCreateComponent";
 
 export interface InfoListData {
   id?: string;
@@ -48,6 +49,11 @@ export default function InfoListComponent({
           isOpen={resourceType === "Observation" ? openDialog : false}
           patientId={patientId!}
         ></ObservationCreateComponent>
+        <MedicationCreateComponent
+          onOpen={handleIsOpen}
+          isOpen={resourceType === "MedicationStatement" ? openDialog : false}
+          patientId={patientId!}
+        ></MedicationCreateComponent>
       </div>
       <div className={styles.infolist}>
         <div className={styles.title}>

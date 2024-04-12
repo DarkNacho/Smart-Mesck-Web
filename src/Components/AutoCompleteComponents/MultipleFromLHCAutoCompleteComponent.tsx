@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import { ValueSet, Coding } from "fhir/r4";
+import { useDebounce } from "use-debounce";
 
 interface MultipleFromLHCAutoCompleteComponentProps {
   label: string;
@@ -24,7 +25,10 @@ export default function MultipleFromLHCAutoCompleteComponent({
     [] as Coding[]
   );
 
-  const fetchData = async (searchTerm: string) => {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 1000);
+
+  const fetchData = async () => {
     setLoading(true);
     try {
       const response = await fetch(
@@ -46,9 +50,15 @@ export default function MultipleFromLHCAutoCompleteComponent({
   };
 
   useEffect(() => {
-    fetchData("");
+    fetchData();
     //fetchDataAndDefaultResource();
   }, [selectedResources]);
+
+  useEffect(() => {
+    if (debouncedSearchTerm !== undefined && debouncedSearchTerm !== "") {
+      fetchData();
+    }
+  }, [debouncedSearchTerm]);
 
   //if (defaultResourceId && !defaultResource) return <div>Loading...</div>;
 
@@ -61,7 +71,8 @@ export default function MultipleFromLHCAutoCompleteComponent({
       loading={loading}
       getOptionLabel={(option) => `${option.code} - ${option.display}`}
       isOptionEqualToValue={(option, value) => option.code === value.code}
-      onInputChange={(_, newInputValue) => fetchData(newInputValue)}
+      //onInputChange={(_, newInputValue) => fetchData(newInputValue)}
+      onInputChange={(_, newInputValue) => setSearchTerm(newInputValue)}
       readOnly={readOnly}
       onChange={(_, newValue) => {
         setSelectedResources(newValue);

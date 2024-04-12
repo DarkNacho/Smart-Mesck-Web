@@ -126,4 +126,48 @@ export default class PersonUtil {
     }
     return "N/A";
   }
+
+  /**
+   * Validates a Chilean RUT (Rol Único Tributario) number.
+   * @param rut - The RUT number to validate.
+   * @returns A boolean indicating whether the RUT is valid or not.
+   */
+  static RutValidation = (rut: string) => {
+    // Eliminar puntos y guiones del RUT y convertir la letra a mayúscula
+    rut = rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
+
+    // Extraer dígito verificador y número
+    const dv = rut.slice(-1);
+    let rutNumerico = parseInt(rut.slice(0, -1), 10);
+
+    // Calcular dígito verificador esperado
+    let m = 0;
+    let s = 1;
+    for (; rutNumerico; rutNumerico = Math.floor(rutNumerico / 10)) {
+      s = (s + (rutNumerico % 10) * (9 - (m++ % 6))) % 11;
+    }
+
+    const dvEsperado = (s ? s - 1 : "K").toString();
+
+    // Verificar si el dígito verificador es correcto
+    return dv === dvEsperado;
+  };
+
+  /**
+   * Retrieves the gender of a person.
+   *
+   * @param resource - The FHIR resource representing a person.
+   * @returns The gender of the person, or "N/A" if not available.
+   */
+  static getGender(resource: FhirResourceType): string {
+    if (resource.gender === undefined) return "N/A";
+
+    const genderMap: Record<string, string> = {
+      male: "masculino",
+      female: "femenino",
+      other: "otro",
+      unknown: "desconocido",
+    };
+    return genderMap[resource.gender] || "N/A";
+  }
 }

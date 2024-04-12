@@ -34,11 +34,12 @@ export default function PatientCreateComponent({
   };
 
   const postPatient = async (newPatient: Patient) => {
-    HandleResult.handleOperation(
+    const response = await HandleResult.handleOperation(
       () => new FhirResourceService("Patient").postResource(newPatient),
       "Paciente Guardado con éxito",
       "Enviando..."
     );
+    if (response.success) handleClose();
   };
 
   // Función que se ejecuta al enviar el formulario
@@ -62,12 +63,7 @@ export default function PatientCreateComponent({
         { system: "email", value: data.email },
       ],
       maritalStatus: {
-        coding: [
-          {
-            code: data.maritalStatus,
-            system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
-          },
-        ],
+        coding: [data.maritalStatus],
       },
       photo: [{ url: data.photo }],
     };

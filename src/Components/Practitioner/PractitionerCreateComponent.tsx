@@ -13,7 +13,7 @@ import { Close } from "@mui/icons-material";
 
 import styles from "./PractitionerCreateComponent.module.css";
 import FhirResourceService from "../../Services/FhirService";
-import { Practitioner } from "fhir/r4";
+import { Practitioner, PractitionerRole } from "fhir/r4";
 import PractitionerFormComponent, {
   PractitionerFormData,
 } from "../Forms/PractitionerFormComponent";
@@ -34,13 +34,30 @@ export default function PatientCreateComponent({
     onOpen(false);
   };
 
-  const postPractitioner = async (newPractitioner: Practitioner) => {
-    HandleResult.handleOperation(
+  const postPractitioner = async (
+    newPractitioner: Practitioner,
+    newPractitionerRole: PractitionerRole
+  ) => {
+    const response = await HandleResult.handleOperation(
       () =>
-        new FhirResourceService("Practitioner").postResource(newPractitioner),
+        new FhirResourceService("Practitioner")
+          .postResource(newPractitioner)
+          .then((response) => {
+            if (response.success) {
+              const role = {
+                ...newPractitionerRole,
+                practitioner: { reference: `Practitioner/${response.data.id}` },
+              };
+              return new FhirResourceService("PractitionerRole").postResource(
+                role
+              );
+            }
+            return response;
+          }),
       "Profesional Guardado exitosamente",
       "Enviando..."
     );
+    if (response.success) handleClose();
   };
 
   // Función que se ejecuta al enviar el formulario
@@ -62,7 +79,15 @@ export default function PatientCreateComponent({
       telecom: [{ system: "phone", value: data.numeroTelefonico }],
       photo: [{ url: data.photo }],
     };
-    postPractitioner(newPractitioner);
+
+    const practitionerRole: PractitionerRole = {
+      resourceType: "PractitionerRole",
+      code: [{ coding: data.role }],
+      specialty: [{ coding: data.specialty }],
+      //code: data.role.map((role) => ({ coding: [role] })),
+      //specialty: data.specialty.map((role) => ({ coding: [role] })),
+    };
+    postPractitioner(newPractitioner, practitionerRole);
   };
 
   return (

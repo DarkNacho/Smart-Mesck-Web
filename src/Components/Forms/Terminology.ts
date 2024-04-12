@@ -296,23 +296,114 @@ export const interpretation: Coding[] = [
       "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
   },
 ];
+/* Tiene más opciones pero es para futura actualización a R5
+export const generoOptions: Coding[] = [
+  {
+    code: "asked-declined",
+    display: "No declarado",
+    system: "http://terminology.hl7.org/CodeSystem/data-absent-reason",
+  },
+  {
+    code: "unknown",
+    display: "No especificado",
+    system: "http://hl7.org/fhir/administrative-gender",
+  },
+  {
+    code: "male",
+    display: "Masculino",
+    system: "http://hl7.org/fhir/administrative-gender",
+  },
+  {
+    code: "female",
+    display: "Femenino",
+    system: "http://hl7.org/fhir/administrative-gender",
+  },
+  {
+    code: "446141000124107",
+    display: "Identifica como femenino",
+    system: "http://snomed.info/sct",
+  },
+  {
+    code: "446151000124109",
+    display: "Identifica como masculino",
+    system: "http://snomed.info/sct",
+  },
+  {
+    code: "33791000087105",
+    display: "Identifica como no-binario",
+    system: "http://snomed.info/sct",
+  },
+  {
+    code: "other",
+    display: "Otro",
+    system: "http://hl7.org/fhir/administrative-gender",
+  },
+];*/
 
 export const generoOptions: Coding[] = [
-  { code: "unknown", display: "No especificado" },
-  { code: "male", display: "Masculino" },
-  { code: "female", display: "Femenino" },
-  { code: "other", display: "Otro" },
+  {
+    code: "unknown",
+    display: "No especificado",
+    system: "http://hl7.org/fhir/administrative-gender",
+  },
+  {
+    code: "male",
+    display: "Masculino",
+    system: "http://hl7.org/fhir/administrative-gender",
+  },
+  {
+    code: "female",
+    display: "Femenino",
+    system: "http://hl7.org/fhir/administrative-gender",
+  },
+  {
+    code: "other",
+    display: "Otro",
+    system: "http://hl7.org/fhir/administrative-gender",
+  },
 ];
 
 export const maritalOptions: Coding[] = [
-  { code: "A", display: "Anulado" },
-  { code: "D", display: "Divorciado" },
-  { code: "I", display: "Interlocutorio" },
-  { code: "L", display: "Legalmente Separado" },
-  { code: "M", display: "Casado" },
-  { code: "C", display: "Unión de Hecho" },
-  { code: "S", display: "Nunca Casado" },
-  { code: "UNK", display: "Desconocido" },
+  {
+    code: "S",
+    display: "Nunca Casado",
+    system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+  },
+  {
+    code: "A",
+    display: "Anulado",
+    system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+  },
+  {
+    code: "D",
+    display: "Divorciado",
+    system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+  },
+  {
+    code: "I",
+    display: "Interlocutorio",
+    system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+  },
+  {
+    code: "L",
+    display: "Legalmente Separado",
+    system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+  },
+  {
+    code: "M",
+    display: "Casado",
+    system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+  },
+  {
+    code: "C",
+    display: "Unión de Hecho",
+    system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+  },
+  {
+    code: "UNK",
+    display: "Desconocido",
+    system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+  },
 ];
 
 export const contactTypes: Coding[] = [

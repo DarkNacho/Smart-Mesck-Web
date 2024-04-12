@@ -8,20 +8,18 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-
 import { Close } from "@mui/icons-material";
-
-import styles from "./ObservationCreateComponent.module.css";
-import { Observation } from "fhir/r4";
-import ObservationService from "../../Services/ObservationService";
-import ObservationFormComponent, {
-  ObservationFormData,
-} from "../Forms/ObservationFormComponent";
+import styles from "./MedicationCreateComponent.module.css";
+import { MedicationStatement } from "fhir/r4";
 import HandleResult from "../HandleResult";
 import { isAdminOrPractitioner } from "../../RolUser";
-import ObservationUtils from "../../Services/Utils/ObservationUtils";
+import MedicationFormComponent, {
+  MedicationFormData,
+} from "../Forms/MedicationFormComponent";
+import FhirResourceService from "../../Services/FhirService";
+import MedicationUtils from "../../Services/Utils/MedicationUtils";
 
-export default function ObservationCreateComponent({
+export default function MedicationCreateComponent({
   patientId,
   onOpen,
   isOpen,
@@ -38,17 +36,19 @@ export default function ObservationCreateComponent({
     ? localStorage.getItem("id") || undefined
     : undefined;
 
-  const onSubmitForm: SubmitHandler<ObservationFormData> = (data) => {
-    const newObservation =
-      ObservationUtils.ObservationFormDataToObservation(data);
-    console.log(newObservation);
-    sendObservation(newObservation);
+  const onSubmitForm: SubmitHandler<MedicationFormData> = (data) => {
+    const medication =
+      MedicationUtils.MedicationFormDataToMedicationStatement(data);
+    sendMedication(medication);
   };
 
-  const sendObservation = async (newObservation: Observation) => {
+  const sendMedication = async (newMedication: MedicationStatement) => {
     const response = await HandleResult.handleOperation(
-      () => new ObservationService().sendResource(newObservation),
-      "Observación guardada de forma exitosa",
+      () =>
+        new FhirResourceService("MedicationStatement").sendResource(
+          newMedication
+        ),
+      "Medicamento guardada de forma exitosa",
       "Enviando..."
     );
     if (response.success) handleClose();
@@ -58,7 +58,7 @@ export default function ObservationCreateComponent({
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Crear nuevo encuentro
+          Agregar Medicamento
           <IconButton
             aria-label="close"
             onClick={handleClose}
@@ -73,13 +73,13 @@ export default function ObservationCreateComponent({
         </DialogTitle>
         <DialogContent>
           <Container className={styles.container}>
-            <ObservationFormComponent
+            <MedicationFormComponent
               formId="form"
               patientId={patientId}
               practitionerId={practitionerId}
               submitForm={onSubmitForm}
               readOnly={false}
-            ></ObservationFormComponent>
+            ></MedicationFormComponent>
           </Container>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>

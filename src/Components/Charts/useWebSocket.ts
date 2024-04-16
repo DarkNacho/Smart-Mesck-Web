@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { Sensor, SensorData } from "./SensorModel";
-
-type SensorDataByDevice = Record<string, Record<string, Sensor>>; // keys = device, sensor
+import { SensorData, SensorDataByDevice } from "./SensorModel";
 
 export default function useWebSocket(
   uri: string

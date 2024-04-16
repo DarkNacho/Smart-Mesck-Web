@@ -15,3 +15,5 @@ export interface Sensor {
   stats: SensorStats;
   metrics: number | undefined;
 }
+
+export type SensorDataByDevice = Record<string, Record<string, Sensor>>; // keys = device, sensor

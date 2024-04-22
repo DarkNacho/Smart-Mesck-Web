@@ -31,7 +31,7 @@ const navigationAdminItems = [
   },
   {
     value: "Sensores",
-    to: "/SensorChartDashboardPage",
+    to: "/SensorChartDashboard",
   },
 ];
 
@@ -46,7 +46,7 @@ const navigationPractitionerItems = [
   },
   {
     value: "Sensores",
-    to: "/SensorChartDashboardPage",
+    to: "/SensorChartDashboard",
   },
 ];
 
@@ -151,7 +151,9 @@ export default function NavBarComponent() {
               <AppBar position="static" sx={{ background: "#2c376e" }}>
                 {/* Sobre escribe y cambia color*/}
                 <Toolbar>
-                  <img height="54px" src={logo} alt="smart-mesck logo"></img>
+                  <a href="/">
+                    <img height="54px" src={logo} alt="smart-mesck logo"></img>
+                  </a>
                   <Box marginLeft="auto">
                     <IconButton color="inherit" onClick={handleClose}>
                       <Close></Close>

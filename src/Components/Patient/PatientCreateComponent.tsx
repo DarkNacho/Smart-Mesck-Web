@@ -12,12 +12,13 @@ import { useEffect } from "react";
 import { Close } from "@mui/icons-material";
 
 import styles from "./PatientCreateComponent.module.css";
-import { Patient } from "fhir/r4";
+import { FhirResource, Patient } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
 import PatientFormComponent, {
   PatientFormData,
 } from "../Forms/PatientFormComponent";
 import HandleResult from "../HandleResult";
+
 export default function PatientCreateComponent({
   onOpen,
   isOpen,
@@ -33,12 +34,44 @@ export default function PatientCreateComponent({
     onOpen(false);
   };
 
-  const postPatient = async (newPatient: Patient) => {
+  const sendPatient = async (
+    newPatient: Patient,
+    user: any
+  ): Promise<Result<FhirResource>> => {
+    const fhirService = new FhirResourceService("Patient");
+    let response = await fhirService.sendResource(newPatient);
+    if (!response.success) return response;
+
+    user.id = response.data.id;
+    response = await fetch("http://localhost:8000/auth/register", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        return response;
+      })
+      .catch(async (error) => {
+        const response = await fhirService.deleteResource(user.id);
+        if (!response.success) return response;
+        return { success: false, error: error }; //TODO: mejorar mensaje de error probablemente desde el server
+      });
+
+    return response;
+  };
+
+  const postPatient = async (newPatient: Patient, user: any) => {
     const response = await HandleResult.handleOperation(
-      () => new FhirResourceService("Patient").postResource(newPatient),
+      () => sendPatient(newPatient, user),
       "Paciente Guardado con éxito",
       "Enviando..."
     );
+
     if (response.success) handleClose();
   };
 
@@ -67,7 +100,15 @@ export default function PatientCreateComponent({
       },
       photo: [{ url: data.photo }],
     };
-    postPatient(newPatient);
+
+    const newUser: any = {
+      email: data.email,
+      rut: rut,
+      phone_number: data.numeroTelefonico,
+      role: "Patient",
+    };
+
+    postPatient(newPatient, newUser);
   };
 
   return (

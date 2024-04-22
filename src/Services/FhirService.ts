@@ -121,6 +121,20 @@ export default class FhirResourceService<T extends FhirResource> {
   }
 
   /**
+   * Deletes a FHIR resource by its ID.
+   * @param {string} id - The ID of the resource.
+   * @returns {Promise<Result<void>>} - The result of the operation.
+   */
+  public async deleteResource(id: string): Promise<Result<T>> {
+    return this.handleResult<T>(
+      this.fhirClient.delete({
+        resourceType: this.resourceTypeName,
+        id: id,
+      }) as Promise<T>
+    );
+  }
+
+  /**
    * Determines the action to perform on a resource in a bundle.
    * @private
    * @param {any} objeto - The resource object.

@@ -55,7 +55,7 @@ const router = createBrowserRouter([
     element: <PractitionerListPage></PractitionerListPage>,
   },
   {
-    path: "/SensorChartDashboardPage",
+    path: "/SensorChartDashboard",
     element: <SensorChartDashboardPage></SensorChartDashboardPage>,
   },
 ]);

@@ -1,9 +1,8 @@
-import { FhirResource } from "fhir/r4";
 import toast from "react-hot-toast";
 
 export default class HandleResult {
   static handleOperation = async (
-    operation: () => Promise<Result<FhirResource>>,
+    operation: () => Promise<Result<any>>,
     successMessage: string,
     loadingMessage: string,
     setResources?: (data: any) => void

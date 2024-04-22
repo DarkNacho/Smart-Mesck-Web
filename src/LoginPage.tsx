@@ -64,9 +64,6 @@ function LoginPage({ onLogin }: { onLogin: (userRol: string) => void }) {
       })
       .catch((error) => {
         console.error("Error:", error);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
       });
     // Perform login logic here
   };

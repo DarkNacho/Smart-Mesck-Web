@@ -8,16 +8,15 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Close } from "@mui/icons-material";
 
 import styles from "./PatientCreateComponent.module.css";
 import { FhirResource, Patient } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
-import PatientFormComponent, {
-  PatientFormData,
-} from "../Forms/PatientFormComponent";
+import { PatientFormData } from "../Forms/PatientFormComponent";
 import HandleResult from "../HandleResult";
+import PatientStepperForm from "../Forms/PatientStepperForm";
 
 export default function PatientCreateComponent({
   onOpen,
@@ -108,7 +107,38 @@ export default function PatientCreateComponent({
       role: "Patient",
     };
 
-    postPatient(newPatient, newUser);
+    console.log("posting patient....", newPatient);
+    handleNext();
+    //postPatient(newPatient, newUser);
+  };
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    formData = { ...formData, ...data };
+    //setFormData((prevFormData) => ({ ...prevFormData, ...data }));
+    handleNext();
+  };
+
+  const [activeStep, setActiveStep] = useState(0);
+  const [steps, setSteps] = useState([
+    { name: "Datos Personales", enable: true },
+    { name: "Datos de Contacto", enable: false },
+    { name: "Contactos de Emergencia", enable: false },
+  ]);
+
+  let formData: PatientFormData = {};
+
+  const handleNext = () => {
+    setSteps((prevSteps) => {
+      const updatedSteps = [...prevSteps];
+      updatedSteps[activeStep].enable = true;
+      return updatedSteps;
+    });
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
   return (
@@ -130,10 +160,12 @@ export default function PatientCreateComponent({
         </DialogTitle>
         <DialogContent>
           <Container className={styles.container}>
-            <PatientFormComponent
-              formId="pacienteForm"
-              submitForm={onSubmitForm}
-            ></PatientFormComponent>
+            <PatientStepperForm
+              steps={steps}
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              onSubmit={onSubmit}
+            ></PatientStepperForm>
           </Container>
         </DialogContent>
         <DialogActions className={styles.dialogActions}>
@@ -148,6 +180,20 @@ export default function PatientCreateComponent({
           >
             Enviar
           </Button>
+
+          <div>
+            <Button disabled={activeStep === 0} onClick={handleBack}>
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              form={`form${activeStep}`}
+            >
+              {activeStep === 2 ? "Finish" : "Next"}
+            </Button>
+          </div>
         </DialogActions>
       </Dialog>
     </div>

@@ -36,7 +36,7 @@ export interface PatientFormData {
   numeroTelefonico: string;
   email: string;
   photo: string;
-  maritalStatus: Coding;
+  maritalStatus: Coding | undefined;
   contact: {
     nombre: string;
     segundoNombre: string;

@@ -1,10 +1,13 @@
 import { Stepper, Step, StepLabel, Button } from "@mui/material";
 import PersonContactDetailsFormComponent from "./Person/PersonContactDetailsComponent";
-import PersonDetailsFormComponent from "./Person/PersonDetailsFormComponent";
+import PersonDetailsFormComponent, {
+  PersonDetails,
+} from "./Person/PersonDetailsFormComponent";
 import PersonContactFormComponent from "./Person/PersonContactsFormComponent";
 import { Coding } from "fhir/r4";
 
 export interface PatientFormData {
+  details: PersonDetails;
   nombre: string;
   segundoNombre: string;
   apellidoPaterno: string;
@@ -34,6 +37,11 @@ export default function PatientStepperForm({
   activeStep,
   setActiveStep,
   onSubmit,
+}: {
+  steps: { name: string; enable: boolean }[];
+  activeStep: number;
+  setActiveStep: (step: number) => void;
+  onSubmit: (data: any) => void;
 }) {
   const getStepContent = (step: number) => {
     return (

@@ -18,6 +18,7 @@ import { PatientFormData } from "../Forms/PatientFormComponent";
 import HandleResult from "../HandleResult";
 import PatientStepperForm from "../Forms/PatientStepperForm";
 
+let formData: PatientFormData;
 export default function PatientCreateComponent({
   onOpen,
   isOpen,
@@ -31,6 +32,14 @@ export default function PatientCreateComponent({
 
   const handleClose = () => {
     onOpen(false);
+    setActiveStep(0);
+    setSteps((prevSteps) => {
+      const updatedSteps = prevSteps.map((step) => {
+        return { ...step, enable: false };
+      });
+      updatedSteps[0].enable = true;
+      return updatedSteps;
+    });
   };
 
   const sendPatient = async (
@@ -95,7 +104,7 @@ export default function PatientCreateComponent({
         { system: "email", value: data.email },
       ],
       maritalStatus: {
-        coding: [data.maritalStatus],
+        coding: data.maritalStatus ? [data.maritalStatus] : undefined,
       },
       photo: [{ url: data.photo }],
     };
@@ -108,11 +117,11 @@ export default function PatientCreateComponent({
     };
 
     console.log("posting patient....", newPatient);
-    handleNext();
-    //postPatient(newPatient, newUser);
+    console.log("posting user....", newUser);
+    postPatient(newPatient, newUser);
   };
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: PatientFormData) => {
     console.log(data);
     formData = { ...formData, ...data };
     //setFormData((prevFormData) => ({ ...prevFormData, ...data }));
@@ -125,8 +134,6 @@ export default function PatientCreateComponent({
     { name: "Datos de Contacto", enable: false },
     { name: "Contactos de Emergencia", enable: false },
   ]);
-
-  let formData: PatientFormData = {};
 
   const handleNext = () => {
     setSteps((prevSteps) => {
@@ -172,26 +179,26 @@ export default function PatientCreateComponent({
           <Button onClick={handleClose} variant="contained" color="error">
             Cancelar
           </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            form="pacienteForm"
-          >
-            Enviar
-          </Button>
-
           <div>
             <Button disabled={activeStep === 0} onClick={handleBack}>
-              Back
+              Atrás
             </Button>
             <Button
               variant="contained"
               color="primary"
               type="submit"
               form={`form${activeStep}`}
+              hidden={activeStep >= steps.length - 1}
             >
-              {activeStep === 2 ? "Finish" : "Next"}
+              Siguiente
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => onSubmitForm(formData)}
+              hidden={activeStep <= steps.length - 2}
+            >
+              Enviar
             </Button>
           </div>
         </DialogActions>

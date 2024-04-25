@@ -30,7 +30,7 @@ function LoginPage({ onLogin }: { onLogin: (userRol: string) => void }) {
     console.log("Username:", username);
     console.log("Password:", password);
 
-    fetch("http://localhost:8000/auth/token", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/auth/token`, {
       method: "POST",
       headers: {
         accept: "application/json",

@@ -17,6 +17,7 @@ import SensorChartDashboardPage from "./Pages/SensorChartDashboardPage.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <App></App>,
   },
   {
     path: "/Patient",
@@ -64,7 +65,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
     <NavBarComponent></NavBarComponent>
-    <App></App>
+
     <Toaster></Toaster>
     <RouterProvider router={router}></RouterProvider>
   </div>

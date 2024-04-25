@@ -115,99 +115,101 @@ export default function PersonContactFormComponent({
           ))}
         </Stepper>
         <React.Fragment key={activeStep}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Nombre"
-              {...register(`contact.${activeStep}.nombre`, {
-                required: "El Nombre de contacto es requerido",
-              })}
-              fullWidth
-              error={Boolean(errors.contact?.[activeStep]?.nombre)}
-              helperText={
-                errors.contact?.[activeStep]?.nombre &&
-                errors.contact?.[activeStep]?.nombre?.message
-              }
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              label="Relación"
-              defaultValue="N"
-              {...register(`contact.${activeStep}.contactType`)}
-              fullWidth
-              error={Boolean(errors.contact?.[activeStep]?.contactType)}
-              helperText={
-                errors.contact?.[activeStep]?.contactType &&
-                errors.contact?.[activeStep]?.contactType?.message
-              }
-            >
-              {contactTypes.map((option) => (
-                <MenuItem key={option.code} value={option.code}>
-                  {option.display}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              type="email"
-              label="Email"
-              {...register(`contact.${activeStep}.email`, {
-                required: "Correo electrónico requerido",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Correo electrónico inválido",
-                },
-              })}
-              error={Boolean(errors.contact?.[activeStep]?.email)}
-              helperText={
-                errors.contact?.[activeStep]?.email &&
-                errors.contact?.[activeStep]?.email?.message
-              }
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={1.5}>
-            <TextField
-              select
-              fullWidth
-              label="Código"
-              defaultValue="+56"
-              {...register(`contact.${activeStep}.countryCode`, {
-                required: "Código de país requerido",
-              })}
-              error={Boolean(errors.contact?.[activeStep]?.countryCode)}
-              helperText={
-                errors.contact?.[activeStep]?.countryCode &&
-                errors.contact?.[activeStep]?.countryCode?.message
-              }
-            >
-              {countryCodes.map((option) => (
-                <MenuItem key={option.code} value={option.code}>
-                  {option.display}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} sm={4.5}>
-            <TextField
-              label="Número Telefónico"
-              type="number"
-              {...register(`contact.${activeStep}.numeroTelefonico`, {
-                required: "Número telefónico requerido",
-                pattern: {
-                  value: /^[0-9]+$/i,
-                  message: "Número telefónico inválido",
-                },
-              })}
-              error={Boolean(errors.contact?.[activeStep]?.numeroTelefonico)}
-              helperText={
-                errors.contact?.[activeStep]?.numeroTelefonico &&
-                errors.contact?.[activeStep]?.numeroTelefonico?.message
-              }
-              fullWidth
-            />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Nombre"
+                {...register(`contact.${activeStep}.nombre`, {
+                  required: "El Nombre de contacto es requerido",
+                })}
+                fullWidth
+                error={Boolean(errors.contact?.[activeStep]?.nombre)}
+                helperText={
+                  errors.contact?.[activeStep]?.nombre &&
+                  errors.contact?.[activeStep]?.nombre?.message
+                }
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                select
+                label="Relación"
+                defaultValue="N"
+                {...register(`contact.${activeStep}.contactType`)}
+                fullWidth
+                error={Boolean(errors.contact?.[activeStep]?.contactType)}
+                helperText={
+                  errors.contact?.[activeStep]?.contactType &&
+                  errors.contact?.[activeStep]?.contactType?.message
+                }
+              >
+                {contactTypes.map((option) => (
+                  <MenuItem key={option.code} value={option.code}>
+                    {option.display}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                type="email"
+                label="Email"
+                {...register(`contact.${activeStep}.email`, {
+                  required: "Correo electrónico requerido",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Correo electrónico inválido",
+                  },
+                })}
+                error={Boolean(errors.contact?.[activeStep]?.email)}
+                helperText={
+                  errors.contact?.[activeStep]?.email &&
+                  errors.contact?.[activeStep]?.email?.message
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} sm={1.5}>
+              <TextField
+                select
+                fullWidth
+                label="Código"
+                defaultValue="+56"
+                {...register(`contact.${activeStep}.countryCode`, {
+                  required: "Código de país requerido",
+                })}
+                error={Boolean(errors.contact?.[activeStep]?.countryCode)}
+                helperText={
+                  errors.contact?.[activeStep]?.countryCode &&
+                  errors.contact?.[activeStep]?.countryCode?.message
+                }
+              >
+                {countryCodes.map((option) => (
+                  <MenuItem key={option.code} value={option.code}>
+                    {option.display}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={4.5}>
+              <TextField
+                label="Número Telefónico"
+                type="number"
+                {...register(`contact.${activeStep}.numeroTelefonico`, {
+                  required: "Número telefónico requerido",
+                  pattern: {
+                    value: /^[0-9]+$/i,
+                    message: "Número telefónico inválido",
+                  },
+                })}
+                error={Boolean(errors.contact?.[activeStep]?.numeroTelefonico)}
+                helperText={
+                  errors.contact?.[activeStep]?.numeroTelefonico &&
+                  errors.contact?.[activeStep]?.numeroTelefonico?.message
+                }
+                fullWidth
+              />
+            </Grid>
           </Grid>
         </React.Fragment>
         <Button

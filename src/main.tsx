@@ -12,10 +12,12 @@ import PatientListPage from "./Pages/ListPages/PatientListPage.tsx";
 import PractitionerListPage from "./Pages/ListPages/PractitionerListPage.tsx";
 import PatientMyPractitionerListPage from "./Pages/ListPages/PatientMyPractitionerListPage.tsx";
 import NavBarComponent from "./Components/NavBar/NavBarComponent.tsx";
+import SensorChartDashboardPage from "./Pages/SensorChartDashboardPage.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <App></App>,
   },
   {
     path: "/Patient",
@@ -53,13 +55,17 @@ const router = createBrowserRouter([
     path: "/Practitioner",
     element: <PractitionerListPage></PractitionerListPage>,
   },
+  {
+    path: "/SensorChartDashboard",
+    element: <SensorChartDashboardPage></SensorChartDashboardPage>,
+  },
 ]);
 
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
     <NavBarComponent></NavBarComponent>
-    <App></App>
+
     <Toaster></Toaster>
     <RouterProvider router={router}></RouterProvider>
   </div>

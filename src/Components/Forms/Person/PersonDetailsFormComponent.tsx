@@ -22,17 +22,34 @@ export interface PersonDetails {
 export default function PersonDetailsFormComponent({
   formId,
   submitForm,
+  person,
 }: {
   formId: string;
   submitForm: SubmitHandler<PersonDetails>;
+  person?: PersonDetails;
 }) {
   const {
     control,
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<PersonDetails>({ mode: "onBlur" });
+  } = useForm<PersonDetails>({
+    defaultValues: {
+      nombre: person?.nombre || "",
+      segundoNombre: person?.segundoNombre || "",
+      apellidoPaterno: person?.apellidoPaterno || "",
+      apellidoMaterno: person?.apellidoMaterno || "",
+      fechaNacimiento: person?.fechaNacimiento
+        ? dayjs(person?.fechaNacimiento)
+        : dayjs().subtract(18, "years"),
+      genero: person?.genero || "unknown",
+      maritalStatus: person?.maritalStatus || maritalOptions[0],
+      rut: person?.rut || "",
+    },
+    mode: "onBlur",
+  });
 
+  console.log("Person:", person);
   return (
     <>
       <form id={formId} onSubmit={handleSubmit(submitForm)}>
@@ -78,7 +95,6 @@ export default function PersonDetailsFormComponent({
           <Grid item xs={12} sm={6}>
             <Controller
               control={control}
-              defaultValue={dayjs().subtract(18, "years")}
               name="fechaNacimiento"
               render={({ field: { onChange, value, ref } }) => (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -117,7 +133,6 @@ export default function PersonDetailsFormComponent({
             <Controller
               name="maritalStatus"
               control={control}
-              defaultValue={maritalOptions[0]}
               render={({ field }) => (
                 <Autocomplete
                   id="Autocomplete-marital"
@@ -158,6 +173,7 @@ export default function PersonDetailsFormComponent({
               fullWidth
               error={Boolean(errors.rut)}
               helperText={errors.rut && errors.rut.message}
+              disabled={Boolean(person)}
             />
           </Grid>
         </Grid>

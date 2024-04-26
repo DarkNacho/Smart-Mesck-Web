@@ -246,9 +246,9 @@ export default class FhirResourceService<T extends FhirResource> {
       this.fhirClient.search({
         resourceType: this.resourceTypeName,
         searchParams: {
+          _count: 5,
           ...params,
           _sort: "-_lastUpdated",
-          _count: params?._count ?? 10,
         },
       }) as Promise<Bundle>
     );

@@ -1,4 +1,6 @@
 import { Patient, Person, Practitioner } from "fhir/r4";
+import { PatientFormData } from "../../Components/Forms/PatientStepperForm";
+import dayjs from "dayjs";
 
 type FhirResourceType = Patient | Practitioner | Person;
 
@@ -170,4 +172,68 @@ export default class PersonUtil {
     };
     return genderMap[resource.gender] || "N/A";
   }
+
+  static PatientFormToPatient = (data: PatientFormData): Patient => {
+    const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
+    return {
+      resourceType: "Patient",
+      identifier: [{ system: "RUT", value: rut }],
+      name: [
+        {
+          family: data.apellidoPaterno,
+          given: [data.nombre, data.segundoNombre],
+          suffix: [data.apellidoMaterno],
+          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`,
+        },
+      ],
+      birthDate: data.fechaNacimiento.toISOString(),
+      gender: data.genero as "male" | "female" | "other" | "unknown",
+      telecom: [
+        {
+          system: "phone",
+          value: data.countryCode + "-" + data.numeroTelefonico,
+        },
+        { system: "email", value: data.email },
+      ],
+      maritalStatus: {
+        coding: data.maritalStatus ? [data.maritalStatus] : undefined,
+      },
+      photo: [{ url: data.photo }],
+    };
+  };
+
+  static PatientToPatientForm = (patient: Patient): PatientFormData => {
+    const rut =
+      patient.identifier?.find((t) => t.system === "RUT")?.value || "";
+    const name = patient.name?.[0] ?? {};
+    const telecomPhone =
+      patient.telecom?.find((t) => t.system === "phone")?.value || "";
+    const telecomEmail =
+      patient.telecom?.find((t) => t.system === "email")?.value || "";
+
+    const tel = telecomPhone.split("-");
+    let country = "+56";
+    let phone = "";
+    if (tel.length > 1) {
+      country = tel[0];
+      phone = tel[1];
+    }
+    return {
+      rut: rut,
+      nombre: name.given?.[0] ?? "",
+      segundoNombre: name.given?.[1] ?? "",
+      apellidoPaterno: name.family || "",
+      apellidoMaterno: name.suffix ? name.suffix[0] : "",
+      fechaNacimiento: patient.birthDate
+        ? dayjs(patient.birthDate)
+        : dayjs().subtract(18, "years"),
+      genero: patient.gender || "unknown",
+      countryCode: country,
+      numeroTelefonico: phone,
+      email: telecomEmail || "",
+      maritalStatus: patient.maritalStatus?.coding?.[0] || {},
+      photo: patient.photo?.[0].url || "",
+      contact: [],
+    };
+  };
 }

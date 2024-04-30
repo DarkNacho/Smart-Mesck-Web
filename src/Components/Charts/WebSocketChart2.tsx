@@ -81,8 +81,9 @@ export default function WebSocketChart2() {
       Object.keys(sensorDataByDevice[device]).map((sensor) => {
         const data = sensorDataByDevice[device][sensor];
         const color = getColorForDeviceAndSensor(device, sensor);
+
         const set = {
-          label: `Device: ${device}, Sensor: ${sensor}`,
+          label: `${sensor}`,
           data: data.data.map((data) => data.value),
           borderColor: color,
           backgroundColor: `${color}80`,

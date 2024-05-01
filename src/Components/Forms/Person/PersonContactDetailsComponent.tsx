@@ -12,16 +12,24 @@ export interface PersonContactDetails {
 export default function PersonContactDetailsFormComponent({
   formId,
   submitForm,
+  person,
 }: {
   formId: string;
   submitForm: SubmitHandler<PersonContactDetails>;
+  person: PersonContactDetails;
 }) {
   const {
     control,
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<PersonContactDetails>({ mode: "onBlur" });
+  } = useForm<PersonContactDetails>({
+    defaultValues: {
+      numeroTelefonico: person?.numeroTelefonico || "",
+      email: person?.email || "",
+    },
+    mode: "onBlur",
+  });
 
   return (
     <>
@@ -32,7 +40,7 @@ export default function PersonContactDetailsFormComponent({
               select
               fullWidth
               label="Código"
-              defaultValue="+56"
+              defaultValue={person?.countryCode || "+56"}
               {...register("countryCode", {
                 required: "Código de país requerido",
               })}
@@ -78,6 +86,7 @@ export default function PersonContactDetailsFormComponent({
               error={Boolean(errors.email)}
               helperText={errors.email && errors.email.message}
               fullWidth
+              disabled={Boolean(person)}
             />
           </Grid>
         </Grid>

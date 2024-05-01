@@ -183,7 +183,7 @@ export const interpretation: Coding[] = [
   },
   {
     code: "SYN-R",
-    display: "Sineria - resistente",
+    display: "Sinergia - resistente",
     system:
       "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
   },
@@ -201,7 +201,7 @@ export const interpretation: Coding[] = [
   },
   {
     code: "SYN-S",
-    display: "Sineria - susceptible",
+    display: "Sinergia - susceptible",
     system:
       "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
   },

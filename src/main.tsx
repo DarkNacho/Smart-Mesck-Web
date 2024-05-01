@@ -13,6 +13,7 @@ import PractitionerListPage from "./Pages/ListPages/PractitionerListPage.tsx";
 import PatientMyPractitionerListPage from "./Pages/ListPages/PatientMyPractitionerListPage.tsx";
 import NavBarComponent from "./Components/NavBar/NavBarComponent.tsx";
 import SensorChartDashboardPage from "./Pages/SensorChartDashboardPage.tsx";
+import SensorChartDashboardPage2 from "./Pages/SensorChartDashboardPage2.tsx";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
   {
     path: "/SensorChartDashboard",
     element: <SensorChartDashboardPage></SensorChartDashboardPage>,
+  },
+  {
+    path: "/SensorChartDashboard2",
+    element: <SensorChartDashboardPage2></SensorChartDashboardPage2>,
   },
 ]);
 

@@ -55,6 +55,11 @@ export default function WebSocketChart() {
           });
         });
 
+        const lastFiveData = data.data.slice(-5);
+        const avgValue =
+          lastFiveData.reduce((sum, data) => sum + data.value, 0) /
+          lastFiveData.length;
+
         const dataset = {
           label: `Device: ${device}, Sensor: ${sensor}`,
           data: data.data.map((data) => data.value),
@@ -77,7 +82,7 @@ export default function WebSocketChart() {
             },
             title: {
               display: true,
-              text: `Mínimo: ${data.stats.minValue} \t Máximo: ${data.stats.maxValue}`,
+              text: `Valor: ${avgValue} Mínimo: ${data.stats.minValue} \t Máximo: ${data.stats.maxValue}`,
             },
             zoom: {
               pan: {

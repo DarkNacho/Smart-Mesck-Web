@@ -30,9 +30,11 @@ export interface PersonContact {
 export default function PersonContactFormComponent({
   formId,
   submitForm,
+  person,
 }: {
   formId: string;
   submitForm: SubmitHandler<PersonContact>;
+  person?: PersonContact;
 }) {
   const {
     control,
@@ -42,7 +44,7 @@ export default function PersonContactFormComponent({
     formState: { errors },
   } = useForm<PersonContact>({
     defaultValues: {
-      contact: [
+      contact: person?.contact || [
         {
           nombre: "",
           segundoNombre: "",

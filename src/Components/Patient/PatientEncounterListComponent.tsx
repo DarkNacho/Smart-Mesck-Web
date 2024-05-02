@@ -42,6 +42,7 @@ export default function PatientEncounterListComponent({
 
   const [searchParams, setSearchParams] = useState<SearchParams>({
     subject: patientId,
+    participant: localStorage.getItem("id")!,
   });
 
   //const [userRole, setUserRole] = useState<RolUser>();

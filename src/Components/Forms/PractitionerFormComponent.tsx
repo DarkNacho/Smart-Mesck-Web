@@ -49,7 +49,7 @@ export default function PractitionerFormComponent({
     try {
       const response = await new FhirResourceService<ValueSet>(
         "ValueSet"
-      ).getById("257");
+      ).getById("15"); //!!Warning: Hardcoded valueSet id for Specialty
       if (!response.success) throw new Error(response.error);
       setSpecialtyOptions(
         ValueSetUtils.convertValueSetToCodingArray(response.data)
@@ -65,7 +65,7 @@ export default function PractitionerFormComponent({
     try {
       const response = await new FhirResourceService<ValueSet>(
         "ValueSet"
-      ).getById("232");
+      ).getById("14"); // !!WARNING: Hardcoded valueSet id for Role
       if (!response.success) throw new Error(response.error);
       setRoleOptions(ValueSetUtils.convertValueSetToCodingArray(response.data));
     } catch (error) {

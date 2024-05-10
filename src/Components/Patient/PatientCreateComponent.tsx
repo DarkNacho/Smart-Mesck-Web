@@ -51,7 +51,7 @@ export default function PatientCreateComponent({
     if (!response.success) return response;
 
     user.id = response.data.id;
-    response = await fetch("http://localhost:8000/auth/register", {
+    response = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/register`, {
       method: "POST",
       headers: {
         accept: "application/json",

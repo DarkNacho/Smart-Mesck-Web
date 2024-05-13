@@ -1,0 +1,18 @@
+- [ ] Diseñar Login más lindo.
+- [ ] Agregar feedback al momento de login
+- [ ] Agregar funcionalidad de recuperar contraseña / olvidé contraseña / cambiar contraseña 
+- [ ] Ahora que hay registro y login , indicar con qué usuario ha iniciado sesión y representarlo de alguna forma para saber si es paciente / profesional / administrador (probablemente asignarle un color único en el nombre)
+- [X] **Falta enviar correo de verificación para Profesional**
+- [ ] **Falta agregar la opción de derivar paciente**
+- [ ] En registro Profesional se olvidó agregar código de país para teléfono, también se olvidó restringir fecha de nacimiento (Dejarlo igual que en paciente)
+- [X] **Al crear el profesional no envía correo. (sólo funciona en paciente)**
+- [ ] Agregar padding al crear observación para Paciente.
+- [ ] ¿Es necesario asociar una observación a un encuentro?
+- [ ] Agregar padding a crear encuentro en paciente.
+- [X] **Asignar el paciente al profesional que lo creó** (Importante debido a que si no se encuentra asignado el profesional no tiene acceso a él) 
+- [ ] Al migrar de servidor agregar terminología por defecto (roles , categorías).
+- [ ] Al migrar servidor, agregar los formularios creados.
+- [ ] Hacer que se comparta una misma base de datos y no se cree nueva base de datos al momento de re construir el proyecto o migrarlo.
+- [ ] Documentar lista para cambiar correo
+- [ ] Documentar como conectarse a otra base de datos
+- [ ] 

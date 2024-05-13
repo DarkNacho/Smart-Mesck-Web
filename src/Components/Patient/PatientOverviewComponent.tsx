@@ -8,23 +8,6 @@ import ConditionUtils from "../../Services/Utils/ConditionUtils";
 import ObservationUtils from "../../Services/Utils/ObservationUtils";
 import FhirResourceService from "../../Services/FhirService";
 import MedicationUtils from "../../Services/Utils/MedicationUtils";
-import { loadUserRoleFromLocalStorage } from "../../RolUser";
-import { SearchParams } from "fhir-kit-client";
-
-const role = loadUserRoleFromLocalStorage();
-
-const params = (
-  patientId: string,
-  practitionerMode: "recorder" | "asserter" | "performer" | "informationSource"
-) => {
-  let _params: SearchParams = {
-    subject: patientId,
-  };
-  if (role === "Practitioner") {
-    _params = { ..._params, [practitionerMode]: localStorage.getItem("id")! };
-  }
-  return _params;
-};
 
 export default function PatientOverviewComponent({
   patient,
@@ -40,9 +23,9 @@ export default function PatientOverviewComponent({
   const [medication, setMedicationData] = useState<InfoListData[]>([]);
 
   const fetchObservationData = async () => {
-    const result = await observationService.getResources(
-      params(patient.id!, "performer")
-    );
+    const result = await observationService.getResources({
+      subject: patient.id!,
+    });
 
     if (result.success) {
       setObservationData(ObservationUtils.extractObservationInfo(result.data));
@@ -51,9 +34,9 @@ export default function PatientOverviewComponent({
   };
 
   const fetchConditionData = async () => {
-    const result = await conditionService.getResources(
-      params(patient.id!, "recorder")
-    );
+    const result = await conditionService.getResources({
+      subject: patient.id!,
+    });
     if (result.success) {
       setConditionData(ConditionUtils.extractConditionName(result.data));
       console.log(result.data);
@@ -61,9 +44,9 @@ export default function PatientOverviewComponent({
   };
 
   const fetchMedicationData = async () => {
-    const result = await medicationService.getResources(
-      params(patient.id!, "informationSource")
-    );
+    const result = await medicationService.getResources({
+      subject: patient.id!,
+    });
     if (result.success) {
       setMedicationData(
         MedicationUtils.extractMedicationInfo(

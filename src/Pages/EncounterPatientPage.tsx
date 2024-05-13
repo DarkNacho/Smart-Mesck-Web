@@ -10,21 +10,32 @@ import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestion
 
 import ObservationUtil from "../Services/Utils/ObservationUtils";
 import ConditionUtils from "../Services/Utils/ConditionUtils";
+import { Encounter } from "fhir/r4";
+import FhirResourceService from "../Services/FhirService";
 
 const observationService = new ObservationService();
 const conditionService = new ConditionService();
+const encounterService = new FhirResourceService<Encounter>("Encounter");
+let patientID = "";
 
 export default function EncounterPatientPage() {
-  const { patientID } = useParams();
   const { encounterID } = useParams();
 
   const [observationData, setObservationData] = useState<InfoListData[]>([]);
 
   const [conditionData, setConditionData] = useState<InfoListData[]>([]);
+  const [encounter, setEncounter] = useState<Encounter>();
 
   const fetchData = async () => {
+    const resultEncounter = await encounterService.getById(encounterID!);
+    if (resultEncounter.success) {
+      patientID = resultEncounter.data?.subject?.reference?.split("/")[1] || "";
+      setEncounter(resultEncounter.data);
+      console.log("encounter:", resultEncounter.data);
+    }
+
     const result = await observationService.getResources({
-      subject: patientID!,
+      subject: patientID,
       encounter: encounterID!,
     });
 
@@ -49,12 +60,15 @@ export default function EncounterPatientPage() {
   useEffect(() => {
     setObservationData([]);
     fetchData();
-  }, [patientID]);
+  }, [encounterID]);
+
+  if (patientID === "") return <div>loading...</div>;
 
   return (
     <div style={{ padding: "50px" }}>
       <div style={{ paddingBottom: "30px" }}>
         <h1>info encuentro</h1>
+        <h1>{encounter?.id}</h1>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
         <div style={{ flex: 1 }}>

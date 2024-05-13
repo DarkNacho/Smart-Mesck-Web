@@ -50,9 +50,6 @@ export default function PersonConfirmPasswordComponent({
               type="password"
               {...register("newPassword", {
                 required: "Contraseña requerida",
-                validate: (value) =>
-                  value === getValues("confirmPassword") ||
-                  "Las contraseñas no coinciden",
               })}
               error={Boolean(errors.newPassword)}
               helperText={errors.newPassword && errors.newPassword.message}

@@ -14,9 +14,11 @@ import { Close } from "@mui/icons-material";
 import styles from "./PatientCreateComponent.module.css";
 import { FhirResource, Patient } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
-import { PatientFormData } from "../Forms/PatientFormComponent";
 import HandleResult from "../HandleResult";
-import PatientStepperForm from "../Forms/PatientStepperForm";
+import PatientStepperForm, {
+  PatientFormData,
+} from "../Forms/PatientStepperForm";
+import PersonUtil from "../../Services/Utils/PersonUtils";
 
 let formData: PatientFormData;
 export default function PatientCreateComponent({
@@ -86,28 +88,11 @@ export default function PatientCreateComponent({
   // Función que se ejecuta al enviar el formulario
   const onSubmitForm: SubmitHandler<PatientFormData> = (data) => {
     const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
-    const newPatient: Patient = {
-      resourceType: "Patient",
-      identifier: [{ system: "RUT", value: rut }],
-      name: [
-        {
-          family: data.apellidoPaterno,
-          given: [data.nombre, data.segundoNombre],
-          suffix: [data.apellidoMaterno],
-          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`,
-        },
-      ],
-      birthDate: data.fechaNacimiento,
-      gender: data.genero as "male" | "female" | "other" | "unknown",
-      telecom: [
-        { system: "phone", value: data.countryCode + data.numeroTelefonico },
-        { system: "email", value: data.email },
-      ],
-      maritalStatus: {
-        coding: data.maritalStatus ? [data.maritalStatus] : undefined,
-      },
-      photo: [{ url: data.photo }],
-    };
+    const newPatient = PersonUtil.PatientFormToPatient(data);
+
+    newPatient.generalPractitioner = [
+      { reference: `Practitioner/${localStorage.getItem("id")}` },
+    ];
 
     const newUser: any = {
       email: data.email,

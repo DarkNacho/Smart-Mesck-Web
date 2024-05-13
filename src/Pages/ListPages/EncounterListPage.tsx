@@ -49,8 +49,7 @@ function getSearchPatientOrPractitioner(
   roleUser: RolUser,
   id: string
 ): SearchParams {
-  if (roleUser === "Practitioner")
-    return { participant: id, Subject: localStorage.getItem("id")! };
+  if (roleUser === "Practitioner") return { participant: id };
 
   if (roleUser === "Patient") return { subject: id };
 

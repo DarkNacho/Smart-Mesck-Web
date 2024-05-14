@@ -144,9 +144,12 @@ export default function PatientCreateComponent({
       email: data.email,
       rut: rut,
       phone_number: data.numeroTelefonico,
+      name: `${data.nombre} ${data.apellidoPaterno}`,
       role: "Practitioner",
       secondaryRoles: data.role?.map((role) => role.code).join(","),
     };
+
+    console.log("posting practitioner....", newUser);
     postPractitioner(newPractitioner, practitionerRole, newUser);
   };
 

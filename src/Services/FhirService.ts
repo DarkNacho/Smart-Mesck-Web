@@ -91,6 +91,16 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
+  public async getVbyId(id: string, version: string): Promise<Result<T>> {
+    return this.handleResult<T>(
+      this.fhirClient.vread({
+        resourceType: this.resourceTypeName,
+        id: id,
+        version: version,
+      }) as Promise<T>
+    );
+  }
+
   /**
    * Retrieves the history of a FHIR resource by its ID.
    * @param {string} id - The ID of the resource.

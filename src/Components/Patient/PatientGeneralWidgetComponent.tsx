@@ -11,7 +11,7 @@ export default function PatientGeneralWidgetComponent({
   edit?: boolean;
 }) {
   return (
-    <div className={styles.generalwidget}>
+    <div className={styles.generalWidget}>
       <div className={styles.title}>
         <div className={styles.icon}>
           <div className={styles.ellipse} />

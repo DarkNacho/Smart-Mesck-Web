@@ -12,6 +12,7 @@ import ObservationUtil from "../Services/Utils/ObservationUtils";
 import ConditionUtils from "../Services/Utils/ConditionUtils";
 import { Encounter } from "fhir/r4";
 import FhirResourceService from "../Services/FhirService";
+import HandleResult from "../Components/HandleResult";
 
 const observationService = new ObservationService();
 const conditionService = new ConditionService();
@@ -26,40 +27,71 @@ export default function EncounterPatientPage() {
   const [conditionData, setConditionData] = useState<InfoListData[]>([]);
   const [encounter, setEncounter] = useState<Encounter>();
 
-  const fetchData = async () => {
-    const resultEncounter = await encounterService.getById(encounterID!);
-    if (resultEncounter.success) {
-      patientID = resultEncounter.data?.subject?.reference?.split("/")[1] || "";
-      setEncounter(resultEncounter.data);
-      console.log("encounter:", resultEncounter.data);
+  const fetchEncounter = async () => {
+    const result = await HandleResult.handleOperation(
+      () => encounterService.getById(encounterID!),
+      "Encuentro obtenido.",
+      "Obteniendo Encuentro..."
+    );
+
+    //const resultEncounter = await encounterService.getById(encounterID!);
+    if (result.success) {
+      patientID = result.data?.subject?.reference?.split("/")[1] || "";
+      setEncounter(result.data);
+      console.log("encounter:", result.data);
     }
+  };
 
-    const result = await observationService.getResources({
-      subject: patientID,
-      encounter: encounterID!,
-    });
+  const fetchObservation = async () => {
+    //const result = await observationService.getResources({
+    //  subject: patientID,
+    //  encounter: encounterID!,
+    //});
 
+    const result = await HandleResult.handleOperation(
+      () =>
+        observationService.getResources({
+          subject: patientID,
+          encounter: encounterID!,
+        }),
+      "Observaciones Obtenidas.",
+      "Obteniendo Observaciones..."
+    );
     console.log("patientID ", patientID);
     console.log("encounterID ", encounterID);
     if (result.success) {
       setObservationData(ObservationUtil.extractObservationInfo(result.data));
       console.log("observation:", result.data);
     }
+  };
 
-    const resultCon = await conditionService.getResources({
-      subject: patientID!,
-      encounter: encounterID!,
-    });
-    if (resultCon.success) {
-      console.log("conditions: ", resultCon.data);
-      setConditionData(ConditionUtils.extractConditionName(resultCon.data));
+  const fetchCondition = async () => {
+    //const resultCon = await conditionService.getResources({
+    //  subject: patientID!,
+    //  encounter: encounterID!,
+    //});
+    const result = await HandleResult.handleOperation(
+      () =>
+        conditionService.getResources({
+          subject: patientID!,
+          encounter: encounterID!,
+        }),
+      "Condiciones Obtenidas.",
+      "Obteniendo Condiciones..."
+    );
+
+    if (result.success) {
+      console.log("conditions: ", result.data);
+      setConditionData(ConditionUtils.extractConditionName(result.data));
       //console.log(conditionService.extractConditionName(resultCon.data));
     }
   };
 
   useEffect(() => {
     setObservationData([]);
-    fetchData();
+    fetchEncounter();
+    fetchObservation();
+    fetchCondition();
   }, [encounterID]);
 
   if (patientID === "") return <div>loading...</div>;
@@ -86,14 +118,6 @@ export default function EncounterPatientPage() {
             title={"Condiciones"}
             icon={"/inercial.svg"}
             resourceType="Condition"
-          ></InfoListComponent>
-        </div>
-        <div style={{ flex: 1 }}>
-          <InfoListComponent
-            data={[]}
-            title={"Medicamentos"}
-            icon={"/medication.svg"}
-            resourceType="Medica"
           ></InfoListComponent>
         </div>
       </div>

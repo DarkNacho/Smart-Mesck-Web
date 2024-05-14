@@ -98,6 +98,7 @@ export default function PatientCreateComponent({
       email: data.email,
       rut: rut,
       phone_number: data.numeroTelefonico,
+      name: `${data.nombre} ${data.apellidoPaterno}`,
       role: "Patient",
     };
 

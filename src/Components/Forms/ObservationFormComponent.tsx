@@ -68,6 +68,7 @@ export default function ObservationFormComponent({
 
   const roleUser = loadUserRoleFromLocalStorage();
   const encounterId = ObservationUtils.getEncounterId(observation!);
+  console.log("EncounterId", encounterId);
   return (
     <>
       <form id={formId} onSubmit={handleSubmit(submitForm)}>
@@ -95,7 +96,9 @@ export default function ObservationFormComponent({
                     field.onChange(null);
                   }
                 }}
-                readOnly={readOnly || !(roleUser === "Admin")}
+                readOnly={
+                  readOnly || !(roleUser === "Admin") || Boolean(encounterId)
+                }
                 textFieldProps={{
                   error: Boolean(errors.performer),
                   helperText: errors.performer && errors.performer.message,

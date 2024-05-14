@@ -8,6 +8,7 @@ import ConditionUtils from "../../Services/Utils/ConditionUtils";
 import ObservationUtils from "../../Services/Utils/ObservationUtils";
 import FhirResourceService from "../../Services/FhirService";
 import MedicationUtils from "../../Services/Utils/MedicationUtils";
+import HandleResult from "../HandleResult";
 
 export default function PatientOverviewComponent({
   patient,
@@ -23,9 +24,17 @@ export default function PatientOverviewComponent({
   const [medication, setMedicationData] = useState<InfoListData[]>([]);
 
   const fetchObservationData = async () => {
-    const result = await observationService.getResources({
-      subject: patient.id!,
-    });
+    const result = await HandleResult.handleOperation(
+      () =>
+        observationService.getResources({
+          subject: patient.id!,
+        }),
+      "Observaciones Obtenidas.",
+      "Obteniendo Observaciones..."
+    );
+    //const result = await observationService.getResources({
+    //  subject: patient.id!,
+    //});
 
     if (result.success) {
       setObservationData(ObservationUtils.extractObservationInfo(result.data));
@@ -34,9 +43,19 @@ export default function PatientOverviewComponent({
   };
 
   const fetchConditionData = async () => {
-    const result = await conditionService.getResources({
-      subject: patient.id!,
-    });
+    //const result = await conditionService.getResources({
+    //  subject: patient.id!,
+    //});
+
+    const result = await HandleResult.handleOperation(
+      () =>
+        conditionService.getResources({
+          subject: patient.id!,
+        }),
+      "Condiciones Obtenidas.",
+      "Obteniendo Condiciones..."
+    );
+
     if (result.success) {
       setConditionData(ConditionUtils.extractConditionName(result.data));
       console.log(result.data);
@@ -44,9 +63,19 @@ export default function PatientOverviewComponent({
   };
 
   const fetchMedicationData = async () => {
-    const result = await medicationService.getResources({
-      subject: patient.id!,
-    });
+    //const result = await medicationService.getResources({
+    //  subject: patient.id!,
+    //});
+
+    const result = await HandleResult.handleOperation(
+      () =>
+        medicationService.getResources({
+          subject: patient.id!,
+        }),
+      "Medicamentos Obtenidos.",
+      "Obteniendo Medicamentos..."
+    );
+
     if (result.success) {
       setMedicationData(
         MedicationUtils.extractMedicationInfo(
@@ -63,6 +92,7 @@ export default function PatientOverviewComponent({
     setObservationData([]);
     setConditionData([]);
     setMedicationData([]);
+
     fetchObservationData();
     fetchConditionData();
     fetchMedicationData();

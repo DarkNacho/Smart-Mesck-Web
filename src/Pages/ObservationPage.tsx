@@ -19,18 +19,19 @@ import HandleResult from "../Components/HandleResult";
 import ObservationUtils from "../Services/Utils/ObservationUtils";
 
 const observationService = new ObservationService();
-
+let practitionerId: string | undefined;
 export default function ObservationPage() {
   const { patientID, observationID } = useParams();
   const [observationInfoData, setObservationInfoData] = useState<
     InfoListData[]
   >([]);
 
-  const [observationData, setObservationData] = useState<Observation[]>([]);
+  const [observation, setObservation] = useState<Observation>();
   const [name, setName] = useState("");
 
   const [result, setResult] = useState(false);
 
+  /*
   const fetchData = async () => {
     const result = await observationService.getHistoryById(observationID!);
     if (!result.success) return false;
@@ -47,15 +48,48 @@ export default function ObservationPage() {
     console.log(result.data);
     return true;
   };
+  */
+
+  const fetchHistory = async (
+    observation: Observation
+  ): Promise<Result<Observation[]>> => {
+    const length = observation?.meta?.versionId || "0";
+    const data: Observation[] = [observation];
+    for (let i = 1; i < parseInt(length); i++) {
+      const result = await observationService.getVbyId(
+        observationID!,
+        i.toString()
+      );
+      if (!result.success) {
+        console.error("Error fetching version", i);
+        return { success: false, error: `Error fetching version: ${i}` };
+      }
+      data.push(result.data);
+    }
+
+    return { success: true, data };
+  };
+
+  const fetchObservation = async () => {
+    const result = await HandleResult.handleOperation(
+      () => observationService.getById(observationID!),
+      "Observación Obtenida",
+      "Obteniendo Observación...",
+      setObservation
+    );
+    return result;
+  };
 
   const onSubmitForm: SubmitHandler<ObservationFormData> = (data) => {
-    const newObservation =
-      ObservationUtils.ObservationFormDataToObservation(data);
-    console.log(newObservation);
+    const newObservation = {
+      ...observation!,
+      ...ObservationUtils.ObservationFormDataToObservation(data),
+    };
     sendObservation(newObservation);
   };
 
   const sendObservation = async (newObservation: Observation) => {
+    console.log("sending.. ", newObservation);
     HandleResult.handleOperation(
       () => new ObservationService().sendResource(newObservation),
       "Observación guardada exitosamente",
@@ -63,14 +97,41 @@ export default function ObservationPage() {
     );
   };
 
+  const fetchData = async (): Promise<Result<InfoListData[]>> => {
+    return fetchObservation()
+      .then((res) => {
+        if (!res.success) return res;
+        setName(ObservationUtil.getName(res.data));
+        setObservation(res.data);
+        practitionerId = ObservationUtil.getFirstPerformerId(res.data);
+        return fetchHistory(res.data);
+      })
+      .then((res) => {
+        if (!res.success) return res;
+        const obs = res.data.map((item) => {
+          const name = ObservationUtil.getValue(item);
+          const value = dayjs(
+            item.issued || item.meta?.lastUpdated
+          ).toISOString();
+          return { name, value };
+        });
+        setResult(true);
+        return { success: true, data: obs };
+      });
+  };
+
   useEffect(() => {
-    setObservationInfoData([]);
-    fetchData().then((res) => setResult(res));
+    HandleResult.handleOperation(
+      fetchData,
+      "Datos Obtenidos exitosamente.",
+      "Obteniendo datos...",
+      setObservationInfoData
+    );
   }, [observationID]);
 
-  if (result && observationData.length === 0) return <div>No data</div>;
+  if (result && observation === undefined) return <div>No data</div>;
 
-  if (!result) return <div>Ha ocurrido un error</div>;
+  if (!observation) return <div>loading...</div>;
 
   console.log("result", result);
   return (
@@ -90,20 +151,18 @@ export default function ObservationPage() {
           {observationInfoData.length >= 1 && (
             <div>
               <ObservationFormComponent
-                formId="form"
-                observation={observationData[0]}
+                formId="formObservation"
+                observation={observation}
                 patientId={patientID!}
                 submitForm={onSubmitForm}
                 readOnly={checkPatientRol()}
-                practitionerId={ObservationUtil.getFirstPerformerId(
-                  observationData[0]
-                )}
+                practitionerId={practitionerId}
               ></ObservationFormComponent>
               {!checkPatientRol() && (
                 <Button
                   color="primary"
                   variant="contained"
-                  form="form"
+                  form="formObservation"
                   type="submit"
                 >
                   Guardar

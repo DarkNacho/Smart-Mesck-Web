@@ -1,25 +1,6 @@
-import { Button } from "@mui/material";
 import { jwtDecode } from "jwt-decode";
 
-function setAdmin(onLogin: (userRol: string) => void) {
-  localStorage.setItem("userRol", "Admin");
-  localStorage.setItem("id", "231");
-  onLogin("Admin");
-}
-
-function setPatient(onLogin: (userRol: string) => void) {
-  localStorage.setItem("userRol", "Patient");
-  localStorage.setItem("id", "4");
-  onLogin("Patient");
-}
-
-function setPractitioner(onLogin: (userRol: string) => void) {
-  localStorage.setItem("userRol", "Practitioner");
-  localStorage.setItem("id", "231");
-  onLogin("Practitioner");
-}
-
-function LoginPage({ onLogin }: { onLogin: (userRol: string) => void }) {
+function LoginPage() {
   localStorage.clear();
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
@@ -53,9 +34,11 @@ function LoginPage({ onLogin }: { onLogin: (userRol: string) => void }) {
         console.log("Decoded Token:", decodedToken);
         console.log("userRol:", decodedToken.role);
         console.log("id:", decodedToken.id);
+        console.log("name:", decodedToken.name);
 
         localStorage.setItem("userRol", decodedToken.role);
         localStorage.setItem("id", decodedToken.id);
+        localStorage.setItem("name", decodedToken.name);
 
         if (decodedToken.role === "Patient")
           window.location.href = `/Patient/${decodedToken.id}`;
@@ -70,31 +53,6 @@ function LoginPage({ onLogin }: { onLogin: (userRol: string) => void }) {
 
   return (
     <>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => setAdmin(onLogin)}
-        href="/Patient"
-      >
-        Admin
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => setPatient(onLogin)}
-        href="/Patient/4"
-      >
-        Patient
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => setPractitioner(onLogin)}
-        href="/Patient"
-      >
-        Practitioner
-      </Button>
-
       <form onSubmit={handleLogin}>
         <input name="username" type="text" placeholder="Username" />
         <input name="password" type="password" placeholder="Password" />

@@ -6,6 +6,7 @@ import FhirType from "../../Services/Utils/Fhirtypes";
 import { FhirResource } from "fhir/r4";
 import { SearchParams } from "fhir-kit-client";
 import { useDebounce } from "use-debounce";
+import { isAdmin } from "../../RolUser";
 
 interface AutoCompleteComponentProps<T extends FhirResource> {
   resourceType: FhirType;
@@ -65,6 +66,7 @@ export default function AutoCompleteComponent<T extends FhirResource>({
 
   const fetchDefaultResource = async () => {
     if (!defaultResourceId) return;
+    if (resourceType === "Practitioner" && isAdmin()) return;
     try {
       const result = await fhirService.getById(defaultResourceId);
 
@@ -92,7 +94,12 @@ export default function AutoCompleteComponent<T extends FhirResource>({
     }
   }, [debouncedSearchTerm]);
 
-  if (defaultResourceId && !defaultResource) return <div>Loading...</div>;
+  if (
+    defaultResourceId &&
+    !defaultResource &&
+    !(resourceType === "Practitioner" && isAdmin())
+  )
+    return <div>Loading auto...</div>;
 
   return (
     <Autocomplete

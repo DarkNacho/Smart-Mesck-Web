@@ -4,10 +4,8 @@ import { TextField, Grid, MenuItem, Autocomplete } from "@mui/material";
 import { generoOptions } from "./Terminology";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 
-import { Coding, ValueSet } from "fhir/r4";
-import FhirResourceService from "../../Services/FhirService";
-import ValueSetUtils from "../../Services/Utils/ValueSetUtils";
-import { useEffect, useState } from "react";
+import { Coding } from "fhir/r4";
+import { practitionerRole, practitionerSpecialty } from "./Terminology";
 
 // Interfaz para los datos del formulario
 export interface PractitionerFormData {
@@ -38,47 +36,6 @@ export default function PractitionerFormComponent({
     handleSubmit,
     formState: { errors },
   } = useForm<PractitionerFormData>({ mode: "onBlur" });
-
-  const [specialtyOptions, setSpecialtyOptions] = useState<Coding[]>([]);
-  const [loadingSpecialty, setLoadingSpecialty] = useState<boolean>(true);
-
-  const [roleOptions, setRoleOptions] = useState<Coding[]>([]);
-  const [loadingRole, setLoadingRole] = useState<boolean>(true);
-
-  const fetchSpecialty = async () => {
-    try {
-      const response = await new FhirResourceService<ValueSet>(
-        "ValueSet"
-      ).getById("15"); //!!Warning: Hardcoded valueSet id for Specialty
-      if (!response.success) throw new Error(response.error);
-      setSpecialtyOptions(
-        ValueSetUtils.convertValueSetToCodingArray(response.data)
-      );
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingSpecialty(false);
-    }
-  };
-
-  const fetchRole = async () => {
-    try {
-      const response = await new FhirResourceService<ValueSet>(
-        "ValueSet"
-      ).getById("14"); // !!WARNING: Hardcoded valueSet id for Role
-      if (!response.success) throw new Error(response.error);
-      setRoleOptions(ValueSetUtils.convertValueSetToCodingArray(response.data));
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingRole(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSpecialty();
-    fetchRole();
-  }, []);
 
   return (
     <>
@@ -203,8 +160,7 @@ export default function PractitionerFormComponent({
                 <Autocomplete
                   id="Autocomplete-role"
                   multiple
-                  options={roleOptions}
-                  loading={loadingRole}
+                  options={practitionerRole}
                   getOptionLabel={(option) =>
                     option.display || option.code || "UNKNOWN"
                   }
@@ -237,8 +193,7 @@ export default function PractitionerFormComponent({
                 <Autocomplete
                   id="Autocomplete-specialty"
                   multiple
-                  options={specialtyOptions}
-                  loading={loadingSpecialty}
+                  options={practitionerSpecialty}
                   getOptionLabel={(option) =>
                     option.display || option.code || "UNKNOWN"
                   }

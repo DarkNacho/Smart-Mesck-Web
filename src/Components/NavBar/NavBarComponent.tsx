@@ -81,6 +81,8 @@ const getNavigationItems = () => {
   return [];
 };
 
+const userName = localStorage.getItem("name");
+
 export default function NavBarComponent() {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -125,7 +127,7 @@ export default function NavBarComponent() {
           </Box>
           <Hidden smDown>
             <Box>{mappedNavigationItems}</Box>
-            <Box marginLeft="auto">Usuario aquí</Box>
+            <Box marginLeft="auto">{userName}</Box>
             <Button variant="contained" onClick={handleLogOut}>
               Cerrar Sesión
             </Button>
@@ -171,7 +173,7 @@ export default function NavBarComponent() {
                 {mappedNavigationItems}
               </Box>
               <Box display="flex" flexDirection="column" alignItems="center">
-                <h1>Usuario aquí</h1>
+                <h1>{userName}</h1>
                 <h1>extra 1</h1>
                 <h1>extra 2</h1>
                 <Button variant="contained" onClick={handleLogOut}>

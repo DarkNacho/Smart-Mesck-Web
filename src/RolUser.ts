@@ -24,6 +24,10 @@ export function checkAdminRol(): boolean {
   return loadUserRoleFromLocalStorage() === "Practitioner";
 }
 
+export function isAdmin(): boolean {
+  return loadUserRoleFromLocalStorage() === "Admin";
+}
+
 export function isAdminOrPractitioner(): boolean {
   const rol = loadUserRoleFromLocalStorage();
   return rol === "Practitioner" || rol === "Admin";

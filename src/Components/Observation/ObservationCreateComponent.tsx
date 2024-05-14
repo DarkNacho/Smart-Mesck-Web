@@ -58,7 +58,7 @@ export default function ObservationCreateComponent({
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Crear nuevo encuentro
+          Añadir Observación
           <IconButton
             aria-label="close"
             onClick={handleClose}

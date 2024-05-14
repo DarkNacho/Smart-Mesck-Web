@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   TextField,
@@ -11,13 +11,16 @@ import styles from "./ListPage.module.css";
 
 import { Add, Search } from "@mui/icons-material";
 import ListResourceComponent from "../../Components/ListResourceComponent";
-import { Coding, Practitioner, ValueSet } from "fhir/r4";
+import { Coding, Practitioner } from "fhir/r4";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import FhirResourceService from "../../Services/FhirService";
 import PractitionerCreateComponent from "../../Components/Practitioner/PractitionerCreateComponent";
 import { SearchParams } from "fhir-kit-client";
 import { isAdminOrPractitioner } from "../../RolUser";
-import ValueSetUtils from "../../Services/Utils/ValueSetUtils";
+import {
+  practitionerRole,
+  practitionerSpecialty,
+} from "../../Components/Forms/Terminology";
 
 const fhirService = new FhirResourceService<Practitioner>("Practitioner");
 
@@ -35,43 +38,8 @@ export default function PractitionerListPage() {
 
   let specialty: Coding | undefined;
   //const [specialty, setSpecialty] = useState<Coding>();
-  const [specialtyOptions, setSpecialtyOptions] = useState<Coding[]>([]);
-  const [loadingSpecialty, setLoadingSpecialty] = useState<boolean>(true);
-
   //const [role, setRole] = useState<Coding>();
   let role: Coding | undefined;
-  const [roleOptions, setRoleOptions] = useState<Coding[]>([]);
-  const [loadingRole, setLoadingRole] = useState<boolean>(true);
-
-  const fetchSpecialty = async () => {
-    try {
-      const response = await new FhirResourceService<ValueSet>(
-        "ValueSet"
-      ).getById("257");
-      if (!response.success) throw new Error(response.error);
-      setSpecialtyOptions(
-        ValueSetUtils.convertValueSetToCodingArray(response.data)
-      );
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingSpecialty(false);
-    }
-  };
-
-  const fetchRole = async () => {
-    try {
-      const response = await new FhirResourceService<ValueSet>(
-        "ValueSet"
-      ).getById("232");
-      if (!response.success) throw new Error(response.error);
-      setRoleOptions(ValueSetUtils.convertValueSetToCodingArray(response.data));
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingRole(false);
-    }
-  };
 
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
@@ -95,10 +63,6 @@ export default function PractitionerListPage() {
     return search;
   };
 
-  useEffect(() => {
-    fetchSpecialty();
-    fetchRole();
-  }, []);
   return (
     <div>
       <div className={styles.content}>
@@ -168,8 +132,7 @@ export default function PractitionerListPage() {
 
           <Autocomplete
             id="Autocomplete-role"
-            options={roleOptions}
-            loading={loadingRole}
+            options={practitionerRole}
             getOptionLabel={(option) =>
               option.display || option.code || "UNKNOWN"
             }
@@ -195,8 +158,7 @@ export default function PractitionerListPage() {
           />
           <Autocomplete
             id="Autocomplete-specialty"
-            options={specialtyOptions}
-            loading={loadingSpecialty}
+            options={practitionerSpecialty}
             getOptionLabel={(option) =>
               option.display || option.code || "UNKNOWN"
             }

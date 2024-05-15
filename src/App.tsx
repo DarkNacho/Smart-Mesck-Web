@@ -1,9 +1,10 @@
-import LoginPage from "./Pages/LoginPage.tsx";
+//import LoginPage from "./Pages/LoginPage.tsx";
 import { useEffect, useState } from "react";
 import { loadUserRoleFromLocalStorage } from "./RolUser.ts";
 import NavBarComponent from "./Components/NavBar/NavBarComponent.tsx";
 import { useLocation } from "react-router-dom";
 import PersonConfirmPasswordComponent from "./Components/Person/PersonConfirmPasswordComponent.tsx";
+import SignInSide from "./Pages/SignInSide.tsx";
 
 function App() {
   const [userRol] = useState<string | undefined>(
@@ -27,7 +28,7 @@ function App() {
 
   return (
     <div>
-      {userRol ? <NavBarComponent></NavBarComponent> : <LoginPage />}
+      {userRol ? <NavBarComponent></NavBarComponent> : <SignInSide />}
 
       <PersonConfirmPasswordComponent
         onOpen={handleIsOpen}

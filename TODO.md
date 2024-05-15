@@ -1,7 +1,7 @@
-- [ ] Diseñar Login más lindo.
-- [ ] Agregar feedback al momento de login
+- [X] Diseñar Login más lindo.
+- [X] Agregar feedback al momento de login
 - [X] Agregar funcionalidad de recuperar contraseña / olvidé contraseña / cambiar contraseña **(BackEnd)**
-- [ ] Agregar funcionalida de recuperar contraseña **FrontEnd**
+- [X] Agregar funcionalida de recuperar contraseña **FrontEnd**
 - [X] Ahora que hay registro y login , indicar con qué usuario ha iniciado sesión
 - [X] **Falta enviar correo de verificación para Profesional**
 - [ ] **Falta agregar la opción de derivar paciente**
@@ -11,9 +11,8 @@
 - [ ] ¿Es necesario asociar una observación a un encuentro?
 - [X] Agregar padding a crear encuentro en paciente.
 - [X] **Asignar el paciente al profesional que lo creó** (Importante debido a que si no se encuentra asignado el profesional no tiene acceso a él) 
-- [ ] Al migrar de servidor agregar terminología por defecto (roles , categorías).
+- [X] Al migrar de servidor agregar terminología por defecto (roles , categorías).
 - [ ] Al migrar servidor, agregar los formularios creados.
-- [ ] Hacer que se comparta una misma base de datos y no se cree nueva base de datos al momento de re construir el proyecto o migrarlo.
+- [X] Hacer que se comparta una misma base de datos y no se cree nueva base de datos al momento de re construir el proyecto o migrarlo.
 - [ ] Documentar lista para cambiar correo
 - [ ] Documentar como conectarse a otra base de datos
-- [ ] 

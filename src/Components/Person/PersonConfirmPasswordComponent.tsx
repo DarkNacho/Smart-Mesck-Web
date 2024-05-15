@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useEffect } from "react";
 import { Close } from "@mui/icons-material";
-import styles from "./PersonConfirmPasswordComponent.module.css";
+import styles from "./modal.module.css";
 import HandleResult from "../HandleResult";
 import ConfirmPasswordForm, {
   PersonConfirmPassword,

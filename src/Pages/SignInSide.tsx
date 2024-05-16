@@ -14,7 +14,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import HandleResult from "../Components/HandleResult";
 import { jwtDecode } from "jwt-decode";
 import PersonForgotPasswordComponent from "../Components/Person/PersonForgotPasswordComponent";
-
+import backgroundLogin from "../../public/fondo-login.jpg";
+import logoBlue from "../../public/logo-azul.png";
 function Copyright(props: any) {
   return (
     <Typography
@@ -39,7 +40,7 @@ const defaultTheme = createTheme({
       styleOverrides: {
         root: {
           "@media (max-width:600px)": {
-            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url(https://source.unsplash.com/random?wallpapers)`,
+            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url(${backgroundLogin})`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             backgroundPosition: "center",
@@ -123,23 +124,6 @@ export default function SignInSide() {
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            backgroundImage:
-              "url(https://source.unsplash.com/random?wallpapers)",
-            backgroundRepeat: "no-repeat",
-            backgroundColor: (t) =>
-              t.palette.mode === "light"
-                ? t.palette.grey[50]
-                : t.palette.grey[900],
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
           <Box
             sx={{
@@ -171,6 +155,9 @@ export default function SignInSide() {
                 name="rut"
                 autoComplete="rut"
                 autoFocus
+                InputLabelProps={{
+                  style: { color: "#fff" },
+                }}
               />
               <TextField
                 margin="normal"
@@ -200,11 +187,39 @@ export default function SignInSide() {
                   {"Forgot Password?"}
                 </Link>
               </Box>
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="100%"
+              >
+                <img
+                  src={logoBlue}
+                  alt="logo"
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
+              </Box>
 
               <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
         </Grid>
+        <Grid
+          item
+          xs={false}
+          sm={4}
+          md={7}
+          sx={{
+            backgroundImage: `url(${backgroundLogin})`,
+            backgroundRepeat: "no-repeat",
+            backgroundColor: (t) =>
+              t.palette.mode === "light"
+                ? t.palette.grey[50]
+                : t.palette.grey[900],
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
       </Grid>
       <PersonForgotPasswordComponent
         onOpen={handleIsOpen}

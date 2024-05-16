@@ -14,6 +14,7 @@ import PatientMyPractitionerListPage from "./Pages/ListPages/PatientMyPractition
 import NavBarComponent from "./Components/NavBar/NavBarComponent.tsx";
 import SensorChartDashboardPage from "./Pages/SensorChartDashboardPage.tsx";
 import SensorChartDashboardPage2 from "./Pages/SensorChartDashboardPage2.tsx";
+import { loadUserRoleFromLocalStorage } from "./RolUser.ts";
 
 const router = createBrowserRouter([
   {
@@ -69,7 +70,7 @@ const router = createBrowserRouter([
 //<HeaderComponent onTabSelected={handleSelectedTab}></HeaderComponent>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
-    <NavBarComponent></NavBarComponent>
+    {loadUserRoleFromLocalStorage() && <NavBarComponent></NavBarComponent>}
 
     <Toaster></Toaster>
     <RouterProvider router={router}></RouterProvider>

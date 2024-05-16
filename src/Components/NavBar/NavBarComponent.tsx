@@ -8,11 +8,13 @@ import {
   Toolbar,
   useMediaQuery,
   useTheme,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 
 import logo from "../../assets/smart-mesck-logo.png";
 import backgroundImageSmartMesck from "../../assets/background-smart-mesck.png";
-import { Close, Menu } from "@mui/icons-material";
+import { Close, Menu as MenuIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
@@ -86,7 +88,17 @@ const userName = localStorage.getItem("name");
 export default function NavBarComponent() {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const handleClickAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseAnchor = () => {
+    setAnchorEl(null);
+  };
 
   const handleOpen = () => {
     setOpen(true);
@@ -127,15 +139,26 @@ export default function NavBarComponent() {
           </Box>
           <Hidden smDown>
             <Box>{mappedNavigationItems}</Box>
-            <Box marginLeft="auto">{userName}</Box>
-            <Button variant="contained" onClick={handleLogOut}>
-              Cerrar Sesión
+            <Box marginLeft="auto"></Box>
+            <Button variant="text" onClick={handleClickAnchor}>
+              {userName}
             </Button>
+            <Menu
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleCloseAnchor}
+            >
+              <MenuItem onClick={() => alert("abrir perfil aquí")}>
+                Mi Perfil
+              </MenuItem>
+              <MenuItem onClick={handleLogOut}>Cerrar Sesión</MenuItem>
+            </Menu>
           </Hidden>
           <Hidden smUp>
             <Box marginLeft="auto">
               <IconButton color="inherit" onClick={handleOpen}>
-                <Menu></Menu>
+                <MenuIcon></MenuIcon>
               </IconButton>
             </Box>
             <Dialog

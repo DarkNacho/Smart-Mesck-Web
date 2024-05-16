@@ -5,17 +5,24 @@ import { generoOptions } from "./Terminology";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 
 import { Coding } from "fhir/r4";
-import { practitionerRole, practitionerSpecialty } from "./Terminology";
-
+import {
+  practitionerRole,
+  practitionerSpecialty,
+  countryCodes,
+} from "./Terminology";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
 // Interfaz para los datos del formulario
 export interface PractitionerFormData {
   nombre: string;
   segundoNombre: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
-  fechaNacimiento: string;
+  fechaNacimiento: Dayjs;
   genero: string;
   rut: string;
+  countryCode: string;
   numeroTelefonico: string;
   email: string;
   photo: string;
@@ -80,19 +87,22 @@ export default function PractitionerFormComponent({
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Fecha de Nacimiento"
-              type="date"
-              {...register("fechaNacimiento", {
-                required: "La Fecha de Nacimiento es necesaria",
-              })}
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-              error={Boolean(errors.fechaNacimiento)}
-              helperText={
-                errors.fechaNacimiento && errors.fechaNacimiento.message
-              }
-            />
+            <Controller
+              control={control}
+              name="fechaNacimiento"
+              render={({ field: { onChange, value, ref } }) => (
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    maxDate={dayjs().year(dayjs().year() - 18)}
+                    label="Fecha de Nacimiento"
+                    onChange={onChange}
+                    value={value}
+                    inputRef={ref}
+                    sx={{ width: "100%" }}
+                  ></DatePicker>
+                </LocalizationProvider>
+              )}
+            ></Controller>
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -126,14 +136,33 @@ export default function PractitionerFormComponent({
               helperText={errors.rut && errors.rut.message}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={1.5}>
+            <TextField
+              select
+              fullWidth
+              label="Código"
+              defaultValue={"+56"}
+              {...register("countryCode", {
+                required: "Código de país requerido",
+              })}
+              error={Boolean(errors.countryCode)}
+              helperText={errors.countryCode && errors.countryCode.message}
+            >
+              {countryCodes.map((option) => (
+                <MenuItem key={option.code} value={option.code}>
+                  {option.display}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={4.5}>
             <TextField
               label="Número Telefónico"
               {...register("numeroTelefonico")}
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={12}>
             <TextField
               type="email"
               label="Email"
@@ -149,9 +178,7 @@ export default function PractitionerFormComponent({
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
-            <TextField label="Foto" {...register("photo")} fullWidth />
-          </Grid>
+
           <Grid item xs={12} sm={12}>
             <Controller
               name="role"
@@ -217,6 +244,9 @@ export default function PractitionerFormComponent({
                 />
               )}
             />
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <TextField label="Foto" {...register("photo")} fullWidth />
           </Grid>
         </Grid>
       </form>

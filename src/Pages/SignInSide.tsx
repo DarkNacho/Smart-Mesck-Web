@@ -24,8 +24,8 @@ function Copyright(props: any) {
       {...props}
     >
       {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="https:/www.cttn.cl/">
+        CTTN
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -33,8 +33,22 @@ function Copyright(props: any) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  components: {
+    MuiGrid: {
+      styleOverrides: {
+        root: {
+          "@media (max-width:600px)": {
+            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url(https://source.unsplash.com/random?wallpapers)`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          },
+        },
+      },
+    },
+  },
+});
 
 async function login(username: string, password: string): Promise<Result<any>> {
   const response = await fetch(
@@ -177,18 +191,16 @@ export default function SignInSide() {
               >
                 Sign In
               </Button>
-              <Grid container>
-                <Grid item xs></Grid>
-                <Grid item>
-                  <Link
-                    href="#"
-                    variant="body2"
-                    onClick={() => handleIsOpen(true)}
-                  >
-                    {"Forgot Password?"}
-                  </Link>
-                </Grid>
-              </Grid>
+              <Box textAlign="right">
+                <Link
+                  href="#"
+                  variant="body2"
+                  onClick={() => handleIsOpen(true)}
+                >
+                  {"Forgot Password?"}
+                </Link>
+              </Box>
+
               <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>

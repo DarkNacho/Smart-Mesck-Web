@@ -126,9 +126,14 @@ export default function PatientCreateComponent({
           text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`,
         },
       ],
-      birthDate: data.fechaNacimiento,
+      birthDate: data.fechaNacimiento.toISOString(),
       gender: data.genero as "male" | "female" | "other" | "unknown",
-      telecom: [{ system: "phone", value: data.numeroTelefonico }],
+      telecom: [
+        {
+          system: "phone",
+          value: `${data.countryCode}-${data.numeroTelefonico}`,
+        },
+      ],
       photo: [{ url: data.photo }],
     };
 

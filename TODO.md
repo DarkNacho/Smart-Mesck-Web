@@ -14,5 +14,5 @@
 - [X] Al migrar de servidor agregar terminología por defecto (roles , categorías).
 - [ ] Al migrar servidor, agregar los formularios creados.
 - [X] Hacer que se comparta una misma base de datos y no se cree nueva base de datos al momento de re construir el proyecto o migrarlo.
-- [ ] Documentar lista para cambiar correo
-- [ ] Documentar como conectarse a otra base de datos
+- [X] Documentar lista para cambiar correo
+- [X] Documentar como conectarse a otra base de datos

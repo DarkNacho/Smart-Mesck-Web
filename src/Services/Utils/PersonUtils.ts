@@ -1,6 +1,7 @@
-import { Patient, Person, Practitioner } from "fhir/r4";
+import { Patient, Person, Practitioner, PractitionerRole } from "fhir/r4";
 import { PatientFormData } from "../../Components/Forms/PatientStepperForm";
 import dayjs from "dayjs";
+import { PractitionerFormData } from "../../Components/Forms/PractitionerFormComponent";
 
 type FhirResourceType = Patient | Practitioner | Person;
 
@@ -177,6 +178,7 @@ export default class PersonUtil {
     const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
     return {
       resourceType: "Patient",
+      id: data.id,
       identifier: [{ system: "RUT", value: rut }],
       name: [
         {
@@ -219,6 +221,7 @@ export default class PersonUtil {
       phone = tel[1];
     }
     return {
+      id: patient.id,
       rut: rut,
       nombre: name.given?.[0] ?? "",
       segundoNombre: name.given?.[1] ?? "",
@@ -234,6 +237,89 @@ export default class PersonUtil {
       maritalStatus: patient.maritalStatus?.coding?.[0] || {},
       photo: patient.photo?.[0].url || "",
       contact: [],
+    };
+  };
+
+  static PractitionerFormToPractitioner(data: PractitionerFormData): {
+    practitioner: Practitioner;
+    practitionerRole: PractitionerRole;
+  } {
+    const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
+    const practitioner: Practitioner = {
+      resourceType: "Practitioner",
+      id: data.practitionerId,
+      identifier: [{ system: "RUT", value: rut }],
+      name: [
+        {
+          family: data.apellidoPaterno,
+          given: [data.nombre, data.segundoNombre],
+          suffix: [data.apellidoMaterno],
+          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`,
+        },
+      ],
+      birthDate: data.fechaNacimiento.toISOString(),
+      gender: data.genero as "male" | "female" | "other" | "unknown",
+      telecom: [
+        {
+          system: "phone",
+          value: `${data.countryCode}-${data.numeroTelefonico}`,
+        },
+        { system: "email", value: data.email },
+      ],
+      photo: [{ url: data.photo }],
+    };
+
+    const practitionerRole: PractitionerRole = {
+      resourceType: "PractitionerRole",
+      id: data.practitionerRoleId,
+      code: [{ coding: data.role }],
+      specialty: [{ coding: data.specialty }],
+    };
+
+    return { practitioner, practitionerRole };
+  }
+
+  static PractitionerToPractitionerForm = (
+    practitioner: Practitioner,
+    practitionerRole: PractitionerRole
+  ): PractitionerFormData => {
+    const rut =
+      practitioner.identifier?.find((t) => t.system === "RUT")?.value || "";
+    const name = practitioner.name?.[0] ?? {};
+    const telecomPhone =
+      practitioner.telecom?.find((t) => t.system === "phone")?.value || "";
+    const telecomEmail =
+      practitioner.telecom?.find((t) => t.system === "email")?.value || "";
+
+    const tel = telecomPhone.split("-");
+    let country = "+56";
+    let phone = "";
+    if (tel.length > 1) {
+      country = tel[0];
+      phone = tel[1];
+    }
+
+    const role = practitionerRole?.code?.[0]?.coding || [];
+    const specialty = practitionerRole?.specialty?.[0]?.coding || [];
+
+    return {
+      practitionerId: practitioner.id || undefined,
+      practitionerRoleId: practitionerRole?.id || undefined,
+      rut: rut,
+      nombre: name.given?.[0] ?? name.text ?? "",
+      segundoNombre: name.given?.[1] ?? "",
+      apellidoPaterno: name.family || "",
+      apellidoMaterno: name.suffix ? name.suffix[0] : "",
+      fechaNacimiento: practitioner.birthDate
+        ? dayjs(practitioner.birthDate)
+        : dayjs().subtract(18, "years"),
+      genero: practitioner.gender || "unknown",
+      countryCode: country,
+      numeroTelefonico: phone,
+      photo: practitioner.photo?.[0].url || "",
+      email: telecomEmail,
+      specialty: specialty,
+      role: role,
     };
   };
 }

@@ -18,6 +18,8 @@ import { Close, Menu as MenuIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
+import PractitionerCreateComponent from "../Practitioner/PractitionerCreateComponent";
+
 const navigationAdminItems = [
   {
     value: "Pacientes",
@@ -90,6 +92,8 @@ export default function NavBarComponent() {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  const [editProfile, setEditProfile] = useState(false);
+
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleClickAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -106,6 +110,10 @@ export default function NavBarComponent() {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleEditProfile = (isOpen: boolean) => {
+    setEditProfile(isOpen);
   };
 
   const handleLogOut = () => {
@@ -130,6 +138,11 @@ export default function NavBarComponent() {
 
   return (
     <>
+      <PractitionerCreateComponent
+        onOpen={handleEditProfile}
+        isOpen={editProfile && loadUserRoleFromLocalStorage() !== "Patient"}
+        practitionerId={localStorage.getItem("id")!}
+      ></PractitionerCreateComponent>
       <AppBar position="fixed" sx={{ background: "#2c376e" }}>
         <Toolbar>
           <Box display="flex" alignItems="center">
@@ -149,7 +162,7 @@ export default function NavBarComponent() {
               open={Boolean(anchorEl)}
               onClose={handleCloseAnchor}
             >
-              <MenuItem onClick={() => alert("abrir perfil aquí")}>
+              <MenuItem onClick={() => setEditProfile(true)}>
                 Mi Perfil
               </MenuItem>
               <MenuItem onClick={handleLogOut}>Cerrar Sesión</MenuItem>

@@ -25,9 +25,13 @@ import {
 const fhirService = new FhirResourceService<Practitioner>("Practitioner");
 
 function getDisplay(resource: Practitioner): string {
-  return `ID: ${resource.id}\nName: ${PersonUtil.getPersonNameAsString(
-    resource
-  )}\nGender: ${resource.gender || "N/A"}`;
+  return `  ${PersonUtil.getFirstIdentifierOrId(resource)}
+  Nombre: ${PersonUtil.getPersonNameAsString(resource)}
+  Género: ${PersonUtil.getGender(resource)}
+  Teléfono: ${PersonUtil.getContactPointFirstOrDefaultAsString(
+    resource,
+    "phone"
+  ).replace(/-/g, "")}`;
 }
 
 export default function PractitionerListPage() {

@@ -15,6 +15,7 @@ interface MultipleAutoCompleteComponentProps<T extends FhirResource> {
   readOnly?: boolean;
   searchParam: string;
   defaultParams?: SearchParams;
+  defaultValues?: T[];
 }
 
 export default function MultipleAutoCompleteComponent<T extends FhirResource>({
@@ -26,10 +27,13 @@ export default function MultipleAutoCompleteComponent<T extends FhirResource>({
   searchParam,
   defaultParams,
   onChange,
+  defaultValues,
 }: MultipleAutoCompleteComponentProps<T>) {
   const [dataSet, setDataSet] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedResources, setSelectedResources] = useState<T[]>([]);
+  const [selectedResources, setSelectedResources] = useState<T[]>(
+    defaultValues || []
+  );
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 1000);
 
@@ -44,7 +48,7 @@ export default function MultipleAutoCompleteComponent<T extends FhirResource>({
       const result = await fhirService.getResources({
         ...defaultParams,
         ...param,
-        _count: 3,
+        _count: 5,
       });
 
       if (!result.success) throw new Error(result.error);
@@ -74,10 +78,12 @@ export default function MultipleAutoCompleteComponent<T extends FhirResource>({
   //if (defaultResourceId && !defaultResource) return <div>Loading...</div>;
 
   console.log("set:", dataSet);
+  console.log("selected:", selectedResources);
   return (
     <Autocomplete
       id={`${resourceType}-${label}-Autocomplete`}
       multiple
+      value={selectedResources}
       options={dataSet}
       loading={loading}
       getOptionLabel={(option) => getDisplay(option)}

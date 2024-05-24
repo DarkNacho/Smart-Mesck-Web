@@ -2,6 +2,7 @@ import { Patient } from "fhir/r4";
 import { useState } from "react";
 import styles from "./PatientHeaderComponent.module.css";
 import PersonUtil from "../../Services/Utils/PersonUtils";
+import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
 export default function PatientHeaderComponent({
   patient,
@@ -50,38 +51,40 @@ export default function PatientHeaderComponent({
         <b className={styles.user}>{name}</b>
         <div className={styles.tabstop}>
           <div className={styles.location}>
-            <div className={styles["tabs-group"]}>
-              <div
-                className={`${styles.item5} ${
-                  selectedOption === "Overview" ? styles.active : ""
-                }`}
-                onClick={() => handleOptionSelect("Overview")}
-              >
-                <div className={styles.title}>
-                  <div className={styles.text1}>Overview</div>
+            {loadUserRoleFromLocalStorage() === "Patient" && (
+              <div className={styles["tabs-group"]}>
+                <div
+                  className={`${styles.item5} ${
+                    selectedOption === "Overview" ? styles.active : ""
+                  }`}
+                  onClick={() => handleOptionSelect("Overview")}
+                >
+                  <div className={styles.title}>
+                    <div className={styles.text1}>Descripción General</div>
+                  </div>
+                </div>
+                <div
+                  className={`${styles.item5} ${
+                    selectedOption === "Formularios" ? styles.active : ""
+                  }`}
+                  onClick={() => handleOptionSelect("Formularios")}
+                >
+                  <div className={styles.title}>
+                    <div className={styles.text1}>Formularios</div>
+                  </div>
+                </div>
+                <div
+                  className={`${styles.item5} ${
+                    selectedOption === "Encounters" ? styles.active : ""
+                  }`}
+                  onClick={() => handleOptionSelect("Encounters")}
+                >
+                  <div className={styles.title}>
+                    <div className={styles.text1}>Encuentros</div>
+                  </div>
                 </div>
               </div>
-              <div
-                className={`${styles.item5} ${
-                  selectedOption === "Formularios" ? styles.active : ""
-                }`}
-                onClick={() => handleOptionSelect("Formularios")}
-              >
-                <div className={styles.title}>
-                  <div className={styles.text1}>Formularios</div>
-                </div>
-              </div>
-              <div
-                className={`${styles.item5} ${
-                  selectedOption === "Encounters" ? styles.active : ""
-                }`}
-                onClick={() => handleOptionSelect("Encounters")}
-              >
-                <div className={styles.title}>
-                  <div className={styles.text1}>Encounters</div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

@@ -11,20 +11,23 @@ import {
 import { useEffect } from "react";
 import { Close } from "@mui/icons-material";
 
-import styles from "./PractitionerCreateComponent.module.css";
+import styles from "./PractitionerModal.module.css";
 import FhirResourceService from "../../Services/FhirService";
 import { Practitioner, PractitionerRole } from "fhir/r4";
 import PractitionerFormComponent, {
   PractitionerFormData,
 } from "../Forms/PractitionerFormComponent";
 import HandleResult from "../HandleResult";
+import PersonUtil from "../../Services/Utils/PersonUtils";
 
-export default function PatientCreateComponent({
+export default function PractitionerCreateComponent({
   onOpen,
   isOpen,
+  practitionerId,
 }: {
   onOpen: (isOpen: boolean) => void;
   isOpen: boolean;
+  practitionerId?: string;
 }) {
   useEffect(() => {
     onOpen(isOpen);
@@ -44,7 +47,12 @@ export default function PatientCreateComponent({
     if (!response.success) return response;
 
     user.id = response.data.id;
-    response = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/register`, {
+
+    const url = newPractitioner.id
+      ? `${import.meta.env.VITE_SERVER_URL}/auth/update`
+      : `${import.meta.env.VITE_SERVER_URL}/auth/register`;
+
+    response = await fetch(url, {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -115,35 +123,8 @@ export default function PatientCreateComponent({
   // Función que se ejecuta al enviar el formulario
   const onSubmitForm: SubmitHandler<PractitionerFormData> = (data) => {
     const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
-    const newPractitioner: Practitioner = {
-      resourceType: "Practitioner",
-      identifier: [{ system: "RUT", value: rut }],
-      name: [
-        {
-          family: data.apellidoPaterno,
-          given: [data.nombre, data.segundoNombre],
-          suffix: [data.apellidoMaterno],
-          text: `${data.nombre} ${data.segundoNombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`,
-        },
-      ],
-      birthDate: data.fechaNacimiento.toISOString(),
-      gender: data.genero as "male" | "female" | "other" | "unknown",
-      telecom: [
-        {
-          system: "phone",
-          value: `${data.countryCode}-${data.numeroTelefonico}`,
-        },
-      ],
-      photo: [{ url: data.photo }],
-    };
-
-    const practitionerRole: PractitionerRole = {
-      resourceType: "PractitionerRole",
-      code: [{ coding: data.role }],
-      specialty: [{ coding: data.specialty }],
-      //code: data.role.map((role) => ({ coding: [role] })),
-      //specialty: data.specialty.map((role) => ({ coding: [role] })),
-    };
+    const { practitioner, practitionerRole } =
+      PersonUtil.PractitionerFormToPractitioner(data);
 
     const newUser: any = {
       email: data.email,
@@ -154,8 +135,10 @@ export default function PatientCreateComponent({
       secondaryRoles: data.role?.map((role) => role.code).join(","),
     };
 
-    console.log("posting practitioner....", newUser);
-    postPractitioner(newPractitioner, practitionerRole, newUser);
+    console.log("posting newUser....", newUser);
+    console.log("posting practitioner....", practitioner);
+    console.log("posting practitionerRole....", practitionerRole);
+    postPractitioner(practitioner, practitionerRole, newUser);
   };
 
   return (
@@ -180,6 +163,7 @@ export default function PatientCreateComponent({
             <PractitionerFormComponent
               formId="pacienteForm"
               submitForm={onSubmitForm}
+              practitionerId={practitionerId}
             ></PractitionerFormComponent>
           </Container>
         </DialogContent>

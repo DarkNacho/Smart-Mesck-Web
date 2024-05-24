@@ -91,6 +91,31 @@ export default class FhirResourceService<T extends FhirResource> {
     );
   }
 
+  public async getResource(reference: string): Promise<Result<T>> {
+    if (!reference) return { success: false, error: "Reference is empty" };
+
+    try {
+      const splitReference = reference.split("/");
+
+      if (splitReference.length < 2) {
+        throw new Error("Invalid reference format");
+      }
+
+      return this.handleResult<T>(
+        this.fhirClient.read({
+          resourceType: splitReference[0],
+          id: splitReference[1],
+        }) as Promise<T>
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        return { success: false, error: error.message };
+      } else {
+        return { success: false, error: error + " An unknown error occurred" };
+      }
+    }
+  }
+
   public async getVbyId(id: string, version: string): Promise<Result<T>> {
     return this.handleResult<T>(
       this.fhirClient.vread({

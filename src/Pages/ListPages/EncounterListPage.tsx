@@ -31,7 +31,7 @@ function getDisplay(resource: Encounter): string {
     display = `Paciente: ${EncounterUtils.getSubjectDisplayOrID(
       resource.subject!
     )}
-    \nProfesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`;
+  Profesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`;
 
   if (roleUser == "Patient")
     display = `Profesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`;
@@ -40,9 +40,8 @@ function getDisplay(resource: Encounter): string {
       resource.subject!
     )}`;
 
-  return `ID: ${resource.id}
-  \n${display}
-  \n${EncounterUtils.getFormatPeriod(resource.period!)}`;
+  return `  ${display}
+  ${EncounterUtils.getFormatPeriod(resource.period!)}`;
 }
 
 function getSearchPatientOrPractitioner(

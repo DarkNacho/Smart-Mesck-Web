@@ -11,19 +11,29 @@ import PersonUtil from "../../Services/Utils/PersonUtils";
 import FhirResourceService from "../../Services/FhirService";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 import { SearchParams } from "fhir-kit-client";
+import PractitionerReferComponent from "../../Components/Practitioner/PractitionerReferComponent";
 
 const fhirService = new FhirResourceService<Patient>("Patient");
 
 function getDisplay(resource: Patient): string {
-  return `ID: ${resource.id}\nName: ${PersonUtil.getPersonNameAsString(
-    resource
-  )}\nGender: ${resource.gender || "N/A"}`;
+  return `  ${PersonUtil.getFirstIdentifierOrId(resource)}
+  Nombre: ${PersonUtil.getPersonNameAsString(resource)}
+  Género: ${PersonUtil.getGender(resource)}
+  Edad: ${PersonUtil.calcularEdad(resource.birthDate!)}
+  Teléfono: ${PersonUtil.getContactPointFirstOrDefaultAsString(
+    resource,
+    "phone"
+  ).replace("/-/g", "")}`;
 }
+
+let selectedPatient = {} as Patient;
 
 export default function PatientListPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("1");
+  const [openRefer, setOpenRefer] = useState(false);
+
   const userRole = loadUserRoleFromLocalStorage();
 
   const [searchParams, setSearchParams] = useState<SearchParams>(
@@ -35,6 +45,15 @@ export default function PatientListPage() {
   //const [userRole, setUserRole] = useState<RolUser>();
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
+  };
+
+  const handleOpenRefer = (isOpen: boolean) => {
+    setOpenRefer(isOpen);
+  };
+
+  const handleRefer = (resource: Patient) => {
+    selectedPatient = resource;
+    handleOpenRefer(true);
   };
 
   const handleSearch = () => {
@@ -64,6 +83,11 @@ export default function PatientListPage() {
   if (!userRole) return <h1>Loading...</h1>; //!Por el momento sólo por si acaso
   return (
     <div>
+      <PractitionerReferComponent
+        isOpen={openRefer}
+        onOpen={handleOpenRefer}
+        patient={selectedPatient}
+      />
       <div className={styles.content}>
         <div
           style={{
@@ -131,6 +155,8 @@ export default function PatientListPage() {
             searchParam={searchParams}
             getDisplay={getDisplay}
             fhirService={fhirService}
+            onClick={(resource) => console.log(resource)}
+            onDoubleClick={(resource) => handleRefer(resource)}
           ></ListResourceComponent>
         </div>
       </div>

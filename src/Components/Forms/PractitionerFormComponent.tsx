@@ -1,20 +1,24 @@
 import { DevTool } from "@hookform/devtools";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { TextField, Grid, MenuItem, Autocomplete } from "@mui/material";
-import { generoOptions } from "./Terminology";
-import PersonUtil from "../../Services/Utils/PersonUtils";
-
-import { Coding } from "fhir/r4";
 import {
+  generoOptions,
   practitionerRole,
   practitionerSpecialty,
   countryCodes,
 } from "./Terminology";
+import PersonUtil from "../../Services/Utils/PersonUtils";
+
+import { Coding, Practitioner, PractitionerRole } from "fhir/r4";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
+import FhirResourceService from "../../Services/FhirService";
+import { useEffect, useState } from "react";
+
 // Interfaz para los datos del formulario
 export interface PractitionerFormData {
+  practitionerId?: string;
   nombre: string;
   segundoNombre: string;
   apellidoPaterno: string;
@@ -28,21 +32,86 @@ export interface PractitionerFormData {
   photo: string;
   specialty: Coding[];
   role: Coding[];
+  practitionerRoleId?: string;
 }
 
 export default function PractitionerFormComponent({
   formId,
   submitForm,
+  practitionerId,
 }: {
   formId: string;
   submitForm: SubmitHandler<PractitionerFormData>;
+  practitionerId?: string;
 }) {
+  const [loading, setLoading] = useState(true);
+
+  const fetchDefaultResource = async () => {
+    if (!practitionerId) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const resultPractitioner = await new FhirResourceService<Practitioner>(
+        "Practitioner"
+      ).getById(practitionerId);
+      if (!resultPractitioner.success)
+        throw new Error(resultPractitioner.error);
+
+      const resultPractitionerRole =
+        await new FhirResourceService<PractitionerRole>(
+          "PractitionerRole"
+        ).getResources({ practitioner: practitionerId });
+
+      if (!resultPractitionerRole.success)
+        throw new Error(resultPractitionerRole.error);
+
+      const practitionerFormData = PersonUtil.PractitionerToPractitionerForm(
+        resultPractitioner.data,
+        resultPractitionerRole.data[0]
+      );
+
+      reset(practitionerFormData);
+      console.log("Practitioner:", resultPractitioner.data);
+      console.log("PractitionerRole:", resultPractitionerRole.data);
+      console.log("PractitionerFormData:", practitionerFormData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm<PractitionerFormData>({ mode: "onBlur" });
+  } = useForm<PractitionerFormData>({
+    mode: "onBlur",
+    defaultValues: {
+      nombre: "",
+      segundoNombre: "",
+      apellidoPaterno: "",
+      apellidoMaterno: "",
+      genero: "unknown",
+      rut: "",
+      countryCode: "+56",
+      fechaNacimiento: dayjs().subtract(18, "year"),
+      numeroTelefonico: "",
+      email: "",
+      photo: "",
+      specialty: [],
+      role: [],
+    },
+  });
+
+  useEffect(() => {
+    fetchDefaultResource();
+  }, [practitionerId]);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <>
@@ -134,14 +203,15 @@ export default function PractitionerFormComponent({
               fullWidth
               error={Boolean(errors.rut)}
               helperText={errors.rut && errors.rut.message}
+              disabled={Boolean(practitionerId)}
             />
           </Grid>
           <Grid item xs={12} sm={1.5}>
             <TextField
               select
               fullWidth
+              defaultValue="+56"
               label="Código"
-              defaultValue={"+56"}
               {...register("countryCode", {
                 required: "Código de país requerido",
               })}
@@ -194,6 +264,7 @@ export default function PractitionerFormComponent({
                   isOptionEqualToValue={(option, value) =>
                     option.code === value.code
                   }
+                  value={field.value}
                   onChange={(_, newValue) => field.onChange(newValue)}
                   renderOption={(props, option) => (
                     <li {...props} key={option.code}>
@@ -228,6 +299,7 @@ export default function PractitionerFormComponent({
                     option.code === value.code
                   }
                   onChange={(_, newValue) => field.onChange(newValue)}
+                  value={field.value}
                   renderOption={(props, option) => (
                     <li {...props} key={option.code}>
                       {option.display}

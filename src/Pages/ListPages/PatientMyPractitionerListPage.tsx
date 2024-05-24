@@ -8,9 +8,13 @@ import { useNavigate } from "react-router-dom";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 
 function getDisplay(resource: Practitioner): string {
-  return `ID: ${resource.id}\nName: ${PersonUtil.getPersonNameAsString(
-    resource
-  )}\nGender: ${resource.gender || "N/A"}`;
+  return `  ${PersonUtil.getFirstIdentifierOrId(resource)}
+  Nombre: ${PersonUtil.getPersonNameAsString(resource)}
+  Género: ${PersonUtil.getGender(resource)}
+  Teléfono: ${PersonUtil.getContactPointFirstOrDefaultAsString(
+    resource,
+    "phone"
+  ).replace(/-/g, "")}`;
 }
 
 const fhirPatientService = new FhirResourceService<Patient>("Patient");

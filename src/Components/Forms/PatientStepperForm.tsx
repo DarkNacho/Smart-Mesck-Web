@@ -9,6 +9,7 @@ import PersonUtil from "../../Services/Utils/PersonUtils";
 import { Dayjs } from "dayjs";
 
 export interface PatientFormData {
+  id?: string;
   nombre: string;
   segundoNombre: string;
   apellidoPaterno: string;

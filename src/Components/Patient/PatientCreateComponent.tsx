@@ -24,9 +24,11 @@ let formData: PatientFormData;
 export default function PatientCreateComponent({
   onOpen,
   isOpen,
+  patientID,
 }: {
   onOpen: (isOpen: boolean) => void;
   isOpen: boolean;
+  patientID?: string;
 }) {
   useEffect(() => {
     onOpen(isOpen);
@@ -53,7 +55,11 @@ export default function PatientCreateComponent({
     if (!response.success) return response;
 
     user.id = response.data.id;
-    response = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/register`, {
+    const url = newPatient.id
+      ? `${import.meta.env.VITE_SERVER_URL}/auth/update`
+      : `${import.meta.env.VITE_SERVER_URL}/auth/register`;
+
+    response = await fetch(url, {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -90,9 +96,11 @@ export default function PatientCreateComponent({
     const rut = data.rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
     const newPatient = PersonUtil.PatientFormToPatient(data);
 
-    newPatient.generalPractitioner = [
-      { reference: `Practitioner/${localStorage.getItem("id")}` },
-    ];
+    if (!newPatient.id) {
+      newPatient.generalPractitioner = [
+        { reference: `Practitioner/${localStorage.getItem("id")}` },
+      ];
+    }
 
     const newUser: any = {
       email: data.email,
@@ -158,6 +166,7 @@ export default function PatientCreateComponent({
               activeStep={activeStep}
               setActiveStep={setActiveStep}
               onSubmit={onSubmit}
+              patientID={patientID}
             ></PatientStepperForm>
           </Container>
         </DialogContent>

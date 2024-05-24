@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FhirResource } from "fhir/r4";
 
 import {
@@ -6,6 +6,8 @@ import {
   ListItem,
   //ListItemText,
   Button,
+  Box,
+  Stack,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import styles from "./ListResourceComponent.module.css";
@@ -18,12 +20,18 @@ interface ListResourceProps<T extends FhirResource> {
   searchParam?: SearchParams;
   getDisplay: (value: T) => string;
   fhirService: FhirService<T>;
+  onClick?: (resource: T) => void;
+  onDoubleClick?: (resource: T) => void;
+  chields?: ReactNode;
 }
 
 export default function ListResourceComponent<T extends FhirResource>({
   searchParam,
   getDisplay,
   fhirService,
+  onClick,
+  onDoubleClick,
+  chields: chields,
 }: ListResourceProps<T>) {
   const [resources, setResources] = useState<T[]>([]);
 
@@ -58,9 +66,17 @@ export default function ListResourceComponent<T extends FhirResource>({
           <ListItem
             className={styles.listItem}
             key={resource.id}
-            onClick={() => navigate(`/${resource.resourceType}/${resource.id}`)}
+            onClick={() =>
+              onClick
+                ? onClick(resource)
+                : navigate(`/${resource.resourceType}/${resource.id}`)
+            }
+            onDoubleClick={() => onDoubleClick && onDoubleClick(resource)}
           >
-            <pre>{getDisplay(resource)}</pre>
+            <Stack direction="row">
+              <pre>{getDisplay(resource)}</pre>
+              <Box>{chields}</Box>
+            </Stack>
           </ListItem>
         ))}
       </List>
@@ -71,7 +87,7 @@ export default function ListResourceComponent<T extends FhirResource>({
           onClick={() => handleNewResources("prev")}
           disabled={!fhirService.hasPrevPage}
         >
-          Previous Page
+          Atrás
         </Button>
         <Button
           variant="contained"
@@ -79,7 +95,7 @@ export default function ListResourceComponent<T extends FhirResource>({
           onClick={() => handleNewResources("next")}
           disabled={!fhirService.hasNextPage}
         >
-          Next Page
+          Siguiente
         </Button>
       </div>
     </div>

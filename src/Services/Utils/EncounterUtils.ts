@@ -1,4 +1,5 @@
 import { Encounter, Period, Reference } from "fhir/r4";
+import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
 /**
  * Utility class for working with Encounter objects.
@@ -41,6 +42,43 @@ export default class EncounterUtils {
     return `${formattedStartDate} - ${formattedEndDate}`;
   }
 
+  public static getPeriod(period: Period): string {
+    if (!period) return "N/A"; //throw new Error("Period is required.");
+
+    if (!period.start) return "N/A";
+
+    const startDate = new Date(period.start);
+
+    const formattedStartDate = `${this.padZero(
+      startDate.getHours()
+    )}:${this.padZero(startDate.getMinutes())}`;
+
+    if (!period.end) return formattedStartDate;
+
+    const endDate = new Date(period.end);
+    const formattedEndDate = `${this.padZero(
+      endDate.getHours()
+    )}:${this.padZero(endDate.getMinutes())}`;
+
+    return `${formattedStartDate} - ${formattedEndDate}`;
+  }
+
+  public static getDisplay(resource: Encounter): string {
+    const roleUser = loadUserRoleFromLocalStorage();
+    let display = "";
+
+    if (roleUser === "Admin")
+      display = `Paciente: ${this.getSubjectDisplayOrID(resource.subject!)}
+  Profesional: ${this.getPrimaryPractitioner(resource)}`;
+
+    if (roleUser == "Patient")
+      display = `Profesional: ${this.getPrimaryPractitioner(resource)}`;
+    if (roleUser == "Practitioner")
+      display = `Paciente: ${this.getSubjectDisplayOrID(resource.subject!)}`;
+
+    return `  ${display}
+  ${EncounterUtils.getFormatPeriod(resource.period!)}`;
+  }
   /**
    * Gets the display name or ID of the subject.
    * @param subject - The subject object.

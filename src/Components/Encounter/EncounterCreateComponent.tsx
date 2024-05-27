@@ -75,6 +75,10 @@ export default function EncounterCreateComponent({
         start: data.start.toISOString(),
         end: data.end.toISOString(),
       },
+      partOf: {
+        reference: `Encounter/${data.seguimiento?.id}`,
+        display: data.seguimiento?.display,
+      },
       status: "finished",
       class: {
         code: data.type,

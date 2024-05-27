@@ -13,6 +13,20 @@ import ConditionUtils from "../Services/Utils/ConditionUtils";
 import { Encounter } from "fhir/r4";
 import FhirResourceService from "../Services/FhirService";
 import HandleResult from "../Components/HandleResult";
+import EncounterUtils from "../Services/Utils/EncounterUtils";
+
+import Timeline from "@mui/lab/Timeline";
+import TimelineItem from "@mui/lab/TimelineItem";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineDot from "@mui/lab/TimelineDot";
+import { TimelineOppositeContent } from "@mui/lab";
+import dayjs from "dayjs";
+
+import "dayjs/locale/es"; // importa el locale español
+import { Typography } from "@mui/material";
+dayjs.locale("es"); // usa el locale español
 
 const observationService = new ObservationService();
 const conditionService = new ConditionService();
@@ -26,8 +40,39 @@ export default function EncounterPatientPage() {
 
   const [conditionData, setConditionData] = useState<InfoListData[]>([]);
   const [encounter, setEncounter] = useState<Encounter>();
+  const [encounters, setEncounters] = useState<Encounter[]>([]);
 
-  const fetchEncounter = async () => {
+  const [loading, setLoading] = useState(true);
+
+  const fetchSeguimiento = async (encounter: Encounter) => {
+    setLoading(true);
+    try {
+      if (!encounter?.partOf) return false;
+      const encounters: Encounter[] = [];
+      encounters.push(encounter);
+      let data = encounter;
+      while (data.partOf) {
+        if (data.partOf.reference) {
+          const res = await encounterService.getById(
+            data.partOf.reference.split("/")[1]
+          );
+          if (!res.success) return res.success;
+          encounters.push(res.data);
+          data = res.data;
+        }
+      }
+      console.log("encounters: ", encounters);
+      setEncounters(encounters);
+      return true;
+    } catch (error) {
+      console.error("encounters:", error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchEncounter = async (): Promise<Result<Encounter>> => {
     const result = await HandleResult.handleOperation(
       () => encounterService.getById(encounterID!),
       "Encuentro obtenido.",
@@ -40,6 +85,7 @@ export default function EncounterPatientPage() {
       setEncounter(result.data);
       console.log("encounter:", result.data);
     }
+    return result;
   };
 
   const fetchObservation = async () => {
@@ -89,19 +135,46 @@ export default function EncounterPatientPage() {
 
   useEffect(() => {
     setObservationData([]);
-    fetchEncounter();
-    fetchObservation();
-    fetchCondition();
+    fetchEncounter().then((result) => {
+      if (result.success) {
+        fetchObservation();
+        fetchCondition();
+        fetchSeguimiento(result.data);
+      }
+    });
   }, [encounterID]);
 
-  if (patientID === "") return <div>loading...</div>;
+  if (loading) return <div>loading...</div>;
 
   return (
     <div style={{ padding: "50px" }}>
-      <div style={{ paddingBottom: "30px" }}>
-        <h1>info encuentro</h1>
-        <h1>{encounter?.id}</h1>
+      <div>
+        <Typography variant="h5">{encounter?.subject?.display}</Typography>
+        <Timeline>
+          {encounters.map((encounter, index) => (
+            <TimelineItem
+              key={index}
+              onClick={() =>
+                (window.location.href = `/Encounter/${encounter.id}`)
+              }
+            >
+              <TimelineOppositeContent>
+                {dayjs(encounter.period?.start).format(
+                  "dddd DD [de] MMMM YYYY"
+                )}
+              </TimelineOppositeContent>
+              <TimelineSeparator>
+                <TimelineDot />
+                {index < encounters.length - 1 && <TimelineConnector />}
+              </TimelineSeparator>
+              <TimelineContent>
+                {EncounterUtils.getPeriod(encounter.period!)}
+              </TimelineContent>
+            </TimelineItem>
+          ))}
+        </Timeline>
       </div>
+
       <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
         <div style={{ flex: 1 }}>
           <InfoListComponent

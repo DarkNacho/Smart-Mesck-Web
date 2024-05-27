@@ -11,10 +11,12 @@ import {
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Box, MenuItem, Stack, TextField } from "@mui/material";
-import { Patient, Practitioner } from "fhir/r4";
+import { Encounter, Patient, Practitioner } from "fhir/r4";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
 import { encounterType } from "./Terminology";
+import { useState } from "react";
+import EncounterUtils from "../../Services/Utils/EncounterUtils";
 
 export interface EncounterFormData {
   practitioner: {
@@ -29,6 +31,31 @@ export interface EncounterFormData {
   start: Dayjs;
   end: Dayjs;
   type: string;
+  seguimiento?: {
+    id: string;
+    display: string;
+  };
+}
+
+function getDisplay(resource: Encounter): string {
+  const roleUser = loadUserRoleFromLocalStorage();
+  let display = "";
+
+  if (roleUser === "Admin")
+    display = `Paciente: ${EncounterUtils.getSubjectDisplayOrID(
+      resource.subject!
+    )}
+  Profesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`;
+
+  if (roleUser == "Patient")
+    display = `Profesional: ${EncounterUtils.getPrimaryPractitioner(resource)}`;
+  if (roleUser == "Practitioner")
+    display = `Paciente: ${EncounterUtils.getSubjectDisplayOrID(
+      resource.subject!
+    )}`;
+
+  return `  ${display}
+  ${EncounterUtils.getFormatPeriod(resource.period!)}`;
 }
 
 export default function EncounterFormComponent({
@@ -53,6 +80,13 @@ export default function EncounterFormComponent({
 
   const roleUser = loadUserRoleFromLocalStorage();
 
+  const [selectedPatient, setSelectedPatient] = useState<string | undefined>(
+    patientId
+  );
+  const [selectedPractitioner, setSelectedPractitioner] = useState<
+    string | undefined
+  >(practitionerId);
+
   return (
     <>
       <form id={formId} onSubmit={handleSubmit(submitForm)}>
@@ -76,6 +110,7 @@ export default function EncounterFormComponent({
                       id: selectedObject.id,
                       display: PersonUtil.getPersonNameAsString(selectedObject),
                     });
+                    setSelectedPractitioner(selectedObject.id);
                   } else {
                     field.onChange(null);
                   }
@@ -113,6 +148,7 @@ export default function EncounterFormComponent({
                       id: selectedObject.id,
                       display: PersonUtil.getPersonNameAsString(selectedObject),
                     });
+                    setSelectedPatient(selectedObject.id);
                   } else {
                     field.onChange(null);
                   }
@@ -198,6 +234,38 @@ export default function EncounterFormComponent({
               </MenuItem>
             ))}
           </TextField>
+          <Controller
+            name="seguimiento"
+            control={control}
+            render={({ field }) => (
+              <AutoCompleteComponent<Encounter>
+                resourceType={"Encounter"}
+                label={"Selecciona un encuentro para hacer seguimiento"}
+                getDisplay={getDisplay}
+                defaultParams={{
+                  subject: selectedPatient!,
+                  participant: selectedPractitioner!,
+                  _count: 99999,
+                }}
+                searchParam={""}
+                onChange={(selectedObject) => {
+                  if (selectedObject) {
+                    field.onChange({
+                      id: selectedObject.id,
+                      display: getDisplay(selectedObject),
+                    });
+                  } else {
+                    field.onChange(null);
+                  }
+                }}
+                textFieldProps={{
+                  error: Boolean(errors.practitioner),
+                  helperText:
+                    errors.practitioner && errors.practitioner.message,
+                }}
+              />
+            )}
+          />
           <button type="submit">test</button>
         </Stack>
       </form>

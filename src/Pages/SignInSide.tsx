@@ -25,7 +25,7 @@ function Copyright(props: any) {
       {...props}
     >
       {"Copyright © "}
-      <Link color="inherit" href="https:/www.cttn.cl/">
+      <Link color="inherit" href="https://www.cttn.cl">
         CTTN
       </Link>{" "}
       {new Date().getFullYear()}
@@ -138,7 +138,7 @@ export default function SignInSide() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              Iniciar Sesión
             </Typography>
             <Box
               component="form"
@@ -155,9 +155,7 @@ export default function SignInSide() {
                 name="rut"
                 autoComplete="rut"
                 autoFocus
-                InputLabelProps={{
-                  style: { color: "#fff" },
-                }}
+                placeholder="123456789"
               />
               <TextField
                 margin="normal"
@@ -176,7 +174,7 @@ export default function SignInSide() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Sign In
+                Iniciar Sesión
               </Button>
               <Box textAlign="right">
                 <Link
@@ -184,7 +182,7 @@ export default function SignInSide() {
                   variant="body2"
                   onClick={() => handleIsOpen(true)}
                 >
-                  {"Forgot Password?"}
+                  {"¿Olvidó su contraseña?"}
                 </Link>
               </Box>
               <Box

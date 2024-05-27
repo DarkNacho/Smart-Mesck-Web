@@ -145,7 +145,7 @@ export default function PractitionerCreateComponent({
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Añadir Nuevo Profesional
+          {practitionerId ? "Editar Profesional" : "Crear Profesional"}
           <IconButton
             aria-label="close"
             onClick={handleClose}

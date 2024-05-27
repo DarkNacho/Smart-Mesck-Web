@@ -9,6 +9,7 @@ import { loadUserRoleFromLocalStorage } from "../../RolUser";
 import AutoCompleteFromLHCComponentComponent from "../AutoCompleteComponents/AutoCompleteFromLHCComponent";
 
 import { clinicalStatus } from "./Terminology";
+import AutoCompleteFromSnomedComponent from "../AutoCompleteComponents/AutoCompleteFromSnomed";
 
 function getEncounterDisplay(resource: Encounter): string {
   return `Profesional: ${EncounterUtils.getPrimaryPractitioner(
@@ -97,7 +98,12 @@ export default function ConditionFormComponent({
               />
             )}
           />
-
+          <AutoCompleteFromSnomedComponent
+            label={"Snomed"}
+            onChange={function (value: Coding | null): void {
+              alert(JSON.stringify(value, null, 2));
+            }}
+          ></AutoCompleteFromSnomedComponent>
           <Controller
             name="subject"
             control={control}

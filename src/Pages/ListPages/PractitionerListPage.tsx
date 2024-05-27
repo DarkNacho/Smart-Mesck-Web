@@ -25,7 +25,8 @@ import {
 const fhirService = new FhirResourceService<Practitioner>("Practitioner");
 
 function getDisplay(resource: Practitioner): string {
-  return `  ${PersonUtil.getFirstIdentifierOrId(resource)}
+  const identifier = PersonUtil.getIdentifierByCode(resource, "RUT");
+  return `  ${identifier.system} ${identifier.value}
   Nombre: ${PersonUtil.getPersonNameAsString(resource)}
   Género: ${PersonUtil.getGender(resource)}
   Teléfono: ${PersonUtil.getContactPointFirstOrDefaultAsString(

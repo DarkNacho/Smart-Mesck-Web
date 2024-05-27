@@ -146,7 +146,7 @@ export default function PatientCreateComponent({
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Añadir Nuevo Paciente
+          {patientID ? "Editar Paciente" : "Crear Paciente"}
           <IconButton
             aria-label="close"
             onClick={handleClose}

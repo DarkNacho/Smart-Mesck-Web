@@ -19,6 +19,7 @@ import { useState } from "react";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
 import PractitionerCreateComponent from "../Practitioner/PractitionerCreateComponent";
+import PatientCreateComponent from "../Patient/PatientCreateComponent";
 
 const navigationAdminItems = [
   {
@@ -138,6 +139,11 @@ export default function NavBarComponent() {
 
   return (
     <>
+      <PatientCreateComponent
+        onOpen={handleEditProfile}
+        isOpen={editProfile && loadUserRoleFromLocalStorage() === "Patient"}
+        patientID={localStorage.getItem("id")!}
+      ></PatientCreateComponent>
       <PractitionerCreateComponent
         onOpen={handleEditProfile}
         isOpen={editProfile && loadUserRoleFromLocalStorage() !== "Patient"}

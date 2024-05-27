@@ -92,14 +92,30 @@ export default class PersonUtil {
    * @param resource - The FHIR resource representing a person.
    * @returns The first identifier value or ID of the resource as a string.
    */
-  static getFirstIdentifierOrId(resource: FhirResourceType): string {
+  static getFirstIdentifierOrDefault(resource: FhirResourceType) {
     if (resource.identifier && resource.identifier.length > 0) {
       // Return the value of the first identifier if it exists
-      return resource.identifier[0].value || resource.id || "";
-    } else {
-      // If there are no identifiers, return the ID of the resource
-      return resource.id || "";
+      return resource.identifier[0];
     }
+    return { system: "ID", value: resource.id };
+  }
+
+  /**
+   * Retrieves an identifier based on the code.
+   * @param resource - The FHIR resource representing a person.
+   * @param code - The code of the identifier to retrieve.
+   * @returns The identifier with the specified code, or an empty string if no such identifier exists.
+   */
+  static getIdentifierByCode(resource: FhirResourceType, code: string) {
+    if (resource.identifier && resource.identifier.length > 0) {
+      // Find the identifier with the specified code
+      const identifier = resource.identifier.find((id) => id.system === code);
+      // If the identifier exists, return its value
+      if (identifier) {
+        return identifier;
+      }
+    }
+    return this.getFirstIdentifierOrDefault(resource);
   }
 
   /**

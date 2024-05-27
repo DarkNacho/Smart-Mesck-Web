@@ -16,6 +16,7 @@ import PersonUtil from "../../Services/Utils/PersonUtils";
 import { Patient, Practitioner } from "fhir/r4";
 import FhirResourceService from "../../Services/FhirService";
 import { useForm, Controller } from "react-hook-form";
+import HandleResult from "../HandleResult";
 
 type FormData = {
   practitioners: Practitioner[];
@@ -62,7 +63,7 @@ export default function PractitionerReferComponent({
     console.log("practitioner-general", defaultRefer);
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     console.log(data); // This will log the selected practitioners
     const practitionersRef = data.practitioners.map((practitioner) => ({
       reference: `Practitioner/${practitioner.id}`,
@@ -70,6 +71,12 @@ export default function PractitionerReferComponent({
     patient.generalPractitioner = practitionersRef;
     console.log("ref ", practitionersRef);
     console.log("new patient ", patient);
+    const response = await HandleResult.handleOperation(
+      () => new FhirResourceService<Patient>("Patient").updateResource(patient),
+      "Actualizado",
+      "Enviando..."
+    );
+    if (response.success) handleClose();
   };
 
   const { handleSubmit, control } = useForm<FormData>();

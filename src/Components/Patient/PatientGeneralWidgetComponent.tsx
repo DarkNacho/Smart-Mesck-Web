@@ -10,6 +10,7 @@ export default function PatientGeneralWidgetComponent({
   patient: Patient;
   edit?: boolean;
 }) {
+  const identifier = PersonUtil.getIdentifierByCode(patient, "RUT");
   return (
     <div className={styles.generalWidget}>
       <div className={styles.title}>
@@ -24,7 +25,7 @@ export default function PatientGeneralWidgetComponent({
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">
-              ID: {PersonUtil.getFirstIdentifierOrId(patient)}
+              {identifier.system}: {identifier.value}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6} md={4}>

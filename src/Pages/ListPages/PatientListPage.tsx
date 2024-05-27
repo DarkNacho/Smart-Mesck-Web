@@ -16,14 +16,15 @@ import PractitionerReferComponent from "../../Components/Practitioner/Practition
 const fhirService = new FhirResourceService<Patient>("Patient");
 
 function getDisplay(resource: Patient): string {
-  return `  ${PersonUtil.getFirstIdentifierOrId(resource)}
+  const identifier = PersonUtil.getIdentifierByCode(resource, "RUT");
+  return `  ${identifier.system} ${identifier.value}
   Nombre: ${PersonUtil.getPersonNameAsString(resource)}
   Género: ${PersonUtil.getGender(resource)}
   Edad: ${PersonUtil.calcularEdad(resource.birthDate!)}
   Teléfono: ${PersonUtil.getContactPointFirstOrDefaultAsString(
     resource,
     "phone"
-  ).replace("/-/g", "")}`;
+  ).replace(/-/g, "")}`;
 }
 
 let selectedPatient = {} as Patient;
@@ -157,6 +158,18 @@ export default function PatientListPage() {
             fhirService={fhirService}
             onClick={(resource) => console.log(resource)}
             onDoubleClick={(resource) => handleRefer(resource)}
+            chields={
+              <div>
+                accesos directos
+                <ul>
+                  <li>Item 1</li>
+                  <li>Item 2</li>
+                  <li>Item 3</li>
+                  <li>Item 4</li>
+                  <li>Item 5</li>
+                </ul>
+              </div>
+            }
           ></ListResourceComponent>
         </div>
       </div>

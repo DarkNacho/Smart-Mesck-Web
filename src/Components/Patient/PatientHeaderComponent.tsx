@@ -32,7 +32,7 @@ export default function PatientHeaderComponent({
         <div className={styles.location}>
           <div className={styles.item}>
             <div className={styles.item}>
-              <div className={styles.text}>Patients</div>
+              <div className={styles.text}>Pacientes</div>
             </div>
             <div className={styles.item1}>
               <div className={styles.text}>{`>`}</div>
@@ -51,7 +51,7 @@ export default function PatientHeaderComponent({
         <b className={styles.user}>{name}</b>
         <div className={styles.tabstop}>
           <div className={styles.location}>
-            {loadUserRoleFromLocalStorage() === "Patient" && (
+            {loadUserRoleFromLocalStorage() !== "Patient" && (
               <div className={styles["tabs-group"]}>
                 <div
                   className={`${styles.item5} ${

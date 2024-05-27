@@ -4,15 +4,18 @@
 - [X] Agregar funcionalida de recuperar contraseña **FrontEnd**
 - [X] Ahora que hay registro y login , indicar con qué usuario ha iniciado sesión
 - [X] **Falta enviar correo de verificación para Profesional**
-- [ ] **Falta agregar la opción de derivar paciente**
-- [ ] En registro Profesional se olvidó agregar código de país para teléfono, también se olvidó restringir fecha de nacimiento (Dejarlo igual que en paciente)
+- [X] **Falta agregar la opción de derivar paciente**
+- [X] En registro Profesional se olvidó agregar código de país para teléfono, también se olvidó restringir fecha de nacimiento (Dejarlo igual que en paciente)
 - [X] **Al crear el profesional no envía correo. (sólo funciona en paciente)**
 - [X] Agregar padding al crear observación para Paciente.
-- [ ] ¿Es necesario asociar una observación a un encuentro?
+observación a un encuentro?
 - [X] Agregar padding a crear encuentro en paciente.
 - [X] **Asignar el paciente al profesional que lo creó** (Importante debido a que si no se encuentra asignado el profesional no tiene acceso a él) 
 - [X] Al migrar de servidor agregar terminología por defecto (roles , categorías).
-- [ ] Al migrar servidor, agregar los formularios creados.
 - [X] Hacer que se comparta una misma base de datos y no se cree nueva base de datos al momento de re construir el proyecto o migrarlo.
 - [X] Documentar lista para cambiar correo
-- [X] Documentar como conectarse a otra base de datos
+- [X] Documentar como conectarse a otra base de datos.
+- [ ] Agregar Dosage en Medicamentos.
+- [ ] En Observación poder ingresar unidad de medida a valores.
+- [ ] Usar servidor terminológico del minsal.
+- [ ] crear scrip para poblar formularios o valueSet en caso de que la base de datos sea nueva.

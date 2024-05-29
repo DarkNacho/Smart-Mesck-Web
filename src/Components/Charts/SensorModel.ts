@@ -1,5 +1,5 @@
 export interface SensorData {
-  sensor: string;
+  sensor_type: string;
   device: string;
   time: string;
   value: number;

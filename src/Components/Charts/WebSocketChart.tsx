@@ -28,8 +28,6 @@ ChartJS.register(
   zoomPlugin
 );
 
-type ChartData = { [device: string]: { [sensor: string]: JSX.Element } };
-
 export default function WebSocketChart() {
   const [sensorDataByDevice, isConnected] = useWebSocket(
     import.meta.env.VITE_CHART_SERVER_URL
@@ -38,83 +36,70 @@ export default function WebSocketChart() {
   const [activeDevice, setActiveDevice] = useState<string>();
   const [activeSensor, setActiveSensor] = useState<string>();
 
-  function generateCharts(): ChartData {
-    const charts: ChartData = {};
+  function generateChart(device: string, sensor: string): JSX.Element | null {
+    if (!sensorDataByDevice[device] || !sensorDataByDevice[device][sensor]) {
+      return null;
+    }
 
-    Object.keys(sensorDataByDevice).map((device) => {
-      charts[device] = {};
-
-      Object.keys(sensorDataByDevice[device]).map((sensor) => {
-        const data = sensorDataByDevice[device][sensor];
-        //const labels = data.data.map((data) => data.time);
-        const labels = data.data.map((data) => {
-          const time = new Date(data.time);
-          return time.toLocaleTimeString("en-US", {
-            minute: "numeric",
-            second: "numeric",
-          });
-        });
-
-        const lastFiveData = data.data.slice(-5);
-        const avgValue =
-          lastFiveData.reduce((sum, data) => sum + data.value, 0) /
-          lastFiveData.length;
-
-        const dataset = {
-          label: `Device: ${device}, Sensor: ${sensor}`,
-          data: data.data.map((data) => data.value),
-          borderColor: "rgb(255, 99, 132)",
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
-          borderWidth: 2,
-          tension: 0.5,
-        };
-
-        const options: ChartOptions<"line"> = {
-          responsive: true,
-          maintainAspectRatio: true,
-          /*scales: {
-            x: { max: 20 },
-          },*/
-          plugins: {
-            legend: {
-              position: "top" as const,
-              display: false,
-            },
-            title: {
-              display: true,
-              text: `Valor: ${avgValue} Mínimo: ${data.stats.minValue} \t Máximo: ${data.stats.maxValue}`,
-            },
-            zoom: {
-              pan: {
-                enabled: true,
-                mode: "xy",
-              },
-              zoom: {
-                wheel: {
-                  enabled: true,
-                },
-                pinch: {
-                  enabled: true,
-                },
-                mode: "xy",
-              },
-            },
-          },
-        };
-
-        const chartElement = (
-          <div key={`${device}-${sensor}`}>
-            <Line data={{ labels, datasets: [dataset] }} options={options} />
-          </div>
-        );
-        charts[device][sensor] = chartElement;
+    const data = sensorDataByDevice[device][sensor];
+    const labels = data.data.map((data) => {
+      const time = new Date(data.time);
+      return time.toLocaleTimeString("en-US", {
+        minute: "numeric",
+        second: "numeric",
       });
     });
 
-    return charts;
-  }
+    const lastFiveData = data.data.slice(-5);
+    const avgValue =
+      lastFiveData.reduce((sum, data) => sum + data.value, 0) /
+      lastFiveData.length;
 
-  const charts = generateCharts();
+    const dataset = {
+      label: `Device: ${device}, Sensor: ${sensor}`,
+      data: data.data.map((data) => data.value),
+      borderColor: "rgb(255, 99, 132)",
+      backgroundColor: "rgba(255, 99, 132, 0.5)",
+      borderWidth: 2,
+      tension: 0.5,
+    };
+
+    const options: ChartOptions<"line"> = {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: "top" as const,
+          display: false,
+        },
+        title: {
+          display: true,
+          text: `Valor: ${avgValue} Mínimo: ${data.stats.minValue} \t Máximo: ${data.stats.maxValue}`,
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: "xy",
+          },
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true,
+            },
+            mode: "xy",
+          },
+        },
+      },
+    };
+
+    return (
+      <div key={`${device}-${sensor}`}>
+        <Line data={{ labels, datasets: [dataset] }} options={options} />
+      </div>
+    );
+  }
 
   useEffect(() => {
     // Actualizar activeDevice al primer dispositivo si hay datos disponibles
@@ -135,9 +120,11 @@ export default function WebSocketChart() {
     }
   }, [isConnected, sensorDataByDevice]);
 
+  const chart =
+    activeDevice && activeSensor && generateChart(activeDevice, activeSensor);
+
   if (!isConnected) return <p>Connecting...</p>;
-  else if (Object.keys(charts).length === 0)
-    return <p>No data being received</p>;
+  else if (!chart) return <p>No data being received</p>;
   else {
     return (
       <div>
@@ -145,14 +132,14 @@ export default function WebSocketChart() {
           value={activeDevice}
           onChange={(_, value) => {
             setActiveDevice(value);
-            setActiveSensor(Object.keys(charts[value])[0]);
+            setActiveSensor(Object.keys(sensorDataByDevice[value])[0]);
           }}
           indicatorColor="primary"
           textColor="primary"
           variant="scrollable"
           scrollButtons="auto"
         >
-          {Object.keys(charts).map((device) => (
+          {Object.keys(sensorDataByDevice).map((device) => (
             <Tab key={device} label={device} value={device} />
           ))}
         </Tabs>
@@ -167,12 +154,12 @@ export default function WebSocketChart() {
             variant="scrollable"
             scrollButtons="auto"
           >
-            {Object.keys(charts[activeDevice]).map((sensor) => (
+            {Object.keys(sensorDataByDevice[activeDevice]).map((sensor) => (
               <Tab key={sensor} label={sensor} value={sensor} />
             ))}
           </Tabs>
         )}
-        {activeDevice && activeSensor && charts[activeDevice][activeSensor]}
+        {chart}
       </div>
     );
   }

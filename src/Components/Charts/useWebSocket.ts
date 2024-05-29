@@ -23,7 +23,7 @@ export default function useWebSocket(
         console.log("Dato recibido:", data);
 
         const deviceKey = data.device;
-        const sensorKey = data.sensor;
+        const sensorKey = data.sensor_type;
 
         setSensorDataByDevice((prevData) => {
           const existingSensorData = prevData[deviceKey]?.[sensorKey] || {

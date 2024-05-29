@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite --mode development",
     "build-max": "cross-env NODE_OPTIONS=--max_old_space_size=4096 vite build",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "lint": "eslint . --ext ts,tsx",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+    "tsc": "cross-env NODE_OPTIONS=--max_old_space_size=4096 tsc"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

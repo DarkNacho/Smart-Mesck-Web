@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import useWebSocket from "./useWebSocket";
 
@@ -15,7 +15,7 @@ import {
   Legend,
   ChartOptions,
 } from "chart.js";
-import { Tab, Tabs } from "@mui/material";
+import { Button, Tab, Tabs } from "@mui/material";
 
 ChartJS.register(
   CategoryScale,
@@ -33,6 +33,8 @@ export default function WebSocketChart() {
     import.meta.env.VITE_CHART_SERVER_URL
   );
 
+  const chartRef = useRef<any>(null);
+
   const [activeDevice, setActiveDevice] = useState<string>();
   const [activeSensor, setActiveSensor] = useState<string>();
 
@@ -44,10 +46,13 @@ export default function WebSocketChart() {
     const data = sensorDataByDevice[device][sensor];
     const labels = data.data.map((data) => {
       const time = new Date(data.time);
-      return time.toLocaleTimeString("en-US", {
+      const milliseconds = time.getMilliseconds();
+      const timeString = time.toLocaleTimeString("en-US", {
         minute: "numeric",
         second: "numeric",
       });
+
+      return `${timeString}.${milliseconds.toString().padStart(3, "0")}`;
     });
 
     const lastFiveData = data.data.slice(-5);
@@ -96,10 +101,20 @@ export default function WebSocketChart() {
 
     return (
       <div key={`${device}-${sensor}`}>
-        <Line data={{ labels, datasets: [dataset] }} options={options} />
+        <Line
+          ref={chartRef}
+          data={{ labels, datasets: [dataset] }}
+          options={options}
+        />
       </div>
     );
   }
+
+  const resetChart = () => {
+    if (chartRef.current) {
+      chartRef.current.resetZoom(); // Reset zoom
+    }
+  };
 
   useEffect(() => {
     // Actualizar activeDevice al primer dispositivo si hay datos disponibles
@@ -160,6 +175,9 @@ export default function WebSocketChart() {
           </Tabs>
         )}
         {chart}
+        <Button variant="outlined" onClick={resetChart}>
+          Restablecer
+        </Button>
       </div>
     );
   }

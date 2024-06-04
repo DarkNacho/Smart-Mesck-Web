@@ -9,6 +9,8 @@ type FhirType =
   | "MedicationStatement"
   | "Practitioner"
   | "PractitionerRole"
-  | "ValueSet";
+  | "ValueSet"
+  | "Binary"
+  | "DocumentReference";
 
 export default FhirType;

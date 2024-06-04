@@ -1,25 +1,73 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { DocumentReference, Binary } from "fhir/r4";
 
-import HandleResult from "../HandleResult";
+//import HandleResult from "../HandleResult";
 import FhirResourceService from "../../Services/FhirService";
 import getFileIconInfo from "./getFileIconInfo";
+import CircularProgress from "@mui/material/CircularProgress";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import ErrorIcon from "@mui/icons-material/Error";
+
+import {
+  Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
+} from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { useDropzone } from "react-dropzone";
+
+import styles from "./FileManager.module.css";
+
+function formatBytes(bytes: number, decimals = 2) {
+  if (bytes === 0) return "0 Bytes";
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
+
+async function calculateFileHash(file: File) {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+  return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+}
 
 export default function UploadFileComponent() {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState<{ [key: string]: boolean }>({});
+  const [errorUpload, setErrorUpload] = useState<{
+    [key: string]: string;
+  }>({});
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setFile(event.target.files[0]);
-    }
+  const handleFileChange = (files: File[]) => {
+    setFiles(files);
   };
 
-  const handleFileUpload = async () => {
-    return await HandleResult.handleOperation(
-      () => HandleUpload(),
+  const handleFileUpload = async (file: File, index: number) => {
+    setUploading((prev) => ({ ...prev, [index]: true }));
+    /*await HandleResult.handleOperation(
+      () => HandleUpload(file),
       "Archivo subido y documento guardado correctamente",
       "Subiendo..."
-    );
+    );*/
+    //await new Promise((resolve) => setTimeout(resolve, 2000));
+    const response = await HandleUpload(file);
+    if (!response.success)
+      setErrorUpload((prev) => ({ ...prev, [index]: response.error }));
+
+    setUploading((prev) => ({ ...prev, [index]: false }));
   };
 
   const uploadBinary = async (file: File): Promise<Result<Binary>> => {
@@ -39,6 +87,7 @@ export default function UploadFileComponent() {
   const sendDocumentReference = async (
     binaryId: string,
     fileName: string,
+    filetype: string,
     hash: string
   ): Promise<Result<DocumentReference>> => {
     const documentReference: DocumentReference = {
@@ -56,7 +105,7 @@ export default function UploadFileComponent() {
       content: [
         {
           attachment: {
-            contentType: file?.type || "",
+            contentType: filetype,
             url: `Binary/${binaryId}`,
             title: fileName,
             hash: hash,
@@ -70,7 +119,7 @@ export default function UploadFileComponent() {
     ).postResource(documentReference);
   };
 
-  const HandleUpload = async (): Promise<Result<any>> => {
+  const HandleUpload = async (file: File): Promise<Result<any>> => {
     if (!file) {
       return {
         success: false,
@@ -94,31 +143,95 @@ export default function UploadFileComponent() {
     const responseDocument = await sendDocumentReference(
       responseBinary.data.id,
       file.name,
+      file.type,
       hash
     );
     console.log("documentResponse: ", responseDocument);
     return responseDocument;
   };
 
-  const calculateFileHash = async (file: File) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+  const handleFileRemove = (event: React.MouseEvent, index: number) => {
+    event.stopPropagation();
+    setFiles(files.filter((_, i) => i !== index));
   };
 
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: handleFileChange,
+  });
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} />
+    <Box p={10}>
+      <section {...getRootProps()} className={styles.dropzone}>
+        <Stack>
+          <input {...getInputProps()} />
+          <Button variant="outlined">
+            <CloudUploadIcon />
+          </Button>
+        </Stack>
+        <Stack className="filesContainer">
+          <Grid container spacing={2}>
+            {files.map((file, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                <Card key={index} className={styles.card}>
+                  <CardContent className={styles.cardContent}>
+                    {uploading[index] && (
+                      <Box className={styles.uploading}>
+                        <CircularProgress />
+                      </Box>
+                    )}
+                    {errorUpload[index] && (
+                      <Box className={styles.error}>
+                        <ErrorIcon color="error" />
+                        <Typography color="error">
+                          {errorUpload[index]}
+                        </Typography>
+                      </Box>
+                    )}
 
-      <button onClick={handleFileUpload}>
-        Subir Archivo y Guardar Documento
-      </button>
-      {file && (
-        <div onClick={() => window.open(URL.createObjectURL(file!), "_blank")}>
-          {file.name}
-          {getFileIconInfo(file.type).icon}{" "}
-        </div>
-      )}
-    </div>
+                    <Box className={styles.box}>
+                      <Typography variant="body1" component="div">
+                        {file.name}
+                      </Typography>
+                      <Typography variant="body2" component="div">
+                        {formatBytes(file.size)}
+                      </Typography>
+
+                      {getFileIconInfo(file.type).icon}
+                    </Box>
+                    <Box className={`options ${styles.options}`}>
+                      <IconButton
+                        onClick={(event) => handleFileRemove(event, index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                      <IconButton
+                        onClick={() =>
+                          window.open(
+                            URL.createObjectURL(file),
+                            "_blank",
+                            "noopener,noreferrer"
+                          )
+                        }
+                      >
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Stack>
+      </section>
+      <Stack>
+        <Button
+          variant="contained"
+          onClick={() =>
+            files.forEach((file, index) => handleFileUpload(file, index))
+          }
+        >
+          Subir Archivos y Guardar Documentos
+        </Button>
+      </Stack>
+    </Box>
   );
 }

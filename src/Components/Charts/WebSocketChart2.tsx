@@ -62,11 +62,15 @@ export default function WebSocketChart2() {
       const firstDevice = Object.keys(sensorDataByDevice)[0];
       const firstSensor = Object.keys(sensorDataByDevice[firstDevice])[0];
       labels = sensorDataByDevice[firstDevice][firstSensor].data.map((data) => {
-        const time = new Date(data.time);
-        return time.toLocaleTimeString("en-US", {
+        const time = new Date(data.timestamp_epoch * 1000);
+        const milliseconds = data.timestamp_millis;
+        const timeString = time.toLocaleTimeString("es-CL", {
           minute: "numeric",
           second: "numeric",
+          timeZone: "America/Santiago",
         });
+
+        return `${timeString}.${milliseconds.toString().padStart(3, "0")}`;
       });
     }
     Object.keys(sensorDataByDevice).map((device) => {

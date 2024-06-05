@@ -45,11 +45,12 @@ export default function WebSocketChart() {
 
     const data = sensorDataByDevice[device][sensor];
     const labels = data.data.map((data) => {
-      const time = new Date(data.time);
-      const milliseconds = time.getMilliseconds();
-      const timeString = time.toLocaleTimeString("en-US", {
+      const time = new Date(data.timestamp_epoch * 1000);
+      const milliseconds = data.timestamp_millis;
+      const timeString = time.toLocaleTimeString("es-CL", {
         minute: "numeric",
         second: "numeric",
+        timeZone: "America/Santiago",
       });
 
       return `${timeString}.${milliseconds.toString().padStart(3, "0")}`;

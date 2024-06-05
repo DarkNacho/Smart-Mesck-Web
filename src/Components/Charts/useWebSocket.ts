@@ -31,12 +31,6 @@ export default function useWebSocket(
             stats: { minValue: Infinity, maxValue: -Infinity },
           };
 
-          let calculatedMetrics = undefined;
-
-          if (sensorKey === "BPM") {
-            calculatedMetrics = calculateHeartRate(existingSensorData.data);
-          }
-
           return {
             ...prevData,
             [deviceKey]: {
@@ -53,7 +47,6 @@ export default function useWebSocket(
                     data.value
                   ),
                 },
-                metrics: calculatedMetrics,
               },
             },
           };
@@ -81,27 +74,3 @@ export default function useWebSocket(
 
   return [sensorDataByDevice, isConnected];
 }
-
-const calculateHeartRate = (sensorData: SensorData[]): number | undefined => {
-  if (sensorData.length < 2) {
-    return undefined;
-  }
-
-  const latestData = sensorData[sensorData.length - 1];
-  const prevData = sensorData[sensorData.length - 2];
-
-  const currentTime = new Date(latestData.time).getTime();
-  const prevTime = new Date(prevData.time).getTime();
-
-  // Calcula la diferencia de tiempo entre las dos últimas mediciones en segundos
-  const timeDifferenceInSeconds = (currentTime - prevTime) / 1000;
-
-  // Contar directamente las pulsaciones y calcular el BPM
-  const heartbeatsCount = sensorData.length - 1; // Una medición por segundo
-  const heartRateBPM =
-    heartbeatsCount > 0
-      ? (heartbeatsCount / timeDifferenceInSeconds) * 60
-      : undefined;
-
-  return heartRateBPM;
-};

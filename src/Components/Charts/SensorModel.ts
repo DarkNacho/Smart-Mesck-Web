@@ -1,7 +1,8 @@
 export interface SensorData {
   sensor_type: string;
   device: string;
-  time: string;
+  timestamp_epoch: number;
+  timestamp_millis: number;
   value: number;
 }
 
@@ -13,7 +14,6 @@ export interface SensorStats {
 export interface Sensor {
   data: SensorData[];
   stats: SensorStats;
-  metrics: number | undefined;
 }
 
 export type SensorDataByDevice = Record<string, Record<string, Sensor>>; // keys = device, sensor

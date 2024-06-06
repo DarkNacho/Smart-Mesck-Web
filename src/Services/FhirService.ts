@@ -7,6 +7,7 @@ import {
   FhirResource,
   CodeableConcept,
 } from "fhir/r4";
+import { OpPatch } from "fhir-kit-client/types/externals";
 
 /**
  * Represents a service for interacting with FHIR resources.
@@ -59,7 +60,10 @@ export default class FhirResourceService<T extends FhirResource> {
         return {
           success: false,
           error:
-            this.parseOperationOutcome(error.response?.data) || error.message,
+            this.parseOperationOutcome(error.response?.data) ||
+            error.message ||
+            error.response.data ||
+            error,
         } as Result<T>;
       });
   }
@@ -158,6 +162,16 @@ export default class FhirResourceService<T extends FhirResource> {
       this.fhirClient.create({
         resourceType: this.resourceTypeName,
         body: newResource,
+      }) as Promise<T>
+    );
+  }
+
+  public async patchResource(id: string, patch: OpPatch[]): Promise<Result<T>> {
+    return this.handleResult<T>(
+      this.fhirClient.patch({
+        resourceType: this.resourceTypeName,
+        id: id,
+        JSONPatch: patch,
       }) as Promise<T>
     );
   }
@@ -341,8 +355,10 @@ export default class FhirResourceService<T extends FhirResource> {
    * @param {OperationOutcome} operation - The operation outcome.
    * @returns {string} - The error message.
    */
-  private parseOperationOutcome(operation: OperationOutcome): string {
-    return operation.issue[0]?.diagnostics || "Unknown error";
+  private parseOperationOutcome(
+    operation: OperationOutcome
+  ): string | undefined {
+    return operation.issue?.[0]?.diagnostics || undefined;
   }
 
   /**

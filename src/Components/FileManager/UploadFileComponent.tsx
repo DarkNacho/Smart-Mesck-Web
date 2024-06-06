@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DocumentReference, Binary } from "fhir/r4";
+import { DocumentReference, Binary, Reference } from "fhir/r4";
 
 //import HandleResult from "../HandleResult";
 import FhirResourceService from "../../Services/FhirService";
@@ -7,6 +7,7 @@ import getFileIconInfo from "./getFileIconInfo";
 import CircularProgress from "@mui/material/CircularProgress";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ErrorIcon from "@mui/icons-material/Error";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import {
   Delete as DeleteIcon,
@@ -25,6 +26,8 @@ import {
 import { useDropzone } from "react-dropzone";
 
 import styles from "./FileManager.module.css";
+import { loadUserRoleFromLocalStorage } from "../../RolUser";
+import ListDocumentReferenceComponent from "./ListDocumentReferenceComponent";
 
 function formatBytes(bytes: number, decimals = 2) {
   if (bytes === 0) return "0 Bytes";
@@ -41,12 +44,23 @@ function formatBytes(bytes: number, decimals = 2) {
 async function calculateFileHash(file: File) {
   const buffer = await file.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-  return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join(""); // convert bytes to hex string
+  return btoa(`sha256-${hashHex}`);
 }
 
-export default function UploadFileComponent() {
+export default function UploadFileComponent({
+  subject,
+}: {
+  subject?: Reference;
+}) {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState<{ [key: string]: boolean }>({});
+  const [successUpload, setSuccessUpload] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [errorUpload, setErrorUpload] = useState<{
     [key: string]: string;
   }>({});
@@ -68,15 +82,20 @@ export default function UploadFileComponent() {
       setErrorUpload((prev) => ({ ...prev, [index]: response.error }));
 
     setUploading((prev) => ({ ...prev, [index]: false }));
+    setSuccessUpload((prev) => ({ ...prev, [index]: response.success }));
   };
 
-  const uploadBinary = async (file: File): Promise<Result<Binary>> => {
+  const uploadBinary = async (
+    file: File,
+    docRefId: string
+  ): Promise<Result<Binary>> => {
     const contentType = file.type;
     const fileContent = await file.arrayBuffer();
     const binaryResource: Binary = {
       resourceType: "Binary",
       contentType: contentType,
       data: btoa(String.fromCharCode(...new Uint8Array(fileContent))),
+      securityContext: { reference: `DocumentReference/${docRefId}` },
     };
 
     return new FhirResourceService<Binary>("Binary").postResource(
@@ -85,30 +104,48 @@ export default function UploadFileComponent() {
   };
 
   const sendDocumentReference = async (
-    binaryId: string,
     fileName: string,
     filetype: string,
+    fileSize: number,
     hash: string
   ): Promise<Result<DocumentReference>> => {
+    const role = loadUserRoleFromLocalStorage();
+    const userId = localStorage.getItem("id");
+    if (!role) {
+      return {
+        success: false,
+        error: "No se pudo obtener el rol del usuario",
+      };
+    }
+    if (!userId) {
+      return {
+        success: false,
+        error: "No se pudo obtener el id del usuario",
+      };
+    }
+
+    let author: { reference: string } = { reference: "" };
+
+    if (role === "Patient") {
+      author = { reference: `Patient/${userId}` };
+    }
+    if (role === "Practitioner" || role === "Admin") {
+      author = { reference: `Practitioner/${userId}` };
+    }
+
     const documentReference: DocumentReference = {
       resourceType: "DocumentReference",
       status: "current",
-      type: {
-        coding: [
-          {
-            system: "http://loinc.org",
-            code: "34108-1",
-            display: "Outpatient Note",
-          },
-        ],
-      },
+      author: [author],
+      subject: subject,
       content: [
         {
           attachment: {
             contentType: filetype,
-            url: `Binary/${binaryId}`,
             title: fileName,
             hash: hash,
+            size: fileSize,
+            creation: new Date().toISOString(),
           },
         },
       ],
@@ -127,8 +164,24 @@ export default function UploadFileComponent() {
       };
     }
 
-    const responseBinary = await uploadBinary(file);
-    console.log("binaryResponse: ", responseBinary);
+    const hash = await calculateFileHash(file);
+    const responseDocument = await sendDocumentReference(
+      file.name,
+      file.type,
+      file.size,
+      hash
+    );
+    console.log("documentResponse: ", responseDocument);
+    if (!responseDocument.success) return responseDocument;
+    if (!responseDocument.data.id) {
+      return {
+        success: false,
+        error: "Error al crear el DocumentReference",
+      };
+    }
+
+    const responseBinary = await uploadBinary(file, responseDocument.data.id);
+    //console.log("binaryResponse: ", responseBinary);
     if (!responseBinary.success) {
       return responseBinary;
     }
@@ -139,20 +192,26 @@ export default function UploadFileComponent() {
       };
     }
 
-    const hash = await calculateFileHash(file);
-    const responseDocument = await sendDocumentReference(
-      responseBinary.data.id,
-      file.name,
-      file.type,
-      hash
-    );
-    console.log("documentResponse: ", responseDocument);
-    return responseDocument;
+    const updateDocumentReference = responseDocument.data;
+    updateDocumentReference.content[0].attachment.url = `Binary/${responseBinary.data.id}`;
+
+    const responseUpdateDocumentRef =
+      await new FhirResourceService<DocumentReference>(
+        "DocumentReference"
+      ).updateResource(updateDocumentReference);
+    console.log("updateDocumentReference: ", responseUpdateDocumentRef);
+    return responseUpdateDocumentRef;
   };
 
   const handleFileRemove = (event: React.MouseEvent, index: number) => {
     event.stopPropagation();
     setFiles(files.filter((_, i) => i !== index));
+  };
+
+  const uploadAllFiles = async () => {
+    setErrorUpload({});
+    setSuccessUpload({});
+    files.forEach((file, index) => handleFileUpload(file, index));
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -179,10 +238,18 @@ export default function UploadFileComponent() {
                       </Box>
                     )}
                     {errorUpload[index] && (
-                      <Box className={styles.error}>
+                      <Box>
                         <ErrorIcon color="error" />
                         <Typography color="error">
                           {errorUpload[index]}
+                        </Typography>
+                      </Box>
+                    )}
+                    {successUpload[index] && (
+                      <Box>
+                        <CheckCircleIcon color="primary" />
+                        <Typography color="primary">
+                          Subido exitosamente
                         </Typography>
                       </Box>
                     )}
@@ -223,15 +290,11 @@ export default function UploadFileComponent() {
         </Stack>
       </section>
       <Stack>
-        <Button
-          variant="contained"
-          onClick={() =>
-            files.forEach((file, index) => handleFileUpload(file, index))
-          }
-        >
+        <Button variant="contained" onClick={uploadAllFiles}>
           Subir Archivos y Guardar Documentos
         </Button>
       </Stack>
+      <ListDocumentReferenceComponent></ListDocumentReferenceComponent>
     </Box>
   );
 }

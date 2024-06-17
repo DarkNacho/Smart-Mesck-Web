@@ -83,6 +83,16 @@ export default function PatientHeaderComponent({
                     <div className={styles.text1}>Encuentros</div>
                   </div>
                 </div>
+                <div
+                  className={`${styles.item5} ${
+                    selectedOption === "Sensor" ? styles.active : ""
+                  }`}
+                  onClick={() => handleOptionSelect("Sensor")}
+                >
+                  <div className={styles.title}>
+                    <div className={styles.text1}>Sensor</div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

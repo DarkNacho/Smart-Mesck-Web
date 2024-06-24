@@ -34,10 +34,6 @@ const navigationAdminItems = [
     value: "Encuentros",
     to: "/Encounter",
   },
-  {
-    value: "Sensores",
-    to: "/SensorChartDashboard",
-  },
 ];
 
 const navigationPractitionerItems = [
@@ -48,10 +44,6 @@ const navigationPractitionerItems = [
   {
     value: "Mis Encuentros",
     to: "/Encounter",
-  },
-  {
-    value: "Sensores",
-    to: "/SensorChartDashboard",
   },
 ];
 
@@ -71,6 +63,10 @@ const navigationPatientItems = [
   {
     value: "Todos los  Profesionales",
     to: "/Practitioner",
+  },
+  {
+    value: "Sensores",
+    to: "/SensorChartDashboard",
   },
 ];
 

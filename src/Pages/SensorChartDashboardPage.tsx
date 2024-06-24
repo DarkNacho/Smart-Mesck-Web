@@ -5,9 +5,10 @@ export default function SensorChartDashboardPage() {
     <div
       style={{
         backgroundColor: "white",
+        marginTop: "100px",
       }}
     >
-      <WebSocketChart />
+      <WebSocketChart patientId={localStorage.getItem("id")!} />
     </div>
   );
 }

@@ -28,6 +28,7 @@ export default function ListDocumentReferenceComponent() {
     );
     const response = await service.getResources({ _count: 10 });
     if (response.success) {
+      console.log(response.data);
       setDocumentReferences(response.data);
     } else {
       console.error(response.error);

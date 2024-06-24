@@ -15,6 +15,7 @@ import NavBarComponent from "./Components/NavBar/NavBarComponent.tsx";
 import SensorChartDashboardPage from "./Pages/SensorChartDashboardPage.tsx";
 import SensorChartDashboardPage2 from "./Pages/SensorChartDashboardPage2.tsx";
 import { loadUserRoleFromLocalStorage } from "./RolUser.ts";
+import UploadFileComponent from "./Components/FileManager/UploadFileComponent.tsx";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
   {
     path: "/SensorChartDashboard2",
     element: <SensorChartDashboardPage2></SensorChartDashboardPage2>,
+  },
+  {
+    path: "/Archivo",
+    element: <UploadFileComponent></UploadFileComponent>,
   },
 ]);
 

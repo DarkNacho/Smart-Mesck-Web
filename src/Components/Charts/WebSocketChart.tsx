@@ -28,9 +28,11 @@ ChartJS.register(
   zoomPlugin
 );
 
-export default function WebSocketChart() {
+export default function WebSocketChart({ patientId }: { patientId: string }) {
   const [sensorDataByDevice, isConnected] = useWebSocket(
-    import.meta.env.VITE_CHART_SERVER_URL
+    `${import.meta.env.VITE_CHART_SERVER_URL}?token=${localStorage.getItem(
+      "access_token"
+    )}&patient_id=${patientId}`
   );
 
   const chartRef = useRef<any>(null);
@@ -72,7 +74,7 @@ export default function WebSocketChart() {
 
     const options: ChartOptions<"line"> = {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           position: "top" as const,
@@ -101,12 +103,17 @@ export default function WebSocketChart() {
     };
 
     return (
-      <div key={`${device}-${sensor}`}>
-        <Line
-          ref={chartRef}
-          data={{ labels, datasets: [dataset] }}
-          options={options}
-        />
+      <div
+        key={`${device}-${sensor}`}
+        style={{ overflowX: "auto", maxWidth: "100%" }}
+      >
+        <div style={{ minWidth: "1000px", height: "500px" }}>
+          <Line
+            ref={chartRef}
+            data={{ labels, datasets: [dataset] }}
+            options={options}
+          />
+        </div>
       </div>
     );
   }

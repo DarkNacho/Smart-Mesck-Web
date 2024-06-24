@@ -8,6 +8,7 @@ import PatientOverviewComponent from "../Components/Patient/PatientOverviewCompo
 import FhirResourceService from "../Services/FhirService";
 import HandleResult from "../Components/HandleResult";
 import PatientEncounterListComponent from "../Components/Patient/PatientEncounterListComponent";
+import WebSocketChart from "../Components/Charts/WebSocketChart";
 
 const fhirService = new FhirResourceService<Patient>("Patient");
 
@@ -54,6 +55,11 @@ export default function PatientPage() {
         <PatientEncounterListComponent
           patientId={patientID!}
         ></PatientEncounterListComponent>
+      );
+      break;
+    case "Sensor":
+      componentToRender = (
+        <WebSocketChart patientId={patientID!}></WebSocketChart>
       );
       break;
     default:

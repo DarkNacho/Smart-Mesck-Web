@@ -156,20 +156,8 @@ export default function PatientListPage() {
             searchParam={searchParams}
             getDisplay={getDisplay}
             fhirService={fhirService}
-            onClick={(resource) => console.log(resource)}
-            onDoubleClick={(resource) => handleRefer(resource)}
-            chields={
-              <div>
-                accesos directos
-                <ul>
-                  <li>Item 1</li>
-                  <li>Item 2</li>
-                  <li>Item 3</li>
-                  <li>Item 4</li>
-                  <li>Item 5</li>
-                </ul>
-              </div>
-            }
+            //onClick={(resource) => console.log(resource)}
+            //onDoubleClick={(resource) => handleRefer(resource)}
           ></ListResourceComponent>
         </div>
       </div>

@@ -128,7 +128,7 @@ export default function EncounterPatientPage() {
 
     if (result.success) {
       console.log("conditions: ", result.data);
-      setConditionData(ConditionUtils.extractConditionName(result.data));
+      setConditionData(ConditionUtils.extractConditionNames(result.data));
       //console.log(conditionService.extractConditionName(resultCon.data));
     }
   };

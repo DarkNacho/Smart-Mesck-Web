@@ -3,6 +3,7 @@ import { useState } from "react";
 import styles from "./PatientHeaderComponent.module.css";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
+import PatientReportComponent from "./PatientReportComponent";
 
 export default function PatientHeaderComponent({
   patient,
@@ -103,6 +104,7 @@ export default function PatientHeaderComponent({
         alt=""
         src="/mask-group@2x.png"
       />
+      <PatientReportComponent patientId={patient.id!}></PatientReportComponent>
     </div>
   );
 }

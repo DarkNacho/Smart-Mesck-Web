@@ -20,6 +20,7 @@ import ConditionFormComponent, {
 } from "../Forms/ConditionFormComponent";
 import { Condition } from "fhir/r4";
 import ConditionService from "../../Services/ConditionService";
+import ConditionUtils from "../../Services/Utils/ConditionUtils";
 
 export default function ConditionCreateComponent({
   patientId,
@@ -39,41 +40,7 @@ export default function ConditionCreateComponent({
     : undefined;
 
   const onSubmitForm: SubmitHandler<ConditionFormData> = (data) => {
-    const newCondition: Condition = {
-      resourceType: "Condition",
-      code: {
-        coding: [
-          {
-            code: data.code.code,
-            system: data.code.system,
-            display: data.code.display,
-          },
-        ],
-      },
-      subject: {
-        reference: `Patient/${data.subject.id}`,
-        display: data.subject.display,
-      },
-      encounter: {
-        reference: `Encounter/${data.encounter.id}`,
-        display: data.encounter.display,
-      },
-      recorder: {
-        //! WARNING: quizás pueda cambiar a asserter o tener ambos
-        reference: `Practitioner/${data.performer.id}`,
-        display: data.performer.display,
-      },
-
-      note: [{ text: data.note }],
-      clinicalStatus: {
-        coding: [
-          {
-            code: data.clinicalStatus,
-            system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
-          },
-        ],
-      },
-    };
+    const newCondition = ConditionUtils.ConditionFormDataToCondition(data);
     sendCondition(newCondition);
   };
 

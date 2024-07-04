@@ -57,7 +57,7 @@ export default function PatientOverviewComponent({
     );
 
     if (result.success) {
-      setConditionData(ConditionUtils.extractConditionName(result.data));
+      setConditionData(ConditionUtils.extractConditionNames(result.data));
       console.log(result.data);
     }
   };

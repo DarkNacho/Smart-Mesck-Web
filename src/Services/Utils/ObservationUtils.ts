@@ -2,7 +2,19 @@ import { Observation, Condition } from "fhir/r4";
 import { InfoListData } from "../../Components/InfoListComponent";
 import { ObservationFormData } from "../../Components/Forms/ObservationFormComponent";
 import dayjs from "dayjs";
+import ObservationService from "../ObservationService";
 
+interface ObservationReport {
+  code: string;
+  system: string;
+  value: string; // Adjust based on actual type of value
+  issued: string;
+  performer: string;
+  subject: string;
+  encounter: string;
+  interpretation: string;
+  note: string;
+}
 export default class ObservationUtils {
   public static getValue(observation: Observation) {
     if (!observation) return "";
@@ -165,5 +177,43 @@ export default class ObservationUtils {
       resourceType: "Observation",
       status: "unknown",
     } as Observation;
+  }
+
+  public static ObservationReport(data: Observation): ObservationReport {
+    return {
+      code: data.code?.coding?.[0]?.code || "",
+      system: data.code?.coding?.[0]?.system || "",
+      value: ObservationUtils.getValue(data),
+      issued: dayjs(data.issued).format("DD/MM/YYYY HH:mm"),
+      performer: data.performer?.[0]?.display || "",
+      subject: data.subject?.display || "",
+      encounter: data.encounter?.display || "",
+      interpretation: data.interpretation?.[0]?.coding?.[0]?.display || "",
+      note: data.note?.[0]?.text || "",
+    } as ObservationReport;
+  }
+  public static async generatePatientObservationReport(
+    patientId: string
+  ): Promise<ObservationReport[]> {
+    const observations: Observation[] = [];
+    const observationService = new ObservationService();
+    const response = await observationService.getResources({
+      subject: patientId,
+      _count: 100,
+    });
+    if (!response.success) {
+      throw new Error("Error al obtener observaciones");
+    }
+    observations.push(...response.data);
+    while (observationService.hasNextPage) {
+      const nextPage = await observationService.getNewResources("next");
+      if (!nextPage.success) {
+        throw new Error("Error al obtener observaciones");
+      }
+      observations.push(...nextPage.data);
+    }
+    return observations.map((observation) =>
+      this.ObservationReport(observation)
+    );
   }
 }

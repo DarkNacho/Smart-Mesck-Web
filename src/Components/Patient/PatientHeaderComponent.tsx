@@ -94,6 +94,11 @@ export default function PatientHeaderComponent({
                     <div className={styles.text1}>Sensor</div>
                   </div>
                 </div>
+                <div>
+                  <PatientReportComponent
+                    patientId={patient.id!}
+                  ></PatientReportComponent>
+                </div>
               </div>
             )}
           </div>
@@ -104,7 +109,6 @@ export default function PatientHeaderComponent({
         alt=""
         src="/mask-group@2x.png"
       />
-      <PatientReportComponent patientId={patient.id!}></PatientReportComponent>
     </div>
   );
 }

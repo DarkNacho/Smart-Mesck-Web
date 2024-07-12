@@ -6,6 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import HandleResult from "../HandleResult";
 
 export default function PatientReportComponent({
   patientId,
@@ -33,7 +34,7 @@ export default function PatientReportComponent({
     setReportOptions((prev) => ({ ...prev, [name]: checked }));
   };
 
-  const downloadReport = async () => {
+  const downloadReport = async (): Promise<Result<any>> => {
     // Convert boolean values to strings
     const stringifiedOptions = Object.entries(reportOptions).reduce(
       (acc, [key, value]) => {
@@ -60,6 +61,7 @@ export default function PatientReportComponent({
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
+        return { success: false, error: "Error generating report" };
       }
 
       const blob = await response.blob();
@@ -73,9 +75,20 @@ export default function PatientReportComponent({
       //link.parentNode.removeChild(link);
     } catch (error) {
       console.error("Download failed:", error);
+      return { success: false, error: "Error downloading report" };
     }
 
-    handleClose();
+    return { success: true, data: null };
+  };
+
+  const handleDownload = async () => {
+    const response = await HandleResult.handleOperation(
+      () => downloadReport(),
+      "Reporte generado con éxito",
+      "Generando reporte..."
+    );
+
+    if (response.success) handleClose();
   };
 
   return (
@@ -129,7 +142,7 @@ export default function PatientReportComponent({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={downloadReport}>Descargar</Button>
+          <Button onClick={handleDownload}>Descargar</Button>
         </DialogActions>
       </Dialog>
     </>

@@ -281,6 +281,7 @@ export default class PersonUtil {
           value: `${data.countryCode}-${data.numeroTelefonico}`,
         },
         { system: "email", value: data.email },
+        { system: "url", use: "work", rank: 99, value: data.agendaUrl }, // rank: 99 is usado para especificar que corresponde a url de agenda.
       ],
       photo: [{ url: data.photo }],
     };
@@ -306,6 +307,10 @@ export default class PersonUtil {
       practitioner.telecom?.find((t) => t.system === "phone")?.value || "";
     const telecomEmail =
       practitioner.telecom?.find((t) => t.system === "email")?.value || "";
+
+    const agendaUrl =
+      practitioner.telecom?.find((t) => t.system === "url" && t.rank === 99)
+        ?.value || "";
 
     const tel = telecomPhone.split("-");
     let country = "+56";
@@ -336,6 +341,7 @@ export default class PersonUtil {
       email: telecomEmail,
       specialty: specialty,
       role: role,
+      agendaUrl: agendaUrl,
     };
   };
 }

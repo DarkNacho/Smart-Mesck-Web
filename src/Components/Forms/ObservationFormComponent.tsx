@@ -208,7 +208,7 @@ export default function ObservationFormComponent({
                   <TextField
                     {...params}
                     fullWidth
-                    label="Category"
+                    label="Categoría"
                     variant="outlined"
                   />
                 )}

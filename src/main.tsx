@@ -42,7 +42,7 @@ const router = createBrowserRouter([
     element: <ObservationPage></ObservationPage>,
   },
   {
-    path: "/Patient/:patientID/Encounter/:encounterID/Observation/:observationID",
+    path: "/Encounter/:encounterID/Observation/:observationID",
     element: <ObservationPage></ObservationPage>,
   },
   {
@@ -64,6 +64,10 @@ const router = createBrowserRouter([
   {
     path: "/Archivo",
     element: <UploadFileComponent></UploadFileComponent>,
+  },
+  {
+    path: "PublicSensor/:token",
+    element: <SensorChartDashboardPage></SensorChartDashboardPage>,
   },
 ]);
 

@@ -7,11 +7,11 @@ import { useParams } from "react-router-dom";
 
 import ConditionService from "../Services/ConditionService";
 import PatientQuestionnaireComponent from "../Components/Patient/PatientQuestionnaireComponent";
-
+import EncounterService from "../Services/EncounterService";
 import ObservationUtil from "../Services/Utils/ObservationUtils";
 import ConditionUtils from "../Services/Utils/ConditionUtils";
 import { Encounter } from "fhir/r4";
-import FhirResourceService from "../Services/FhirService";
+
 import HandleResult from "../Components/HandleResult";
 import EncounterUtils from "../Services/Utils/EncounterUtils";
 
@@ -25,12 +25,16 @@ import { TimelineOppositeContent } from "@mui/lab";
 import dayjs from "dayjs";
 
 import "dayjs/locale/es"; // importa el locale español
-import { Typography } from "@mui/material";
+import { Typography, Tabs, Tab, Box, TextField, Button } from "@mui/material";
+import DeviceSensorChart from "../Components/Charts/DeviceSensorChart";
+import { SensorDataByDevice } from "../Components/Charts/SensorModel";
+import PatientReportComponent from "../Components/Patient/PatientReportComponent";
+
 dayjs.locale("es"); // usa el locale español
 
 const observationService = new ObservationService();
 const conditionService = new ConditionService();
-const encounterService = new FhirResourceService<Encounter>("Encounter");
+const encounterService = new EncounterService();
 let patientID = "";
 
 export default function EncounterPatientPage() {
@@ -43,6 +47,32 @@ export default function EncounterPatientPage() {
   const [encounters, setEncounters] = useState<Encounter[]>([]);
 
   const [loading, setLoading] = useState(true);
+  const [loadingSensorData, setLoadingSensorData] = useState(true);
+
+  const [sensorDataByDevice, setSensorDataByDevice] =
+    useState<SensorDataByDevice>({});
+
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const fetchSensorData = async (encounterId: string) => {
+    try {
+      setLoadingSensorData(true);
+      console.log("Fetching data for sensor:", encounterId);
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/sensor2/data/${encounterId}`
+      );
+      if (!response.ok) {
+        throw new Error("error in fetch sensor data");
+      }
+      const data: SensorDataByDevice = await response.json();
+      console.log("Sensor data:", data);
+      setSensorDataByDevice(data);
+    } catch (error) {
+      console.error("Failed to fetch data for sensor:", error);
+    } finally {
+      setLoadingSensorData(false);
+    }
+  };
 
   const fetchSeguimiento = async (encounter: Encounter) => {
     setLoading(true);
@@ -133,23 +163,75 @@ export default function EncounterPatientPage() {
     }
   };
 
+  const TabPanel = (props) => {
+    const { children, value, index, ...other } = props;
+
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`tabpanel-${index}`}
+        aria-labelledby={`tab-${index}`}
+        {...other}
+      >
+        {value === index && <Box p={3}>{children}</Box>}
+      </div>
+    );
+  };
+
+  const showNote = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const note = data.get("note-textfield") as string;
+    const newEncounter = encounterService.setClinicalNote(encounter!, note);
+    //setEncounter(encounterService.setClinicalNote(encounter!, note));
+
+    console.log("encounter", newEncounter);
+
+    const result = await HandleResult.handleOperation(
+      () => encounterService.updateResource(newEncounter!),
+      "Encuentro actualizado.",
+      "Actualizando..."
+    );
+    console.log("result_encounter", result);
+    if (result.success) {
+      setEncounter(newEncounter);
+    }
+  };
+
   useEffect(() => {
     setObservationData([]);
+    setSensorDataByDevice({});
     fetchEncounter().then((result) => {
       if (result.success) {
         fetchObservation();
         fetchCondition();
         fetchSeguimiento(result.data);
       }
+      fetchSensorData(encounterID!);
     });
   }, [encounterID]);
 
-  if (loading) return <div>loading...</div>;
+  const handleTabChange = (_, newValue) => {
+    setTabIndex(newValue);
+  };
+
+  if (loading && loadingSensorData) return <div>loading...</div>;
 
   return (
     <div style={{ padding: "50px" }}>
       <div>
         <Typography variant="h5">{encounter?.subject?.display}</Typography>
+        <div>
+          <PatientReportComponent
+            patientId={patientID!}
+            encounterId={encounterID!}
+          ></PatientReportComponent>
+          <PatientQuestionnaireComponent
+            patientID={patientID!}
+            encounterID={encounterID!}
+          ></PatientQuestionnaireComponent>
+        </div>
         <Timeline>
           {encounters.map((encounter, index) => (
             <TimelineItem
@@ -194,12 +276,42 @@ export default function EncounterPatientPage() {
           ></InfoListComponent>
         </div>
       </div>
-      <div>
-        <PatientQuestionnaireComponent
-          patientID={patientID!}
-          encounterID={encounterID!}
-        ></PatientQuestionnaireComponent>
-      </div>
+
+      <Box
+        component={"form"}
+        bgcolor="rgba(228, 233, 242, 0.8)"
+        mt="30px"
+        borderRadius="10px"
+        onSubmit={showNote}
+      >
+        <Tabs value={tabIndex} onChange={handleTabChange}>
+          <Tab label="Notas" />
+          <Tab label="Gráficos del sensor" />
+        </Tabs>
+        <TabPanel value={tabIndex} index={0}>
+          <TextField
+            id="note-textfield"
+            name="note-textfield"
+            label="Notas"
+            multiline
+            rows={10}
+            variant="outlined"
+            defaultValue={encounterService.getClinicalNoteExtension(encounter!)}
+            fullWidth
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            style={{ marginTop: "10px" }}
+          >
+            Guardar Nota
+          </Button>
+        </TabPanel>
+        <TabPanel value={tabIndex} index={1}>
+          <DeviceSensorChart sensorDataByDevice={sensorDataByDevice} />
+        </TabPanel>
+      </Box>
     </div>
   );
 }

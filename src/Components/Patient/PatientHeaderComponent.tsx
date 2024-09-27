@@ -4,6 +4,8 @@ import styles from "./PatientHeaderComponent.module.css";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 import PatientReportComponent from "./PatientReportComponent";
+import PractitionerReferComponent from "../Practitioner/PractitionerReferComponent";
+import Button from "@mui/material/Button";
 
 export default function PatientHeaderComponent({
   patient,
@@ -14,11 +16,19 @@ export default function PatientHeaderComponent({
 }) {
   const [selectedOption, setSelectedOption] = useState<string>("Overview");
   const name = PersonUtil.getPersonNameAsString(patient);
-  const avatar = patient.photo?.[0]?.url || "/avatar.JPG";
+  const avatar =
+    patient.photo?.[0]?.url ||
+    `https://robohash.org/${Math.random().toString(36).substring(7)}.png`;
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
     onOptionSelect(option);
+  };
+
+  const [openDialogRefer, setOpenDialogRefer] = useState(false);
+
+  const handleIsOpenRefer = (isOpen: boolean) => {
+    setOpenDialogRefer(isOpen);
   };
 
   return (
@@ -98,6 +108,18 @@ export default function PatientHeaderComponent({
                   <PatientReportComponent
                     patientId={patient.id!}
                   ></PatientReportComponent>
+                  <PractitionerReferComponent
+                    patient={patient}
+                    onOpen={handleIsOpenRefer}
+                    isOpen={openDialogRefer}
+                  ></PractitionerReferComponent>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleIsOpenRefer(true)}
+                  >
+                    derivar
+                  </Button>
                 </div>
               </div>
             )}

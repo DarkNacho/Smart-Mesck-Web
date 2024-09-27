@@ -316,7 +316,13 @@ export default function QuestionnaireComponent({
 
     console.log("original resource: ", originalResources);
 
-    sendQuestionnaireResponse(qr).then((res) => {
+    HandleResult.handleOperation(
+      () => sendQuestionnaireResponse(qr),
+      "Formulario Guardado Exitosamente",
+      "Enviado..."
+    );
+
+    /*sendQuestionnaireResponse(qr).then((res) => {
       if (res.success) {
         questionnaireResponse = res.data as QuestionnaireResponse;
         const responsesObservation = responseAsObservations(qr);
@@ -336,6 +342,7 @@ export default function QuestionnaireComponent({
       } //  ! Si en el questionario un elemento que e respondio y se guardó. Luego si lo dejo vacio. Este no cambia en Conditions pero si luego lo vuelvo a editar este cambia.
       else console.error(res.error);
     });
+    */
 
     /*
     const originalObservation = await getObservations();
@@ -347,12 +354,6 @@ export default function QuestionnaireComponent({
 
     sendQuestionnaireResponse(qr).then(res => res.success ? sendObservations(finalObservation): console.error(res.error));
     */
-  };
-
-  const test = async () => {
-    console.log("subject: ", subjectId, "quesresId:", questionnaireResponse.id);
-    const result = await getConditions();
-    console.log(result);
   };
 
   return (
@@ -374,7 +375,6 @@ export default function QuestionnaireComponent({
           >
             Guardar
           </Button>
-          <Button onClick={() => test()}>TEST</Button>
         </div>
       )}
     </div>

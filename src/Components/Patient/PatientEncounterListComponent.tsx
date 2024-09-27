@@ -13,22 +13,20 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
 import EncounterCreateComponent from "../../Components/Encounter/EncounterCreateComponent";
-import {
-  isAdminOrPractitioner,
-  loadUserRoleFromLocalStorage,
-} from "../../RolUser";
+import { isAdminOrPractitioner } from "../../RolUser";
 
 const fhirService = new FhirResourceService<Encounter>("Encounter");
 
 function getDisplay(resource: Encounter): string {
-  const rol = loadUserRoleFromLocalStorage();
-  let display = "";
-  if (rol === "Admin" || rol == "Patient")
-    display = `\nProfesional: ${EncounterUtils.getPrimaryPractitioner(
-      resource
-    )} `;
-  return `ID: ${resource.id} ${display}
-  \n${EncounterUtils.getFormatPeriod(resource.period!)}`;
+  //const rol = loadUserRoleFromLocalStorage();
+  //let display = "";
+  //if (rol === "Admin" || rol == "Patient")
+  //  display = `\nProfesional: ${EncounterUtils.getPrimaryPractitioner(
+  //    resource
+  //  )} `;
+  return `${EncounterUtils.getPrimaryPractitioner(
+    resource
+  )}\n${EncounterUtils.getFormatPeriod(resource.period!)}`;
 }
 
 export default function PatientEncounterListComponent({

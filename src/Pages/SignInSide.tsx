@@ -16,6 +16,7 @@ import { jwtDecode } from "jwt-decode";
 import PersonForgotPasswordComponent from "../Components/Person/PersonForgotPasswordComponent";
 import backgroundLogin from "../../public/fondo-login.jpg";
 import logoBlue from "../../public/logo-azul.png";
+import PractitionerCreateComponent from "../Components/Practitioner/PractitionerCreateComponent";
 function Copyright(props: any) {
   return (
     <Typography
@@ -26,7 +27,7 @@ function Copyright(props: any) {
     >
       {"Copyright © "}
       <Link color="inherit" href="https://www.cttn.cl">
-        XXXXX
+        XXXXX Ingresar
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -78,9 +79,13 @@ async function login(username: string, password: string): Promise<Result<any>> {
 
 export default function SignInSide() {
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialogPractitioner, setOpenDialogPractitioner] = useState(false);
 
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
+  };
+  const handleIsOpenPractitioner = (isOpen: boolean) => {
+    setOpenDialogPractitioner(isOpen);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -88,8 +93,13 @@ export default function SignInSide() {
     const data = new FormData(event.currentTarget);
 
     const { rut, password } = {
-      rut: data.get("rut") as string,
-      password: data.get("password") as string,
+      rut: data
+        .get("rut")
+        ?.toString()
+        .replace(/\./g, "")
+        .replace(/-/g, "")
+        .toUpperCase(),
+      password: data.get("password")?.toString(),
     };
     if (!rut || !password) return;
     console.log({ rut, password });
@@ -114,6 +124,9 @@ export default function SignInSide() {
     localStorage.setItem("userRol", decodedToken.role);
     localStorage.setItem("id", decodedToken.id);
     localStorage.setItem("name", decodedToken.name);
+    localStorage.setItem("tokenExpiration", decodedToken.exp);
+
+    //setLogoutTimer();
 
     if (decodedToken.role === "Patient")
       window.location.href = `/Patient/${decodedToken.id}`;
@@ -162,7 +175,7 @@ export default function SignInSide() {
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                label="Contraseña"
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -175,6 +188,14 @@ export default function SignInSide() {
                 sx={{ mt: 3, mb: 2 }}
               >
                 Iniciar Sesión
+              </Button>
+              <Button
+                onClick={() => handleIsOpenPractitioner(true)}
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Registrar Profesional
               </Button>
               <Box textAlign="right">
                 <Link
@@ -219,6 +240,10 @@ export default function SignInSide() {
           }}
         />
       </Grid>
+      <PractitionerCreateComponent
+        isOpen={openDialogPractitioner}
+        onOpen={handleIsOpenPractitioner}
+      ></PractitionerCreateComponent>
       <PersonForgotPasswordComponent
         onOpen={handleIsOpen}
         isOpen={openDialog}

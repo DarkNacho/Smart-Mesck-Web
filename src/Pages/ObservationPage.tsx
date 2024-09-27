@@ -77,6 +77,7 @@ export default function ObservationPage() {
       "Obteniendo Observación...",
       setObservation
     );
+    console.log("fetchObservation", result);
     return result;
   };
 
@@ -153,7 +154,7 @@ export default function ObservationPage() {
               <ObservationFormComponent
                 formId="formObservation"
                 observation={observation}
-                patientId={patientID!}
+                patientId={observation.subject?.reference?.split("/")[1] || ""}
                 submitForm={onSubmitForm}
                 readOnly={checkPatientRol()}
                 practitionerId={practitionerId}

@@ -32,12 +32,9 @@ export default class FhirResourceService<T extends FhirResource> {
     this.apiUrl =
       import.meta.env.VITE_API_URL || "https://hapi.fhir.org/baseR4"; //TODO: Forzar a que el env esté o si no enviar error.
     const jwtToken = localStorage.getItem("access_token");
-
     this.fhirClient = new Client({
       baseUrl: this.apiUrl,
-      customHeaders: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
+      bearerToken: jwtToken!,
     });
     this._resourceBundle = {} as Bundle;
     this.resourceTypeName = type;
@@ -56,7 +53,7 @@ export default class FhirResourceService<T extends FhirResource> {
         return { success: true, data } as Result<T>;
       })
       .catch((error: any) => {
-        console.error(error);
+        console.error("handleResult:", error);
         return {
           success: false,
           error:
@@ -339,6 +336,8 @@ export default class FhirResourceService<T extends FhirResource> {
             bundle: this._resourceBundle,
           }) as Promise<Bundle>)
     );
+
+    console.log(response);
     if (!response.success) return response;
 
     this._resourceBundle = response.data;
@@ -356,9 +355,12 @@ export default class FhirResourceService<T extends FhirResource> {
    * @returns {string} - The error message.
    */
   private parseOperationOutcome(
-    operation: OperationOutcome
+    operation: OperationOutcome | undefined
   ): string | undefined {
-    return operation.issue?.[0]?.diagnostics || undefined;
+    if (!operation || !operation.issue || !operation.issue[0]) {
+      return undefined;
+    }
+    return operation.issue[0].diagnostics || undefined;
   }
 
   /**

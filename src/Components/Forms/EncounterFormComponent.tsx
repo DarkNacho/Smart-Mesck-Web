@@ -169,7 +169,7 @@ export default function EncounterFormComponent({
               render={({ field }) => (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    label="Fecha inicio test"
+                    label="Fecha"
                     onChange={field.onChange}
                     value={field.value}
                     inputRef={field.ref}
@@ -187,7 +187,7 @@ export default function EncounterFormComponent({
               render={({ field: { onChange, value, ref } }) => (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <TimePicker
-                    label="start"
+                    label="Inicia"
                     onChange={onChange}
                     value={value}
                     inputRef={ref}
@@ -205,7 +205,7 @@ export default function EncounterFormComponent({
               render={({ field: { onChange, value, ref } }) => (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <TimePicker
-                    label="end"
+                    label="Finaliza"
                     onChange={onChange}
                     value={value}
                     inputRef={ref}
@@ -266,7 +266,6 @@ export default function EncounterFormComponent({
               />
             )}
           />
-          <button type="submit">test</button>
         </Stack>
       </form>
       <DevTool control={control} />

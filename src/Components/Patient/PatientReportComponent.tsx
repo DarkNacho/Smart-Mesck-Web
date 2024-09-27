@@ -10,8 +10,10 @@ import HandleResult from "../HandleResult";
 
 export default function PatientReportComponent({
   patientId,
+  encounterId,
 }: {
   patientId: string;
+  encounterId?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [reportOptions, setReportOptions] = useState({
@@ -43,6 +45,7 @@ export default function PatientReportComponent({
       },
       {} as Record<string, string>
     );
+    if (encounterId) stringifiedOptions.encounter_id = encounterId;
 
     const queryParams = new URLSearchParams(stringifiedOptions).toString();
     const downloadUrl = `${
@@ -66,12 +69,28 @@ export default function PatientReportComponent({
 
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
+
+      // Obtener el nombre del archivo desde el encabezado Content-Disposition
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let fileName = "downloaded_file.pdf"; // Nombre por defecto
+      console.log("Content-Disposition:", contentDisposition);
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(
+          /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+        );
+        if (fileNameMatch && fileNameMatch[1]) {
+          fileName = fileNameMatch[1].replace(/['"]/g, "");
+        }
+      }
+
       const link = document.createElement("a");
       link.href = blobUrl;
-      const currentDate = new Date().toISOString().split("T")[0];
-      link.setAttribute("download", `Report_${patientId}_${currentDate}.pdf`);
+      //const currentDate = new Date().toISOString().split("T")[0];
+      //link.setAttribute("download", `Report_${patientId}_${currentDate}.pdf`);
+      link.setAttribute("download", fileName);
       document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
       //link.parentNode.removeChild(link);
     } catch (error) {
       console.error("Download failed:", error);
@@ -93,8 +112,8 @@ export default function PatientReportComponent({
 
   return (
     <>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Descargar Informe
+      <Button variant="contained" color="primary" onClick={handleClickOpen}>
+        Descargar Reporte
       </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Seleccione las opciones para el informe</DialogTitle>
@@ -119,16 +138,18 @@ export default function PatientReportComponent({
             }
             label="Sensor"
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={reportOptions.med}
-                onChange={handleCheckboxChange}
-                name="med"
-              />
-            }
-            label="Medicación"
-          />
+          {!encounterId && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={reportOptions.med}
+                  onChange={handleCheckboxChange}
+                  name="med"
+                />
+              }
+              label="Medicación"
+            />
+          )}
           <FormControlLabel
             control={
               <Checkbox

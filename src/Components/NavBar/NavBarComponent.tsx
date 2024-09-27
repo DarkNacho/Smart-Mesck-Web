@@ -15,7 +15,7 @@ import {
 import logo from "../../assets/smart-mesck-logo.png";
 import backgroundImageSmartMesck from "../../assets/background-smart-mesck.png";
 import { Close, Menu as MenuIcon } from "@mui/icons-material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
 
 import PractitionerCreateComponent from "../Practitioner/PractitionerCreateComponent";
@@ -82,6 +82,18 @@ const getNavigationItems = () => {
   return [];
 };
 
+const isTokenExpired = () => {
+  const expirationTime = localStorage.getItem("tokenExpiration");
+  if (!expirationTime) {
+    return true;
+  }
+
+  const currentTime = new Date().getTime();
+  console.log("current", currentTime);
+  console.log("expiration", parseInt(expirationTime, 10));
+  return parseInt(expirationTime, 10) * 1000 < currentTime;
+};
+
 const userName = localStorage.getItem("name");
 
 export default function NavBarComponent() {
@@ -92,6 +104,28 @@ export default function NavBarComponent() {
   const [editProfile, setEditProfile] = useState(false);
 
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+
+  useEffect(() => {
+    const checkTokenExpiration = () => {
+      if (isTokenExpired()) {
+        alert("Su sesión ha expirado, por favor inicie sesión nuevamente.");
+        console.log("token expired...");
+        localStorage.clear();
+        window.location.href = "/";
+      } else {
+        console.log("token not expired...");
+      }
+    };
+
+    // Check token expiration immediately
+    checkTokenExpiration();
+
+    // Set up an interval to check token expiration every minute
+    const intervalId = setInterval(checkTokenExpiration, 60000); // 60000 ms = 1 minute
+
+    // Clear the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleClickAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

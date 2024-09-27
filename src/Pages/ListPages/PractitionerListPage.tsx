@@ -193,6 +193,13 @@ export default function PractitionerListPage() {
             searchParam={searchParam}
             getDisplay={getDisplay}
             fhirService={fhirService}
+            onClick={(resource) => {
+              const url =
+                resource.telecom?.find(
+                  (t) => t.system === "url" && t.rank === 99
+                )?.value || "https://calendly.com/darknacho/prueba";
+              window.open(url, "_blank");
+            }}
           ></ListResourceComponent>
         </div>
       </div>

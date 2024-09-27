@@ -45,11 +45,14 @@ export default function MultipleAutoCompleteComponent<T extends FhirResource>({
       const stringJson = `{"${searchParam}": "${searchTerm}"}`;
       const param = JSON.parse(stringJson);
 
-      const result = await fhirService.getResources({
-        ...defaultParams,
-        ...param,
-        _count: 5,
-      });
+      console.log("param:", param);
+      console.log("defaultParams:", defaultParams);
+
+      let params = { ...defaultParams, _count: 30 };
+      if (searchTerm) params = { ...defaultParams, ...param };
+      console.log("params:", params);
+
+      const result = await fhirService.getResources(params);
 
       if (!result.success) throw new Error(result.error);
 

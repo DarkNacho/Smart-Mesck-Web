@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
-import useWebSocket from "./useWebSocket";
-
 import zoomPlugin from "chartjs-plugin-zoom";
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,6 +13,7 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Button, Tab, Tabs } from "@mui/material";
+import { SensorDataByDevice } from "./SensorModel";
 
 ChartJS.register(
   CategoryScale,
@@ -28,31 +26,14 @@ ChartJS.register(
   zoomPlugin
 );
 
-export default function WebSocketChart({
-  patientId,
-  token,
+export default function DeviceSensorChart({
+  sensorDataByDevice,
 }: {
-  patientId?: string;
-  token?: string;
+  sensorDataByDevice: SensorDataByDevice;
 }) {
-  let webSocketUrl = `${
-    import.meta.env.VITE_CHART_SERVER_URL
-  }/dashboard_ws?token=${localStorage.getItem(
-    "access_token"
-  )}&patient_id=${patientId}`;
-
-  if (!patientId && token) {
-    webSocketUrl = `${
-      import.meta.env.VITE_CHART_SERVER_URL
-    }/dashboard_ws_public?token=${token}`;
-  }
-
-  const [sensorDataByDevice, isConnected] = useWebSocket(webSocketUrl);
-
-  const chartRef = useRef<any>(null);
-
   const [activeDevice, setActiveDevice] = useState<string>();
   const [activeSensor, setActiveSensor] = useState<string>();
+  const chartRef = useRef<any>(null);
 
   function generateChart(device: string, sensor: string): JSX.Element | null {
     if (!sensorDataByDevice[device] || !sensorDataByDevice[device][sensor]) {
@@ -71,11 +52,6 @@ export default function WebSocketChart({
 
       return `${timeString}.${milliseconds.toString().padStart(3, "0")}`;
     });
-
-    const lastFiveData = data.data.slice(-5);
-    const avgValue =
-      lastFiveData.reduce((sum, data) => sum + data.value, 0) /
-      lastFiveData.length;
 
     const dataset = {
       label: `Device: ${device}, Sensor: ${sensor}`,
@@ -96,7 +72,7 @@ export default function WebSocketChart({
         },
         title: {
           display: true,
-          text: `Valor: ${avgValue} Mínimo: ${data.stats.minValue} \t Máximo: ${data.stats.maxValue}`,
+          text: `Valor: ${data.stats.avgValue} Mínimo: ${data.stats.minValue} \t Máximo: ${data.stats.maxValue}`,
         },
         zoom: {
           pan: {
@@ -139,68 +115,59 @@ export default function WebSocketChart({
   };
 
   useEffect(() => {
-    // Actualizar activeDevice al primer dispositivo si hay datos disponibles
-    if (
-      !activeDevice &&
-      isConnected &&
-      Object.keys(sensorDataByDevice).length > 0
-    ) {
+    // Update activeDevice to the first device if data is available
+    if (!activeDevice && Object.keys(sensorDataByDevice).length > 0) {
       setActiveDevice(Object.keys(sensorDataByDevice)[0]);
     }
     if (
       !activeSensor &&
       activeDevice &&
-      isConnected &&
       Object.keys(sensorDataByDevice[activeDevice]).length > 0
     ) {
       setActiveSensor(Object.keys(sensorDataByDevice[activeDevice])[0]);
     }
-  }, [isConnected, sensorDataByDevice]);
+  }, [sensorDataByDevice]);
 
   const chart =
     activeDevice && activeSensor && generateChart(activeDevice, activeSensor);
 
-  if (!isConnected) return <p>Connecting...</p>;
-  else if (!chart) return <p>No data being received</p>;
-  else {
-    return (
-      <div>
+  return (
+    <div>
+      <Tabs
+        value={activeDevice}
+        onChange={(_, value) => {
+          setActiveDevice(value);
+          setActiveSensor(Object.keys(sensorDataByDevice[value])[0]);
+        }}
+        indicatorColor="primary"
+        textColor="primary"
+        variant="scrollable"
+        scrollButtons="auto"
+      >
+        {Object.keys(sensorDataByDevice).map((device) => (
+          <Tab key={device} label={device} value={device} />
+        ))}
+      </Tabs>
+      {activeDevice && (
         <Tabs
-          value={activeDevice}
+          value={activeSensor}
           onChange={(_, value) => {
-            setActiveDevice(value);
-            setActiveSensor(Object.keys(sensorDataByDevice[value])[0]);
+            setActiveSensor(value);
           }}
           indicatorColor="primary"
           textColor="primary"
           variant="scrollable"
           scrollButtons="auto"
         >
-          {Object.keys(sensorDataByDevice).map((device) => (
-            <Tab key={device} label={device} value={device} />
+          {Object.keys(sensorDataByDevice[activeDevice]).map((sensor) => (
+            <Tab key={sensor} label={sensor} value={sensor} />
           ))}
         </Tabs>
-        {activeDevice && (
-          <Tabs
-            value={activeSensor}
-            onChange={(_, value) => {
-              setActiveSensor(value);
-            }}
-            indicatorColor="primary"
-            textColor="primary"
-            variant="scrollable"
-            scrollButtons="auto"
-          >
-            {Object.keys(sensorDataByDevice[activeDevice]).map((sensor) => (
-              <Tab key={sensor} label={sensor} value={sensor} />
-            ))}
-          </Tabs>
-        )}
-        {chart}
-        <Button variant="outlined" onClick={resetChart}>
-          Restablecer
-        </Button>
-      </div>
-    );
-  }
+      )}
+      {chart}
+      <Button variant="outlined" onClick={resetChart}>
+        Restablecer
+      </Button>
+    </div>
+  );
 }

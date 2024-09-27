@@ -39,7 +39,6 @@ export default function PatientQuestionnaireComponent({
       const responseBundle = await questionnaireResponseService.getResources({
         subject: patientID,
         encounter: encounterID!,
-        author: localStorage.getItem("id")!,
       });
       if (!responseBundle.success) throw Error(responseBundle.error);
 

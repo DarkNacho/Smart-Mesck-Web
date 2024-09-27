@@ -33,6 +33,7 @@ export interface PractitionerFormData {
   specialty: Coding[];
   role: Coding[];
   practitionerRoleId?: string;
+  agendaUrl?: string; //TODO: hacerlo obligatorio
 }
 
 export default function PractitionerFormComponent({
@@ -319,6 +320,9 @@ export default function PractitionerFormComponent({
           </Grid>
           <Grid item xs={12} sm={12}>
             <TextField label="Foto" {...register("photo")} fullWidth />
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <TextField label="Agenda" {...register("agendaUrl")} fullWidth />
           </Grid>
         </Grid>
       </form>

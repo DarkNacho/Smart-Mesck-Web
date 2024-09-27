@@ -3,6 +3,15 @@ import PersonUtil from "../../Services/Utils/PersonUtils";
 import styles from "./PatientGeneralWidgetComponent.module.css";
 import { Patient } from "fhir/r4";
 
+function formatDate(dateString: string | undefined): string {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
 export default function PatientGeneralWidgetComponent({
   patient,
   edit = false,
@@ -48,7 +57,7 @@ export default function PatientGeneralWidgetComponent({
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">
-              Fecha Nacimiento: {patient.birthDate || "N/A"}
+              Fecha Nacimiento: {formatDate(patient.birthDate)}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4} md={2}>

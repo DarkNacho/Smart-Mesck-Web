@@ -110,7 +110,7 @@ export default function PersonContactFormComponent({
             <Step key={index}>
               <StepLabel onClick={() => setActiveStep(index)}>
                 <Link href="#" color="inherit">
-                  {field.nombre ? field.nombre : `Contact ${index + 1}`}
+                  {field.nombre ? field.nombre : `Contacto N° ${index + 1}`}
                 </Link>
               </StepLabel>
             </Step>
@@ -157,7 +157,6 @@ export default function PersonContactFormComponent({
                 type="email"
                 label="Email"
                 {...register(`contact.${activeStep}.email`, {
-                  required: "Correo electrónico requerido",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: "Correo electrónico inválido",
@@ -219,14 +218,18 @@ export default function PersonContactFormComponent({
           color="error"
           onClick={() => removeContact(activeStep)}
         >
-          Delete
+          Eliminar
         </Button>
 
-        <Button variant="contained" onClick={handlePreviousStep}>
-          Previous
+        <Button
+          variant="contained"
+          onClick={handlePreviousStep}
+          disabled={activeStep < 1}
+        >
+          Anterior
         </Button>
         <Button variant="contained" onClick={handleNextStep}>
-          {activeStep === fields.length - 1 ? "Add" : "Next"}
+          {activeStep === fields.length - 1 ? "Agregar" : "Siguiente"}
         </Button>
       </form>
       <DevTool control={control} />

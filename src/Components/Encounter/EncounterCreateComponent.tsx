@@ -57,6 +57,13 @@ export default function EncounterCreateComponent({
     console.log("send form");
     console.log(data);
 
+    const seguimiento = data.seguimiento?.id
+      ? {
+          reference: `Encounter/${data.seguimiento.id}`,
+          display: data.seguimiento.display,
+        }
+      : undefined;
+
     const newEncounter: Encounter = {
       resourceType: "Encounter",
       subject: {
@@ -75,10 +82,7 @@ export default function EncounterCreateComponent({
         start: data.start.toISOString(),
         end: data.end.toISOString(),
       },
-      partOf: {
-        reference: `Encounter/${data.seguimiento?.id}`,
-        display: data.seguimiento?.display,
-      },
+      partOf: seguimiento,
       status: "finished",
       class: {
         code: data.type,

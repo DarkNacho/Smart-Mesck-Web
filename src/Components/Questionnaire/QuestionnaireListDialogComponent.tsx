@@ -96,7 +96,7 @@ export default function QuestionnaireListDialogComponent({
             >
               <TextField
                 style={{ width: "100%" }}
-                label="Buscar un paciente"
+                label="Buscar Formulario por título"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{

@@ -32,12 +32,13 @@ export default function PractitionerReferComponent({
   patient: Patient;
 }) {
   useEffect(() => {
-    if (isOpen) handleRefer(patient);
     onOpen(isOpen);
+    if (isOpen) handleRefer(patient);
   }, [isOpen]);
 
   const handleClose = () => {
-    setDefaultReferData([]);
+    // setDefaultReferData([]);
+    console.log("cerrando");
     onOpen(false);
   };
 
@@ -85,7 +86,7 @@ export default function PractitionerReferComponent({
     <div>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle className={styles.dialogTitle}>
-          Añadir Nuevo Profesional
+          Seleccionar Profesionales
           <IconButton
             aria-label="close"
             onClick={handleClose}
@@ -104,7 +105,6 @@ export default function PractitionerReferComponent({
               id="referGeneralPractitioner"
               onSubmit={handleSubmit(onSubmit)}
             >
-              <h1> contenido aquí </h1>
               {defaultReferData.length > 0 && (
                 <Controller
                   name="practitioners"

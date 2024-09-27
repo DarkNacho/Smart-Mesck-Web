@@ -9,6 +9,7 @@ export interface SensorData {
 export interface SensorStats {
   minValue: number;
   maxValue: number;
+  avgValue: number;
 }
 
 export interface Sensor {

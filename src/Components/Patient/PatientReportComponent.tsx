@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import HandleResult from "../HandleResult";
+import { FormGroup, TextField, Typography } from "@mui/material";
 
 export default function PatientReportComponent({
   patientId,
@@ -23,6 +24,17 @@ export default function PatientReportComponent({
     cond: false,
   });
 
+  const [excludedSensorTypes, setExcludedSensorTypes] = useState({
+    Temperatura: false,
+    sensor2: false,
+    sensor3: false,
+  });
+  const [isTimeRange, setIsTimeRange] = useState(false);
+  const [timeRange, setTimeRange] = useState({ start: "", end: "" });
+
+  const toggleTimeRange = () => {
+    setIsTimeRange((prev) => !prev);
+  };
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -36,6 +48,26 @@ export default function PatientReportComponent({
     setReportOptions((prev) => ({ ...prev, [name]: checked }));
   };
 
+  const handleSensorCheckboxChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, checked } = event.target;
+    setExcludedSensorTypes((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+  };
+
+  const handleTimeRangeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = event.target;
+    setTimeRange((prevRange) => ({
+      ...prevRange,
+      [name]: value,
+    }));
+  };
+
   const downloadReport = async (): Promise<Result<any>> => {
     // Convert boolean values to strings
     const stringifiedOptions = Object.entries(reportOptions).reduce(
@@ -45,12 +77,24 @@ export default function PatientReportComponent({
       },
       {} as Record<string, string>
     );
+
+    if (timeRange.start)
+      stringifiedOptions.start = new Date(timeRange.start).toISOString();
+    if (timeRange.end)
+      stringifiedOptions.end = new Date(timeRange.end).toISOString();
     if (encounterId) stringifiedOptions.encounter_id = encounterId;
 
-    const queryParams = new URLSearchParams(stringifiedOptions).toString();
+    const queryParams = new URLSearchParams(stringifiedOptions);
+
+    Object.entries(excludedSensorTypes).forEach(([sensor, isExcluded]) => {
+      if (isExcluded) {
+        queryParams.append("excluded_sensor_types", sensor);
+      }
+    });
+
     const downloadUrl = `${
       import.meta.env.VITE_SERVER_URL
-    }/report/${patientId}?${queryParams}`;
+    }/report/${patientId}?${queryParams.toString()}`;
 
     console.log("Download URL:", downloadUrl);
     try {
@@ -138,6 +182,44 @@ export default function PatientReportComponent({
             }
             label="Sensor"
           />
+          {reportOptions.sensor && (
+            <FormGroup row>
+              <Typography variant="h6" gutterBottom>
+                Sensores a excluir:
+              </Typography>
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={excludedSensorTypes.Temperatura}
+                    onChange={handleSensorCheckboxChange}
+                    name="Temperatura"
+                  />
+                }
+                label="Temperatura"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={excludedSensorTypes.sensor2}
+                    onChange={handleSensorCheckboxChange}
+                    name="sensor2"
+                  />
+                }
+                label="Sensor 2"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={excludedSensorTypes.sensor3}
+                    onChange={handleSensorCheckboxChange}
+                    name="sensor3"
+                  />
+                }
+                label="Sensor 3"
+              />
+            </FormGroup>
+          )}
           {!encounterId && (
             <FormControlLabel
               control={
@@ -160,6 +242,40 @@ export default function PatientReportComponent({
             }
             label="Condición"
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isTimeRange}
+                onChange={toggleTimeRange}
+                name="isTimeRange"
+              />
+            }
+            label="Rango de Tiempo"
+          />
+          {isTimeRange && (
+            <div>
+              <TextField
+                label="Inicio"
+                type="datetime-local"
+                name="start"
+                value={timeRange.start}
+                onChange={handleTimeRangeChange}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+              <TextField
+                label="Fin"
+                type="datetime-local"
+                name="end"
+                value={timeRange.end}
+                onChange={handleTimeRangeChange}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </div>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>

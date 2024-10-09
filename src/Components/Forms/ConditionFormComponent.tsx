@@ -6,10 +6,10 @@ import AutoCompleteComponent from "../AutoCompleteComponents/AutoCompleteCompone
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
 import { loadUserRoleFromLocalStorage } from "../../RolUser";
-import AutoCompleteFromLHCComponentComponent from "../AutoCompleteComponents/AutoCompleteFromLHCComponent";
+//import AutoCompleteFromLHCComponentComponent from "../AutoCompleteComponents/AutoCompleteFromLHCComponent";
 
 import { clinicalStatus } from "./Terminology";
-import AutoCompleteFromSnomedComponent from "../AutoCompleteComponents/AutoCompleteFromSnomed";
+//import AutoCompleteFromSnomedComponent from "../AutoCompleteComponents/AutoCompleteFromSnomed";
 
 function getEncounterDisplay(resource: Encounter): string {
   return `Profesional: ${EncounterUtils.getPrimaryPractitioner(
@@ -57,12 +57,13 @@ export default function ConditionFormComponent({
     register,
     trigger,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ConditionFormData>();
 
   const roleUser = loadUserRoleFromLocalStorage();
   const condition = {} as Condition;
-
+  console.log("EncounterId", encounterId);
   return (
     <>
       <form id={formId} onSubmit={handleSubmit(submitForm)}>
@@ -98,12 +99,13 @@ export default function ConditionFormComponent({
               />
             )}
           />
-          <AutoCompleteFromSnomedComponent
+          {/*<AutoCompleteFromSnomedComponent
             label={"Snomed"}
             onChange={function (value: Coding | null): void {
               alert(JSON.stringify(value, null, 2));
             }}
           ></AutoCompleteFromSnomedComponent>
+          */}
           <Controller
             name="subject"
             control={control}
@@ -140,7 +142,7 @@ export default function ConditionFormComponent({
               />
             )}
           />
-
+          {/*
           <Controller
             name="code"
             control={control}
@@ -159,6 +161,39 @@ export default function ConditionFormComponent({
                   error: Boolean(errors.code),
                   helperText: errors.code && errors.code.message,
                   onBlur: () => trigger("code"),
+                }}
+              />
+            )}
+          />
+          */}
+          <Controller
+            name="code.display"
+            control={control}
+            defaultValue={condition ? condition?.code?.coding?.[0].display : ""}
+            rules={{ required: "Debe ingresar una observación" }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label="Valor"
+                variant="outlined"
+                error={Boolean(errors.code?.display)}
+                helperText={errors.code?.display?.message}
+                inputProps={{
+                  readOnly: !!condition?.code?.coding || false || readOnly,
+                }}
+                onBlur={(e) => {
+                  //field.onChange(e);
+                  let newCoding: Coding = {};
+                  if (e.target.value) {
+                    newCoding = {
+                      code: "SM00",
+                      system: "cttn.cl",
+                      display: e.target.value,
+                    };
+                  }
+                  setValue("code", newCoding);
+                  console.log("Code", newCoding);
                 }}
               />
             )}

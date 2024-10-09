@@ -8,7 +8,7 @@ import { Observation, Patient, Practitioner, Encounter, Coding } from "fhir/r4";
 
 import { category, interpretation } from "./Terminology";
 import ObservationUtils from "../../Services/Utils/ObservationUtils";
-import AutoCompleteFromLHCComponentComponent from "../AutoCompleteComponents/AutoCompleteFromLHCComponent";
+
 import AutoCompleteComponent from "../AutoCompleteComponents/AutoCompleteComponent";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import EncounterUtils from "../../Services/Utils/EncounterUtils";
@@ -49,6 +49,7 @@ export default function ObservationFormComponent({
   submitForm,
   observation,
   practitionerId,
+  encounterId,
   readOnly = false,
 }: {
   formId: string;
@@ -56,6 +57,7 @@ export default function ObservationFormComponent({
   submitForm: SubmitHandler<ObservationFormData>;
   observation?: Observation;
   practitionerId?: string;
+  encounterId?: string;
   readOnly?: boolean;
 }) {
   const {
@@ -63,11 +65,12 @@ export default function ObservationFormComponent({
     register,
     trigger,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ObservationFormData>();
 
   const roleUser = loadUserRoleFromLocalStorage();
-  const encounterId = ObservationUtils.getEncounterId(observation!);
+  if (observation) encounterId = ObservationUtils.getEncounterId(observation!);
   console.log("EncounterId", encounterId);
   return (
     <>
@@ -143,6 +146,41 @@ export default function ObservationFormComponent({
             )}
           />
           <Controller
+            name="code.display"
+            control={control}
+            defaultValue={
+              observation ? observation.code?.coding?.[0].display : ""
+            }
+            rules={{ required: "Debe ingresar una observación" }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label="Valor"
+                variant="outlined"
+                error={Boolean(errors.code?.display)}
+                helperText={errors.code?.display?.message}
+                inputProps={{
+                  readOnly: !!observation?.code?.coding || false || readOnly,
+                }}
+                onBlur={(e) => {
+                  //field.onChange(e);
+                  let newCoding: Coding = {};
+                  if (e.target.value) {
+                    newCoding = {
+                      code: "SM00",
+                      system: "cttn.cl",
+                      display: e.target.value,
+                    };
+                  }
+                  setValue("code", newCoding);
+                  console.log("Code", newCoding);
+                }}
+              />
+            )}
+          />
+          {/*
+          <Controller
             name="code"
             control={control}
             defaultValue={observation ? observation.code?.coding?.[0] : {}}
@@ -163,7 +201,7 @@ export default function ObservationFormComponent({
                 }}
               />
             )}
-          />
+          />*/}
           <Controller
             control={control}
             name="issued"
@@ -253,7 +291,7 @@ export default function ObservationFormComponent({
             name="encounter"
             control={control}
             rules={{
-              required: "Es necesario seleccionar un Paciente",
+              required: "Es necesario seleccionar un Encuentro",
             }}
             render={({ field }) => (
               <AutoCompleteComponent<Encounter>

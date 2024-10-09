@@ -4,12 +4,16 @@ import { TextField, IconButton, InputAdornment, MenuItem } from "@mui/material";
 import PatientCreateComponent from "../../Components/Patient/PatientCreateComponent";
 import styles from "./ListPage.module.css";
 
+import ForwardIcon from "@mui/icons-material/Forward";
 import { Add, Search } from "@mui/icons-material";
 import ListResourceComponent from "../../Components/ListResourceComponent";
 import { Patient } from "fhir/r4";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import FhirResourceService from "../../Services/FhirService";
-import { loadUserRoleFromLocalStorage } from "../../RolUser";
+import {
+  loadUserRoleFromLocalStorage,
+  isAdminOrPractitioner,
+} from "../../RolUser";
 import { SearchParams } from "fhir-kit-client";
 import PractitionerReferComponent from "../../Components/Practitioner/PractitionerReferComponent";
 
@@ -27,13 +31,11 @@ function getDisplay(resource: Patient): string {
   ).replace(/-/g, "")}`;
 }
 
-let selectedPatient = {} as Patient;
-
 export default function PatientListPage() {
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialogRefer, setOpenDialogRefer] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("1");
-  const [openRefer, setOpenRefer] = useState(false);
 
   const userRole = loadUserRoleFromLocalStorage();
 
@@ -43,18 +45,21 @@ export default function PatientListPage() {
       : {}
   );
 
+  const [selectedPatient, setSelectedPatient] = useState<Patient>();
+
+  const handleOnEdit = (resource: Patient) => {
+    console.log("Editando", resource);
+    setSelectedPatient(resource);
+    handleIsOpen(true);
+  };
+
   //const [userRole, setUserRole] = useState<RolUser>();
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
   };
 
-  const handleOpenRefer = (isOpen: boolean) => {
-    setOpenRefer(isOpen);
-  };
-
-  const handleRefer = (resource: Patient) => {
-    selectedPatient = resource;
-    handleOpenRefer(true);
+  const handleIsOpenRefer = (isOpen: boolean) => {
+    setOpenDialogRefer(isOpen);
   };
 
   const handleSearch = () => {
@@ -84,11 +89,6 @@ export default function PatientListPage() {
   if (!userRole) return <h1>Loading...</h1>; //!Por el momento sólo por si acaso
   return (
     <div>
-      <PractitionerReferComponent
-        isOpen={openRefer}
-        onOpen={handleOpenRefer}
-        patient={selectedPatient}
-      />
       <div className={styles.content}>
         <div
           style={{
@@ -114,6 +114,7 @@ export default function PatientListPage() {
             <PatientCreateComponent
               isOpen={openDialog}
               onOpen={handleIsOpen}
+              patientID={selectedPatient?.id}
             ></PatientCreateComponent>
           </div>
         </div>
@@ -156,10 +157,30 @@ export default function PatientListPage() {
             searchParam={searchParams}
             getDisplay={getDisplay}
             fhirService={fhirService}
+            {...(isAdminOrPractitioner() && { onEdit: handleOnEdit })}
             //onClick={(resource) => console.log(resource)}
             //onDoubleClick={(resource) => handleRefer(resource)}
+            chields={(resource) => (
+              <IconButton
+                sx={{ color: "green" }} // Puedes elegir el color que prefieras
+                aria-label="refer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log("Referir a", resource);
+                  setSelectedPatient(resource);
+                  handleIsOpenRefer(true);
+                }}
+              >
+                <ForwardIcon />
+              </IconButton>
+            )} // Pasar chields aquí
           ></ListResourceComponent>
         </div>
+        <PractitionerReferComponent
+          patient={selectedPatient!}
+          onOpen={handleIsOpenRefer}
+          isOpen={openDialogRefer}
+        ></PractitionerReferComponent>
       </div>
     </div>
   );

@@ -23,12 +23,14 @@ import ObservationUtils from "../../Services/Utils/ObservationUtils";
 
 export default function ObservationCreateComponent({
   patientId,
+  encounterId,
   onOpen,
   isOpen,
 }: {
   patientId: string;
   onOpen: (isOpen: boolean) => void;
   isOpen: boolean;
+  encounterId?: string;
 }) {
   const handleClose = () => {
     onOpen(false);
@@ -79,6 +81,7 @@ export default function ObservationCreateComponent({
               practitionerId={practitionerId}
               submitForm={onSubmitForm}
               readOnly={false}
+              encounterId={encounterId}
             ></ObservationFormComponent>
           </Container>
         </DialogContent>

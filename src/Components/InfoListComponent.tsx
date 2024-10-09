@@ -21,12 +21,14 @@ export default function InfoListComponent({
   icon,
   resourceType,
   patientId,
+  encounterId,
 }: {
   resourceType: string;
   data: InfoListData[];
   title: string;
   icon: string;
   patientId?: string;
+  encounterId?: string;
 }) {
   const navigate = useNavigate();
 
@@ -43,11 +45,13 @@ export default function InfoListComponent({
           onOpen={handleIsOpen}
           isOpen={resourceType === "Condition" ? openDialog : false}
           patientId={patientId!}
+          encounterId={encounterId}
         ></ConditionCreateComponent>
         <ObservationCreateComponent
           onOpen={handleIsOpen}
           isOpen={resourceType === "Observation" ? openDialog : false}
           patientId={patientId!}
+          encounterId={encounterId}
         ></ObservationCreateComponent>
         <MedicationCreateComponent
           onOpen={handleIsOpen}

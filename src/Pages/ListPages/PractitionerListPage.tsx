@@ -16,7 +16,7 @@ import PersonUtil from "../../Services/Utils/PersonUtils";
 import FhirResourceService from "../../Services/FhirService";
 import PractitionerCreateComponent from "../../Components/Practitioner/PractitionerCreateComponent";
 import { SearchParams } from "fhir-kit-client";
-import { isAdminOrPractitioner } from "../../RolUser";
+import { isAdmin, isAdminOrPractitioner } from "../../RolUser";
 import {
   practitionerRole,
   practitionerSpecialty,
@@ -40,7 +40,8 @@ export default function PractitionerListPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("1");
   const [searchParam, setSearchParam] = useState<SearchParams>({});
-
+  const [selectedPractitioner, setSelectedPractitioner] =
+    useState<Practitioner>();
   let specialty: Coding | undefined;
   //const [specialty, setSpecialty] = useState<Coding>();
   //const [role, setRole] = useState<Coding>();
@@ -48,6 +49,12 @@ export default function PractitionerListPage() {
 
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
+  };
+
+  const handleOnEdit = (resource: Practitioner) => {
+    console.log("Editando", resource);
+    setSelectedPractitioner(resource);
+    handleIsOpen(true);
   };
 
   const handleSearch = async () => {
@@ -97,6 +104,7 @@ export default function PractitionerListPage() {
               <PractitionerCreateComponent
                 isOpen={openDialog}
                 onOpen={handleIsOpen}
+                practitionerId={selectedPractitioner?.id}
               ></PractitionerCreateComponent>
             </div>
           )}
@@ -189,7 +197,7 @@ export default function PractitionerListPage() {
           />
         </form>
         <div>
-          <ListResourceComponent
+          <ListResourceComponent<Practitioner>
             searchParam={searchParam}
             getDisplay={getDisplay}
             fhirService={fhirService}
@@ -200,6 +208,7 @@ export default function PractitionerListPage() {
                 )?.value || "https://calendly.com/darknacho/prueba";
               window.open(url, "_blank");
             }}
+            {...(isAdmin() && { onEdit: handleOnEdit })}
           ></ListResourceComponent>
         </div>
       </div>

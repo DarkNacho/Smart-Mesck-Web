@@ -265,6 +265,7 @@ export default function EncounterPatientPage() {
             icon={"/hearth.svg"}
             resourceType="Observation"
             patientId={patientID}
+            encounterId={encounterID}
           ></InfoListComponent>
         </div>
         <div style={{ flex: 1 }}>
@@ -273,6 +274,7 @@ export default function EncounterPatientPage() {
             title={"Condiciones"}
             icon={"/inercial.svg"}
             resourceType="Condition"
+            encounterId={encounterID}
           ></InfoListComponent>
         </div>
       </div>

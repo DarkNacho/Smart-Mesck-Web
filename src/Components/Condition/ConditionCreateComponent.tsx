@@ -24,12 +24,14 @@ import ConditionUtils from "../../Services/Utils/ConditionUtils";
 
 export default function ConditionCreateComponent({
   patientId,
+  encounterId,
   onOpen,
   isOpen,
 }: {
   patientId: string;
   onOpen: (isOpen: boolean) => void;
   isOpen: boolean;
+  encounterId?: string;
 }) {
   const handleClose = () => {
     onOpen(false);
@@ -77,6 +79,7 @@ export default function ConditionCreateComponent({
               patientId={patientId}
               practitionerId={practitionerId!}
               submitForm={onSubmitForm}
+              encounterId={encounterId}
             ></ConditionFormComponent>
           </Container>
         </DialogContent>

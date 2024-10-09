@@ -318,6 +318,18 @@ export default class FhirResourceService<T extends FhirResource> {
     }
   }
 
+  private ensureHttpsInUrls = (bundle: any) => {
+    if (!this.apiUrl.startsWith("https://")) return bundle;
+    if (bundle && bundle.link) {
+      bundle.link.forEach((link: any) => {
+        if (link.url && link.url.startsWith("http://")) {
+          link.url = link.url.replace("http://", "https://");
+        }
+      });
+    }
+    return bundle;
+  };
+
   /**
    * Retrieves the next or previous page of resources.
    * @param {"next" | "prev"} direction - The direction of the page to retrieve.
@@ -327,6 +339,7 @@ export default class FhirResourceService<T extends FhirResource> {
     direction: "next" | "prev"
   ): Promise<Result<T[]>> {
     console.log(this._resourceBundle);
+    this._resourceBundle = this.ensureHttpsInUrls(this._resourceBundle);
     const response = await this.handleResult<Bundle>(
       direction === "next"
         ? (this.fhirClient.nextPage({

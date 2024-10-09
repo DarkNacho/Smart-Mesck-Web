@@ -8,13 +8,25 @@ import {
   Button,
   Box,
   Stack,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import styles from "./ListResourceComponent.module.css";
 
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import WarningIcon from "@mui/icons-material/Warning";
+
 import FhirService from "../Services/FhirService";
 import HandleResult from "./HandleResult";
 import { SearchParams } from "fhir-kit-client";
+import { isAdmin } from "../RolUser";
 
 interface ListResourceProps<T extends FhirResource> {
   searchParam?: SearchParams;
@@ -22,7 +34,8 @@ interface ListResourceProps<T extends FhirResource> {
   fhirService: FhirService<T>;
   onClick?: (resource: T) => void;
   onDoubleClick?: (resource: T) => void;
-  chields?: ReactNode;
+  onEdit?: (resource: T) => void;
+  chields?: (resource: T) => ReactNode;
 }
 
 export default function ListResourceComponent<T extends FhirResource>({
@@ -31,9 +44,13 @@ export default function ListResourceComponent<T extends FhirResource>({
   fhirService,
   onClick,
   onDoubleClick,
-  chields: chields,
+  onEdit,
+  chields,
 }: ListResourceProps<T>) {
   const [resources, setResources] = useState<T[]>([]);
+
+  const [open, setOpen] = useState(false);
+  const [resourceToDelete, setResourceToDelete] = useState<T | null>(null);
 
   const navigate = useNavigate();
 
@@ -59,6 +76,38 @@ export default function ListResourceComponent<T extends FhirResource>({
     fetchResources();
   }, [searchParam]);
 
+  const handleClickOpen = (resource: T) => {
+    setResourceToDelete(resource);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setResourceToDelete(null);
+  };
+
+  const handleDelete = async () => {
+    if (!resourceToDelete || !resourceToDelete.id) {
+      handleClose();
+      return;
+    }
+
+    console.log(`Deleting resource with ID: ${resourceToDelete.id}`);
+    const result = await HandleResult.handleOperation(
+      () => fhirService.deleteResource(resourceToDelete.id!),
+      "Recurso eliminado exitosamente",
+      "Eliminando..."
+    );
+
+    if (result.success) {
+      setResources((prevResources) =>
+        prevResources.filter((r) => r.id !== resourceToDelete.id)
+      );
+    }
+
+    handleClose();
+  };
+
   return (
     <div>
       <List className={styles.listContent}>
@@ -75,7 +124,31 @@ export default function ListResourceComponent<T extends FhirResource>({
           >
             <Stack direction="row">
               <pre>{getDisplay(resource)}</pre>
-              <Box>{chields}</Box>
+              <Box>{chields && chields(resource)}</Box>
+              <Box>
+                <IconButton
+                  sx={{ color: "blue" }}
+                  hidden={!onEdit}
+                  aria-label="edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit && onEdit(resource);
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  sx={{ color: "red" }}
+                  hidden={!isAdmin()}
+                  aria-label="delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClickOpen(resource);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
             </Stack>
           </ListItem>
         ))}
@@ -98,6 +171,35 @@ export default function ListResourceComponent<T extends FhirResource>({
           Siguiente
         </Button>
       </div>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          <WarningIcon style={{ color: "red", marginRight: "8px" }} />
+          <Typography variant="h6" style={{ color: "red", display: "inline" }}>
+            Confirmar
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            id="alert-dialog-description"
+            style={{ color: "red" }}
+          >
+            ¿Estás seguro que quieres eliminar este ítem?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleDelete} color="primary" autoFocus>
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

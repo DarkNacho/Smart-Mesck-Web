@@ -20,6 +20,7 @@ import EncounterFormComponent, {
 } from "../Forms/EncounterFormComponent";
 import HandleResult from "../HandleResult";
 import FhirResourceService from "../../Services/FhirService";
+import dayjs from "dayjs";
 
 export default function EncounterCreateComponent({
   onOpen,
@@ -79,8 +80,18 @@ export default function EncounterCreateComponent({
         },
       ],
       period: {
-        start: data.start.toISOString(),
-        end: data.end.toISOString(),
+        start: dayjs(
+          `${dayjs(data.day).format("DD-MM-YY")} ${dayjs(data.start).format(
+            "HH:mm"
+          )}`,
+          "DD-MM-YY HH:mm"
+        ).toISOString(),
+        end: dayjs(
+          `${dayjs(data.day).format("DD-MM-YY")} ${dayjs(data.end).format(
+            "HH:mm"
+          )}`,
+          "DD-MM-YY HH:mm"
+        ).toISOString(),
       },
       partOf: seguimiento,
       status: "finished",

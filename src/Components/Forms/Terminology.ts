@@ -519,7 +519,7 @@ export const clinicalStatus: Coding[] = [
   { code: "remission", display: "Remisión" },
   { code: "resolved", display: "Resuelto" },
 ];
-
+/* Tiene más opciones pero es para futura actualización y posiblemente mejor traducción
 export const practitionerSpecialty: Coding[] = [
   {
     code: "408467006",
@@ -1096,8 +1096,9 @@ export const practitionerSpecialty: Coding[] = [
     display: "Especialidad Quirúrgica - OTROS - NO LISTADOS",
     system: "http://snomed.info/sct",
   },
-];
+];/*
 
+/* Tiene más opciones pero es para futura actualización y posiblemente mejor traducción
 export const practitionerRole: Coding[] = [
   {
     code: "doctor",
@@ -3600,5 +3601,172 @@ export const practitionerRole: Coding[] = [
     code: "999480461000087104",
     display: "Cinestesiólogo",
     system: "http://snomed.info/sct",
+  },
+];
+*/
+
+export const practitionerRoles: Coding[] = [
+  // Medicina
+  { code: "medicina", display: "Medicina", system: "cttn.cl" },
+  { code: "odontologia", display: "Odontología", system: "cttn.cl" },
+  { code: "kinesiologia", display: "Kinesiología", system: "cttn.cl" },
+  { code: "enfermeria", display: "Enfermería", system: "cttn.cl" },
+  { code: "nutricion", display: "Nutrición", system: "cttn.cl" },
+  { code: "psicologia", display: "Psicología", system: "cttn.cl" },
+  {
+    code: "tecnologia-medica",
+    display: "Tecnología Médica",
+    system: "cttn.cl",
+  },
+  { code: "fonoaudiologia", display: "Fonoaudiología", system: "cttn.cl" },
+  {
+    code: "terapia-ocupacional",
+    display: "Terapia Ocupacional",
+    system: "cttn.cl",
+  },
+];
+
+export const practitionerSpecialties: Coding[] = [
+  // Medicina
+  { code: "pediatria", display: "Pediatría", system: "cttn.cl" },
+  {
+    code: "ginecologia-obstetricia",
+    display: "Ginecología y Obstetricia",
+    system: "cttn.cl",
+  },
+  { code: "cirugia", display: "Cirugía", system: "cttn.cl" },
+  { code: "medicina-interna", display: "Medicina Interna", system: "cttn.cl" },
+  { code: "psiquiatria", display: "Psiquiatría", system: "cttn.cl" },
+  { code: "cardiologia", display: "Cardiología", system: "cttn.cl" },
+  { code: "dermatologia", display: "Dermatología", system: "cttn.cl" },
+  { code: "oftalmologia", display: "Oftalmología", system: "cttn.cl" },
+  {
+    code: "otorrinolaringologia",
+    display: "Otorrinolaringología",
+    system: "cttn.cl",
+  },
+  { code: "anestesiologia", display: "Anestesiología", system: "cttn.cl" },
+
+  // Odontología
+  { code: "ortodoncia", display: "Ortodoncia", system: "cttn.cl" },
+  { code: "endodoncia", display: "Endodoncia", system: "cttn.cl" },
+  { code: "periodoncia", display: "Periodoncia", system: "cttn.cl" },
+  { code: "implantes", display: "Implantes", system: "cttn.cl" },
+  { code: "cirugia-oral", display: "Cirugía Oral", system: "cttn.cl" },
+
+  // Kinesiología
+  {
+    code: "kinesiologia-deportiva",
+    display: "Kinesiología Deportiva",
+    system: "cttn.cl",
+  },
+  {
+    code: "kinesiologia-geriatrica",
+    display: "Kinesiología Geriátrica",
+    system: "cttn.cl",
+  },
+  {
+    code: "kinesiologia-neurologica",
+    display: "Kinesiología Neurológica",
+    system: "cttn.cl",
+  },
+  {
+    code: "kinesiologia-infantil",
+    display: "Kinesiología Infantil",
+    system: "cttn.cl",
+  },
+  {
+    code: "kinesiologia-cardiorespiratoria",
+    display: "Kinesiología Cardiorespiratoria",
+    system: "cttn.cl",
+  },
+
+  // Enfermería
+  {
+    code: "enfermeria-pediatrica",
+    display: "Enfermería Pediátrica",
+    system: "cttn.cl",
+  },
+  {
+    code: "enfermeria-geriatrica",
+    display: "Enfermería Geriátrica",
+    system: "cttn.cl",
+  },
+  {
+    code: "enfermeria-salud-mental",
+    display: "Enfermería en Salud Mental",
+    system: "cttn.cl",
+  },
+  {
+    code: "enfermeria-quirurgica",
+    display: "Enfermería Quirúrgica",
+    system: "cttn.cl",
+  },
+
+  // Nutrición
+  {
+    code: "nutricion-clinica",
+    display: "Nutrición Clínica",
+    system: "cttn.cl",
+  },
+  {
+    code: "nutricion-deportiva",
+    display: "Nutrición Deportiva",
+    system: "cttn.cl",
+  },
+  { code: "salud-publica", display: "Salud Pública", system: "cttn.cl" },
+
+  // Psicología
+  {
+    code: "psicologia-clinica",
+    display: "Psicología Clínica",
+    system: "cttn.cl",
+  },
+  {
+    code: "psicologia-educacional",
+    display: "Psicología Educacional",
+    system: "cttn.cl",
+  },
+  {
+    code: "psicologia-organizacional",
+    display: "Psicología Organizacional",
+    system: "cttn.cl",
+  },
+
+  // Tecnología Médica
+  {
+    code: "imagenes-diagnosticas",
+    display: "Imágenes Diagnósticas",
+    system: "cttn.cl",
+  },
+  {
+    code: "laboratorio-clinico",
+    display: "Laboratorio Clínico",
+    system: "cttn.cl",
+  },
+  { code: "optometria", display: "Optometría", system: "cttn.cl" },
+
+  // Fonoaudiología
+  {
+    code: "fonoaudiologia-clinica",
+    display: "Fonoaudiología Clínica",
+    system: "cttn.cl",
+  },
+  {
+    code: "fonoaudiologia-educacional",
+    display: "Fonoaudiología Educacional",
+    system: "cttn.cl",
+  },
+
+  // Terapia Ocupacional
+  {
+    code: "terapia-ocupacional-salud-mental",
+    display: "Terapia Ocupacional en Salud Mental",
+    system: "cttn.cl",
+  },
+  {
+    code: "terapia-ocupacional-pediatrica",
+    display: "Terapia Ocupacional Pediátrica",
+    system: "cttn.cl",
   },
 ];

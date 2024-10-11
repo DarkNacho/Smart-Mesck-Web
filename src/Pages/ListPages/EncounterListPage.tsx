@@ -137,12 +137,16 @@ export default function PatientListPage() {
           <div style={{ display: "flex", gap: "10px" }}>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
               <DatePicker
+                format="DD-MM-YYYY"
+                views={["year", "month", "day"]}
                 label="Fecha inicio"
                 value={startDate}
                 onChange={(value) => setStartDate(value)}
                 //sx={{ width: "100%" }}
               ></DatePicker>
               <DatePicker
+                format="DD-MM-YYYY"
+                views={["year", "month", "day"]}
                 label="Fecha Fin"
                 value={endDate}
                 onChange={(value) => setEndDate(value)}

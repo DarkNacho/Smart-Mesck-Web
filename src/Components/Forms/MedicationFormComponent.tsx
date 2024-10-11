@@ -184,6 +184,8 @@ export default function MedicationFormComponent({
             render={({ field: { onChange, value, ref } }) => (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
+                  format="DD-MM-YYYY"
+                  views={["year", "month", "day"]}
                   label="Fecha de inicio"
                   onChange={onChange}
                   value={value}
@@ -201,6 +203,8 @@ export default function MedicationFormComponent({
             render={({ field: { onChange, value, ref } }) => (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
+                  format="DD-MM-YYYY"
+                  views={["year", "month", "day"]}
                   label="Fecha de término"
                   onChange={onChange}
                   value={value}

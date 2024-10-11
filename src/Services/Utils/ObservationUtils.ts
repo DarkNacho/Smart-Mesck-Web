@@ -184,7 +184,7 @@ export default class ObservationUtils {
       code: data.code?.coding?.[0]?.code || "",
       system: data.code?.coding?.[0]?.system || "",
       value: ObservationUtils.getValue(data),
-      issued: dayjs(data.issued).format("DD/MM/YYYY HH:mm"),
+      issued: dayjs(data.issued).format("DD-MM-YYYY HH:mm"),
       performer: data.performer?.[0]?.display || "",
       subject: data.subject?.display || "",
       encounter: data.encounter?.display || "",

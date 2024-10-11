@@ -169,6 +169,8 @@ export default function EncounterFormComponent({
               render={({ field }) => (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
+                    format="DD-MM-YYYY"
+                    views={["year", "month", "day"]}
                     label="Fecha"
                     onChange={field.onChange}
                     value={field.value}

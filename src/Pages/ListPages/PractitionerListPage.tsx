@@ -18,8 +18,8 @@ import PractitionerCreateComponent from "../../Components/Practitioner/Practitio
 import { SearchParams } from "fhir-kit-client";
 import { isAdmin, isAdminOrPractitioner } from "../../RolUser";
 import {
-  practitionerRole,
-  practitionerSpecialty,
+  practitionerRoles,
+  practitionerSpecialties,
 } from "../../Components/Forms/Terminology";
 
 const fhirService = new FhirResourceService<Practitioner>("Practitioner");
@@ -145,7 +145,7 @@ export default function PractitionerListPage() {
 
           <Autocomplete
             id="Autocomplete-role"
-            options={practitionerRole}
+            options={practitionerRoles}
             getOptionLabel={(option) =>
               option.display || option.code || "UNKNOWN"
             }
@@ -171,7 +171,7 @@ export default function PractitionerListPage() {
           />
           <Autocomplete
             id="Autocomplete-specialty"
-            options={practitionerSpecialty}
+            options={practitionerSpecialties}
             getOptionLabel={(option) =>
               option.display || option.code || "UNKNOWN"
             }

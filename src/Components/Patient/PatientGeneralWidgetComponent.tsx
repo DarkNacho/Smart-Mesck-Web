@@ -2,15 +2,12 @@ import { Container, Grid, Typography } from "@mui/material";
 import PersonUtil from "../../Services/Utils/PersonUtils";
 import styles from "./PatientGeneralWidgetComponent.module.css";
 import { Patient } from "fhir/r4";
+import dayjs from "dayjs";
 
 function formatDate(dateString: string | undefined): string {
   if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+  const date = dayjs(dateString);
+  return date.format("DD-MM-YYYY");
 }
 export default function PatientGeneralWidgetComponent({
   patient,

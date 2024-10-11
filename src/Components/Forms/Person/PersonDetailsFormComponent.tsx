@@ -99,6 +99,8 @@ export default function PersonDetailsFormComponent({
               render={({ field: { onChange, value, ref } }) => (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
+                    format="DD-MM-YYYY"
+                    views={["year", "month", "day"]}
                     maxDate={dayjs()}
                     label="Fecha de Nacimiento"
                     onChange={onChange}

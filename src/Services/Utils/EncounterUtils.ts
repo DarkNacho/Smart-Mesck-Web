@@ -26,9 +26,11 @@ export default class EncounterUtils {
 
     const startDate = new Date(period.start);
 
-    const formattedStartDate = `${startDate.getFullYear()}-${this.padZero(
+    const formattedStartDate = `${this.padZero(
+      startDate.getDate()
+    )}-${this.padZero(
       startDate.getMonth() + 1
-    )}-${this.padZero(startDate.getDate())} ${this.padZero(
+    )}-${startDate.getFullYear()} ${this.padZero(
       startDate.getHours()
     )}:${this.padZero(startDate.getMinutes())}`;
 

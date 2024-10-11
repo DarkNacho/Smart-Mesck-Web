@@ -156,7 +156,7 @@ export default function ObservationFormComponent({
               <TextField
                 {...field}
                 fullWidth
-                label="Valor"
+                label="Observación"
                 variant="outlined"
                 error={Boolean(errors.code?.display)}
                 helperText={errors.code?.display?.message}
@@ -209,6 +209,8 @@ export default function ObservationFormComponent({
             render={({ field: { onChange, value, ref } }) => (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
+                  format="DD-MM-YYYY"
+                  views={["year", "month", "day"]}
                   label="Fecha de registro"
                   onChange={onChange}
                   value={value}

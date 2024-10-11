@@ -3,8 +3,8 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { TextField, Grid, MenuItem, Autocomplete } from "@mui/material";
 import {
   generoOptions,
-  practitionerRole,
-  practitionerSpecialty,
+  practitionerRoles,
+  practitionerSpecialties,
   countryCodes,
 } from "./Terminology";
 import PersonUtil from "../../Services/Utils/PersonUtils";
@@ -163,6 +163,8 @@ export default function PractitionerFormComponent({
               render={({ field: { onChange, value, ref } }) => (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
+                    format="DD-MM-YYYY"
+                    views={["year", "month", "day"]}
                     maxDate={dayjs().year(dayjs().year() - 18)}
                     label="Fecha de Nacimiento"
                     onChange={onChange}
@@ -258,7 +260,7 @@ export default function PractitionerFormComponent({
                 <Autocomplete
                   id="Autocomplete-role"
                   multiple
-                  options={practitionerRole}
+                  options={practitionerRoles}
                   getOptionLabel={(option) =>
                     option.display || option.code || "UNKNOWN"
                   }
@@ -292,7 +294,7 @@ export default function PractitionerFormComponent({
                 <Autocomplete
                   id="Autocomplete-specialty"
                   multiple
-                  options={practitionerSpecialty}
+                  options={practitionerSpecialties}
                   getOptionLabel={(option) =>
                     option.display || option.code || "UNKNOWN"
                   }

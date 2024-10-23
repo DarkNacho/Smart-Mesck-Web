@@ -25,10 +25,20 @@ import { TimelineOppositeContent } from "@mui/lab";
 import dayjs from "dayjs";
 
 import "dayjs/locale/es"; // importa el locale español
-import { Typography, Tabs, Tab, Box, TextField, Button } from "@mui/material";
+import {
+  Typography,
+  Tabs,
+  Tab,
+  Box,
+  TextField,
+  Button,
+  Link,
+} from "@mui/material";
 import DeviceSensorChart from "../Components/Charts/DeviceSensorChart";
 import { SensorDataByDevice } from "../Components/Charts/SensorModel";
 import PatientReportComponent from "../Components/Patient/PatientReportComponent";
+
+import { useNavigate } from "react-router-dom";
 
 dayjs.locale("es"); // usa el locale español
 
@@ -38,6 +48,7 @@ const encounterService = new EncounterService();
 let patientID = "";
 
 export default function EncounterPatientPage() {
+  const navigate = useNavigate();
   const { encounterID } = useParams();
 
   const [observationData, setObservationData] = useState<InfoListData[]>([]);
@@ -221,7 +232,13 @@ export default function EncounterPatientPage() {
   return (
     <div style={{ padding: "50px" }}>
       <div>
-        <Typography variant="h5">{encounter?.subject?.display}</Typography>
+        <Link
+          component="button"
+          onClick={() => navigate(`/Patient/${patientID}`)}
+          underline="always"
+        >
+          <Typography variant="h5">{encounter?.subject?.display}</Typography>
+        </Link>
         <div>
           <PatientReportComponent
             patientId={patientID!}

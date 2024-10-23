@@ -46,44 +46,79 @@ export default function PatientCreateComponent({
     });
   };
 
-  const sendPatient = async (
+  const senUpdatePatient = async (
     newPatient: Patient,
     user: any
   ): Promise<Result<FhirResource>> => {
+    const url = `${import.meta.env.VITE_SERVER_URL}/auth/update`;
+
     const fhirService = new FhirResourceService("Patient");
-    let response = await fhirService.sendResource(newPatient);
-    if (!response.success) return response;
 
-    user.id = response.data.id;
-    const url = newPatient.id
-      ? `${import.meta.env.VITE_SERVER_URL}/auth/update`
-      : `${import.meta.env.VITE_SERVER_URL}/auth/register`;
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
 
-    response = await fetch(url, {
+    if (response.status !== 200)
+      return { success: false, error: response.statusText };
+
+    const responseFhir = await fhirService.updateResource(newPatient);
+
+    return responseFhir;
+  };
+
+  const sendNewPatient = async (
+    newPatient: Patient,
+    user: any
+  ): Promise<Result<FhirResource>> => {
+    let url = `${import.meta.env.VITE_SERVER_URL}/auth/register`;
+
+    const fhirService = new FhirResourceService("Patient");
+
+    let response = await fetch(url, {
       method: "POST",
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(user),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        return response;
-      })
-      .catch(async (error) => {
-        const response = await fhirService.deleteResource(user.id);
-        if (!response.success) return response;
-        return { success: false, error: error }; //TODO: mejorar mensaje de error probablemente desde el server
-      });
+    });
+    if (response.status === 409)
+      return { success: false, error: "El usuario ya existe" };
+    if (response.status !== 201)
+      return { success: false, error: response.statusText };
 
-    return response;
+    const responseFhir = await fhirService.sendResource(newPatient);
+    if (!responseFhir.success) return responseFhir;
+
+    url = `${import.meta.env.VITE_SERVER_URL}/auth/update`;
+    user.fhir_id = responseFhir.data.id;
+
+    response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+
+    if (response.status !== 200)
+      return { success: false, error: response.statusText };
+
+    return responseFhir;
   };
 
   const postPatient = async (newPatient: Patient, user: any) => {
     const response = await HandleResult.handleOperation(
-      () => sendPatient(newPatient, user),
+      () =>
+        !newPatient.id
+          ? sendNewPatient(newPatient, user)
+          : senUpdatePatient(newPatient, user),
       "Paciente Guardado con éxito",
       "Enviando..."
     );

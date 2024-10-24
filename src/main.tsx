@@ -15,11 +15,16 @@ import NavBarComponent from "./Components/NavBar/NavBarComponent.tsx";
 import SensorChartDashboardPage from "./Pages/SensorChartDashboardPage.tsx";
 import { loadUserRoleFromLocalStorage } from "./RolUser.ts";
 import UploadFileComponent from "./Components/FileManager/UploadFileComponent.tsx";
+import NotFoundPage from "./Pages/ErrorPages/NotFoundPage.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App></App>,
+  },
+  {
+    path: "*",
+    element: <NotFoundPage></NotFoundPage>,
   },
   {
     path: "/Patient",

@@ -139,7 +139,7 @@ export default function ListResourceComponent<T extends FhirResource>({
                 </IconButton>
                 <IconButton
                   sx={{ color: "red" }}
-                  hidden={!isAdmin()}
+                  //hidden={!isAdmin()}
                   aria-label="delete"
                   onClick={(e) => {
                     e.stopPropagation();

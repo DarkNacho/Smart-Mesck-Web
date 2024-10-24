@@ -1,15 +1,25 @@
 //import * as React from "react";
 import { useState } from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
+
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Link,
+  Paper,
+  Box,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Typography,
+} from "@mui/material";
+
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
+
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import HandleResult from "../Components/HandleResult";
 import { jwtDecode } from "jwt-decode";
@@ -80,6 +90,7 @@ async function login(username: string, password: string): Promise<Result<any>> {
 export default function SignInSide() {
   const [openDialog, setOpenDialog] = useState(false);
   const [openDialogPractitioner, setOpenDialogPractitioner] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleIsOpen = (isOpen: boolean) => {
     setOpenDialog(isOpen);
@@ -133,6 +144,16 @@ export default function SignInSide() {
     else window.location.href = "/Patient";
   };
 
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
@@ -176,9 +197,23 @@ export default function SignInSide() {
                 fullWidth
                 name="password"
                 label="Contraseña"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 autoComplete="current-password"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <Button
